@@ -27,7 +27,7 @@
 
 
 
-  <link rel="stylesheet" href="./assets/css/amorist.css?v=timeline-ui-20260731">
+  <link rel="stylesheet" href="./assets/css/amorist.css?v=rating-stars-20260801-4">
   <link rel="stylesheet" href="./assets/css/site-modes.css?v=pure-otome-20260728">
   <link rel="stylesheet" href="./assets/css/polish.css?v=timeline-ui-20260731">
 </head>
@@ -595,23 +595,22 @@
       </section>
 
       <section class="product-view" data-product-view="characters">
-        <div class="product-page-head"><div><h1>角色图鉴</h1><p>L’amour est comme la fièvre, il naît et s’éteint sans que la volonté y ait la moindre part</p></div><button class="product-button rose" id="addCharButton" type="button">＋ 添加角色</button></div>
-        <div class="char-stat-row">
+        <div class="product-page-head char-reference-head"><div><h1>角色图鉴</h1><p>L’amour est comme la fièvre, il naît et s’éteint sans que la volonté y ait la moindre part</p></div><div class="char-stat-row">
           <section class="product-card char-stat-card"><div class="card-eyebrow">TOTAL</div><div class="metric-value" id="charTotalCount">0</div><div class="metric-label">收藏角色</div></section>
           <section class="product-card char-stat-card"><div class="card-eyebrow">BEST</div><div class="metric-value" id="charBestCount">0</div><div class="metric-label">最推し角色</div></section>
           <section class="product-card char-stat-card"><div class="card-eyebrow">FROM</div><div class="metric-value" id="charGameCount">0</div><div class="metric-label">来自作品</div></section>
-        </div>
+        </div></div>
         <div class="char-filter-bar">
-          <input class="product-search" id="charSearchInput" placeholder="搜索角色名或作品名">
+          <div class="char-filter-main"><input class="product-search" id="charSearchInput" placeholder="搜索角色名或作品名">
           <div class="char-filter-group"><span class="char-filter-label">身份</span><div class="filter-pills" id="charRoleFilters">
             <button class="filter-pill active" data-char-role-filter="all">全部</button><button class="filter-pill" data-char-role-filter="protagonist">主人公</button><button class="filter-pill" data-char-role-filter="route">攻略対象</button><button class="filter-pill" data-char-role-filter="sub">サブキャラ</button><button class="filter-pill" data-char-role-filter="unset">未設定</button>
           </div></div>
           <div class="char-filter-group"><span class="char-filter-label">喜好</span><div class="filter-pills" id="charPreferenceFilters">
-            <button class="filter-pill active" data-char-preference-filter="all">全部</button><button class="filter-pill" data-char-preference-filter="favorite">最推し</button><button class="filter-pill" data-char-preference-filter="oshi">推し</button><button class="filter-pill" data-char-preference-filter="like">好き</button><button class="filter-pill" data-char-preference-filter="normal">ふつう</button><button class="filter-pill" data-char-preference-filter="difficult">苦手</button><button class="filter-pill" data-char-preference-filter="excluded">対象外</button><button class="filter-pill" data-char-preference-filter="unclassified">未分類</button>
-          </div></div>
-          <span id="charCountText" class="playing-meta">0 位角色</span><span class="playing-meta char-filter-note">“全部”默认不显示対象外</span><button class="product-button secondary small" id="charBatchToggle" type="button">批量管理</button>
+            <button class="filter-pill active" data-char-preference-filter="all">全部</button><button class="filter-pill" data-char-preference-filter="favorite">最推し</button><button class="filter-pill" data-char-preference-filter="oshi">推し</button><button class="filter-pill" data-char-preference-filter="like">好き</button><button class="filter-pill" data-char-preference-filter="good">好感</button><button class="filter-pill" data-char-preference-filter="curious">気になる</button><button class="filter-pill" data-char-preference-filter="normal">普通</button><button class="filter-pill" data-char-preference-filter="difficult">苦手</button><button class="filter-pill" data-char-preference-filter="excluded">対象外</button><button class="filter-pill" data-char-preference-filter="unclassified">未分類</button>
+          </div></div></div>
+          <div class="char-filter-meta"><span id="charCountText" class="playing-meta">0 位角色</span><span class="playing-meta char-filter-note">“全部”默认不显示対象外</span><button class="product-button secondary small" id="charBatchToggle" type="button">批量管理</button><button class="product-button rose" id="addCharButton" type="button">＋ 添加角色</button></div>
         </div>
-        <div class="batch-actions char-batch-actions" id="charBatchActions" hidden><span class="playing-meta">已选 <strong id="charSelectedCount">0</strong> 位</span><button class="product-button secondary small" id="charBatchAll" type="button">全选</button><select class="product-select small" id="charBatchPreference"><option value="">批量修改喜好…</option><option value="favorite">最推し</option><option value="oshi">推し</option><option value="like">好き</option><option value="normal">ふつう</option><option value="difficult">苦手</option><option value="excluded">対象外</option><option value="unclassified">未分類</option></select><button class="product-button secondary small" id="charBatchApplyPreference" type="button">应用喜好</button><select class="product-select small" id="charBatchRoleType"><option value="">批量修改身份…</option><option value="protagonist">主人公</option><option value="route">攻略対象</option><option value="sub">サブキャラ</option><option value="unset">未設定</option></select><button class="product-button secondary small" id="charBatchApplyRole" type="button">应用身份</button><button class="product-button danger small" id="charBatchDelete" type="button">删除所选</button><button class="product-button secondary small" id="charBatchCancel" type="button">取消</button></div>
+        <div class="batch-actions char-batch-actions" id="charBatchActions" hidden><span class="playing-meta">已选 <strong id="charSelectedCount">0</strong> 位</span><button class="product-button secondary small" id="charBatchAll" type="button">全选</button><select class="product-select small" id="charBatchPreference"><option value="">批量修改喜好…</option><option value="favorite">最推し</option><option value="oshi">推し</option><option value="like">好き</option><option value="good">好感</option><option value="curious">気になる</option><option value="normal">普通</option><option value="difficult">苦手</option><option value="excluded">対象外</option><option value="unclassified">未分類</option></select><button class="product-button secondary small" id="charBatchApplyPreference" type="button">应用喜好</button><select class="product-select small" id="charBatchRoleType"><option value="">批量修改身份…</option><option value="protagonist">主人公</option><option value="route">攻略対象</option><option value="sub">サブキャラ</option><option value="unset">未設定</option></select><button class="product-button secondary small" id="charBatchApplyRole" type="button">应用身份</button><button class="product-button danger small" id="charBatchDelete" type="button">删除所选</button><button class="product-button secondary small" id="charBatchCancel" type="button">取消</button></div>
         <div class="character-grid" id="characterGrid"></div>
       </section>
 
@@ -722,6 +721,7 @@
       <div class="editor-group"><label for="libraryGameStatus">游玩状态</label><select class="product-select" id="libraryGameStatus"><option>已全通</option><option>进行中</option><option>已封盘</option><option>已买未打</option><option>心愿单</option><option>尚未分类</option></select></div>
       <div class="editor-group" id="libraryGameCategoryGroup"><label for="libraryGameCategory">喜好分类</label><select class="product-select" id="libraryGameCategory"><option value="unclassified">未分類</option><option value="hall_of_fame">殿堂入り</option><option value="love">大好き</option><option value="like">好き</option><option value="normal">普通</option><option value="difficult">苦手</option></select></div>
       <div class="editor-group"><label for="libraryGameProgress">进度（0—100）</label><input class="product-input" id="libraryGameProgress" type="number" min="0" max="100" value="0"></div>
+      <div class="editor-group"><label>我的评分</label><div class="game-rating-picker" id="libraryGameRating" role="radiogroup" aria-label="我的评分"><button type="button" data-rating-value="1" aria-label="1 星">☆</button><button type="button" data-rating-value="2" aria-label="2 星">☆</button><button type="button" data-rating-value="3" aria-label="3 星">☆</button><button type="button" data-rating-value="4" aria-label="4 星">☆</button><button type="button" data-rating-value="5" aria-label="5 星">☆</button></div></div>
       <div class="editor-group"><label for="libraryGamePlatform">游玩平台</label><select class="product-select" id="libraryGamePlatform"><option value="">请选择平台</option><option value="NS">NS</option><option value="PC碟">PC碟</option><option value="STEAM">STEAM</option><option value="DLsite">DLsite</option><option value="PSP">PSP</option></select></div>
       <div class="editor-group"><label for="libraryGameHours">累计时长</label><input class="product-input" id="libraryGameHours" type="number" min="0" step="0.5" placeholder="小时"></div>
       <div class="editor-group"><label for="libraryGameRoutes">角色 / 路线</label><input class="product-input" id="libraryGameRoutes" maxlength="160" placeholder="用逗号分隔"></div>
@@ -739,7 +739,7 @@
       <div class="product-dialog-grid" id="charManualFields">
       <div class="editor-group wide"><label for="charName">角色名</label><input class="product-input" id="charName" required maxlength="40"></div>
       <div class="editor-group wide"><label for="charGame">所属作品</label><select class="product-select" id="charGame"><option value="">— 选择作品 —</option></select></div>
-      <div class="editor-group"><label for="charRoleType">角色身份</label><select class="product-select" id="charRoleType"><option value="unset">未設定</option><option value="protagonist">主人公</option><option value="route">攻略対象</option><option value="sub">サブキャラ</option></select><small class="playing-meta" id="charRoleTypeSourceHint"></small></div><div class="editor-group"><label for="charPreference">喜好分类</label><select class="product-select" id="charPreference"><option value="unclassified">未分類</option><option value="favorite">最推し</option><option value="oshi">推し</option><option value="like">好き</option><option value="normal">ふつう</option><option value="difficult">苦手</option><option value="excluded">対象外</option></select></div>
+      <div class="editor-group"><label for="charRoleType">角色身份</label><select class="product-select" id="charRoleType"><option value="unset">未設定</option><option value="protagonist">主人公</option><option value="route">攻略対象</option><option value="sub">サブキャラ</option></select><small class="playing-meta" id="charRoleTypeSourceHint"></small></div><div class="editor-group"><label for="charPreference">喜好分类</label><select class="product-select" id="charPreference"><option value="favorite">最推し</option><option value="oshi">推し</option><option value="like">好き</option><option value="good">好感</option><option value="curious">気になる</option><option value="normal">普通</option><option value="difficult">苦手</option><option value="excluded">対象外</option><option value="unclassified">未分類</option></select></div>
       <div class="editor-group"><label for="charCV">声优</label><input class="product-input" id="charCV" maxlength="30" placeholder="声优名"></div>
       <div class="editor-group wide"><label for="charImage">角色图片网址（可选）</label><input class="product-input" id="charImage" type="text" placeholder="https://..."></div>
       <div class="editor-group wide"><label>或使用本地图片</label><button class="product-button secondary" id="charUploadButton" type="button">选择本地图片</button><input id="charUploadInput" type="file" accept="image/*" hidden></div>
@@ -912,7 +912,7 @@
 
   <script>window.AMORIST_MODE = 'public';</script>
   <script src="./assets/js/image-store.js"></script>
-  <script src="./assets/js/data-model.js"></script>
-  <script src="./assets/js/public-bootstrap.js?v=timeline-ui-20260731"></script>
+  <script src="./assets/js/data-model.js?v=characters-preferences-20260801-1"></script>
+  <script src="./assets/js/public-bootstrap.js?v=character-axis-20260801-3"></script>
 </body>
 </html>

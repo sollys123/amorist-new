@@ -20,7 +20,7 @@
     const matches = [...new Set([...directMatches, ...subjectMatches])];
     return matches.find(game => visibleStatuses.has(String(game?.status || '').trim())) || matches[0] || null;
   };
-  const isVisible = (character, gameRows = []) => visibleStatuses.has(String(linkedGame(character, gameRows)?.status || '').trim());
+  const isVisible = (character, gameRows = []) => !characterGameIds(character).length || visibleStatuses.has(String(linkedGame(character, gameRows)?.status || '').trim());
   const filter = (characters, gameRows = []) => (Array.isArray(characters) ? characters : []).filter(character => isVisible(character, gameRows));
   window.AmoristCharacterBookVisibility = {visibleStatuses, linkedGame, isVisible, filter};
 })();
@@ -2678,7 +2678,7 @@
           }
           if (persist && view === 'library') {
             localStorage.removeItem(LIBRARY_ROUTE_KEY);
-            if ($p('#gameDetailPanel')) { $p('#gameDetailPanel').hidden=true; $p('#libraryBrowseView').hidden=false; }
+            if ($p('#gameDetailPanel')) showLibraryBrowse();
           }
           if (view === 'home') renderDashboard();
           if (view === 'oshi') window.renderOshiHub?.();
@@ -2761,44 +2761,114 @@
       let libraryBatchMode = false;
       const librarySelected = new Set();
       const libraryCategoryEligible = game => Boolean(game);
+      let activeLibraryView = 'rank';
+      let activeLibrarySort = 'updated';
+
+      function setLibraryScreen(screen='browse') {
+        const section = $p('.product-view[data-product-view="library"]');
+        if (section) section.dataset.libraryScreen = screen;
+      }
+
+      function showLibraryBrowse() {
+        setLibraryScreen('browse');
+        if ($p('#gameDetailPanel')) $p('#gameDetailPanel').hidden = true;
+        if ($p('#libraryBrowseView')) $p('#libraryBrowseView').hidden = false;
+        renderGameLibrary();
+      }
+
+      function showLibraryDetail() {
+        setLibraryScreen('detail');
+        if ($p('#libraryBrowseView')) $p('#libraryBrowseView').hidden = true;
+        if ($p('#libraryRankView')) $p('#libraryRankView').hidden = true;
+        if ($p('#gameDetailPanel')) $p('#gameDetailPanel').hidden = false;
+      }
+
+      window.AmoristLibraryUI = { showBrowse:showLibraryBrowse, showDetail:showLibraryDetail, render:renderGameLibrary };
+
+      function ensureLibraryReferenceUI() {
+        const browse = $p('#libraryBrowseView');
+        if (!browse) return;
+        [['libraryCountText','span'],['libraryMetricAll','strong'],['libraryMetricCompleted','strong'],['libraryMetricPlaying','strong'],['gameLibraryGrid','div']].forEach(([id,tag])=>{if(!$p(`#${id}`)){const node=document.createElement(tag);node.id=id;node.hidden=true;browse.appendChild(node);}});
+        const librarySection = browse.closest('.product-view[data-product-view="library"]') || browse.parentElement;
+        const head = librarySection?.querySelector('.product-page-head');
+        head?.classList.add('library-reference-head');
+        if (head && !head.querySelector('#libraryReferenceMetrics')) {
+          head.insertAdjacentHTML('beforeend', '<div class="library-reference-metrics" id="libraryReferenceMetrics" aria-label="游戏档案统计"><div><span>ALL WORKS</span><strong id="libraryMetricAll">0</strong></div><i></i><div><span>COMPLETED</span><strong id="libraryMetricCompleted">0</strong></div><i></i><div><span>PLAYING</span><strong id="libraryMetricPlaying">0</strong></div></div>');
+        }
+        const controls = browse.querySelector('.library-controls');
+        controls?.classList.add('library-reference-toolbar');
+        if (controls && !controls.querySelector('#gameLibrarySort')) {
+          controls.insertAdjacentHTML('afterbegin', '<label class="library-reference-sort"><span>SORT BY</span><select id="gameLibrarySort" aria-label="排序方式"><option value="updated">最近更新</option><option value="started">开始日期</option><option value="completed">完成日期</option><option value="name">作品名称</option></select></label>');
+        }
+        if (controls && !controls.querySelector('#gameLibrarySearch')) {
+          controls.insertAdjacentHTML('beforeend', '<div class="library-reference-tools"><input class="library-reference-search" id="gameLibrarySearch" placeholder="搜索作品" aria-label="搜索作品"><div class="library-reference-views" role="group" aria-label="切换视图"><button type="button" data-library-view="rank" aria-label="喜好轴视图" title="喜好轴视图">↕</button><button type="button" data-library-view="grid" aria-label="画册视图" title="画册视图">▦</button><button type="button" data-library-view="list" aria-label="列表视图" title="列表视图">☷</button></div></div>');
+          $p('#gameLibrarySearch')?.addEventListener('input', event => renderGameLibrary(event.target.value));
+          $p('#gameLibrarySort')?.addEventListener('change', event => { activeLibrarySort = event.target.value; renderGameLibrary(); });
+          $$p('[data-library-view]').forEach(button => button.addEventListener('click', () => { activeLibraryView = button.dataset.libraryView; renderGameLibrary(); }));
+        }
+        if (controls && !controls.querySelector('#libraryAddGameButton')) {
+          const add = document.createElement('button'); add.type='button'; add.id='libraryAddGameButton'; add.className='library-add-game'; add.textContent='＋ 添加作品'; add.addEventListener('click', () => openGameDialog('')); controls.appendChild(add);
+        }
+        if (librarySection) {
+          const rankViews = librarySection.querySelectorAll('#libraryRankView');
+          rankViews.forEach((node,index) => { if (index) node.remove(); });
+          if (!rankViews.length) browse.insertAdjacentHTML('afterend', '<section class="library-rank-view" id="libraryRankView" hidden aria-label="作品喜好排名轴"><div class="library-rank-axis" id="libraryRankAxis"></div></section>');
+        }
+      }
 
       function initials(name) { return String(name || 'A').trim().slice(0,1).toUpperCase(); }
       function renderGameLibrary(query='') {
+        ensureLibraryReferenceUI();
+        if (!$p('#gameDetailPanel') || $p('#gameDetailPanel').hidden) setLibraryScreen('browse');
         const games = loadGames();
-        const normalized = query.trim().toLowerCase();
+        const searchValue = query || $p('#gameLibrarySearch')?.value || '';
+        const normalized = searchValue.trim().toLowerCase();
         const filtered = games.filter(game => {
           const statusMatch = activeLibraryFilter === '全部' || game.status === activeLibraryFilter;
           return statusMatch && (!normalized || `${game.name} ${game.note}`.toLowerCase().includes(normalized));
         });
         const grid = $p('#gameLibraryGrid');
+        if (!$p('#libraryCountText')) { const node=document.createElement('span'); node.id='libraryCountText'; node.hidden=true; document.body.appendChild(node); }
+        if (!$p('#libraryMetricAll')) { const node=document.createElement('strong'); node.id='libraryMetricAll'; node.hidden=true; document.body.appendChild(node); }
+        if (!$p('#libraryMetricCompleted')) { const node=document.createElement('strong'); node.id='libraryMetricCompleted'; node.hidden=true; document.body.appendChild(node); }
+        if (!$p('#libraryMetricPlaying')) { const node=document.createElement('strong'); node.id='libraryMetricPlaying'; node.hidden=true; document.body.appendChild(node); }
+        if (!grid) return;
         $p('#libraryCountText').textContent = `${filtered.length} 部作品`;
-        const useLibraryPreferenceTimeline=true;
-        grid.classList.toggle('library-preference-timeline',useLibraryPreferenceTimeline);
+        $p('#libraryMetricAll').textContent = games.length;
+        $p('#libraryMetricCompleted').textContent = games.filter(game => game.status === '已全通').length;
+        $p('#libraryMetricPlaying').textContent = games.filter(game => game.status === '进行中').length;
+        const sortValue = activeLibrarySort;
+        const valueOf = game => sortValue === 'name' ? String(game.name || '') : sortValue === 'started' ? String(game.startedAt || '') : sortValue === 'completed' ? String(game.completedAt || '') : String(game.updatedAt || '');
+        const sorted = filtered.sort((a,b) => sortValue === 'name' ? valueOf(a).localeCompare(valueOf(b),'zh') : valueOf(b).localeCompare(valueOf(a)));
+        const rankView = $p('#libraryRankView');
+        grid.classList.toggle('library-list-mode', activeLibraryView === 'list');
+        grid.hidden = activeLibraryView === 'rank';
+        if (rankView) rankView.hidden = activeLibraryView !== 'rank';
+        $$p('[data-library-view]').forEach(button => { const active = button.dataset.libraryView === activeLibraryView; button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active)); });
         if (!filtered.length) {
           grid.innerHTML = '<div class="empty-library"><strong>这里暂时没有作品</strong>添加一部游戏，或者换一个筛选条件看看。</div>';
+          if (activeLibraryView === 'rank') renderLibraryRank([]);
+          else if (rankView) $p('#libraryRankAxis')?.replaceChildren();
           return;
         }
-        const cardMarkup=game=>`
-          <article class="game-card${libraryBatchMode?' batch-mode':''}" data-game-id="${escapeProductHtml(game.id)}" tabindex="0">
+        const cardMarkup=(game,index)=>{
+          const routeTotal=Array.isArray(game.routes)?game.routes.length:0;
+          const routeDone=Array.isArray(game.routeDone)?game.routeDone.filter(route=>Array.isArray(game.routes)&&game.routes.includes(route)).length:0;
+          const listSummary=activeLibraryView==='list'?`<div class="library-list-summary"><span><b>DEVELOPER</b>${escapeProductHtml(game.developer||'未记录')}</span><span><b>START DATE</b>${escapeProductHtml(game.startedAt||'未记录')}</span><span><b>CLEAR DATE</b>${escapeProductHtml(game.completedAt||'未记录')}</span><span><b>PLAY TIME</b>${game.hours?`${escapeProductHtml(game.hours)}h`:'未记录'}</span><span><b>ROUTES</b>${routeTotal?`${routeDone} / ${routeTotal}`:'未记录'}</span></div>`:'';
+          const cardVariant=activeLibraryView==='list'?'':`${index===0?' library-reference-feature':''}${index===0||index===6||index===12?' library-reference-wide':''}`;
+          return `
+          <article class="game-card library-reference-card${cardVariant}${libraryBatchMode?' batch-mode':''}" data-game-id="${escapeProductHtml(game.id)}" tabindex="0">
             ${libraryBatchMode ? `<input class="batch-select" type="checkbox" data-batch-game="${escapeProductHtml(game.id)}" ${librarySelected.has(String(game.id))?'checked':''} aria-label="选择${escapeProductHtml(game.name)}">` : ''}
             <div class="game-cover">${game.cover ? `<img src="${escapeProductHtml(game.cover)}" alt="${escapeProductHtml(game.name)}" loading="lazy" referrerpolicy="no-referrer">` : escapeProductHtml(initials(game.name))}</div>
-            <div class="game-card-body"><strong>${escapeProductHtml(game.name)}</strong><p>${escapeProductHtml(game.note || '还没有写下记录。')}</p><div class="game-meta"><span class="game-status">${escapeProductHtml(game.status)}</span><button class="product-button secondary small game-to-repo" type="button">写 REPO</button></div></div>
+            <div class="game-card-body"><strong>${escapeProductHtml(game.name)}</strong><p>${escapeProductHtml(game.note || '还没有写下记录。')}</p><div class="game-meta"><span class="game-year">${escapeProductHtml(String(game.startedAt || game.completedAt || '').slice(0,4))}</span><span class="game-platform">${escapeProductHtml(game.platform || '')}</span><span class="game-hours">${game.hours ? `${escapeProductHtml(game.hours)}h` : ''}</span></div><div class="game-state ${game.status==='进行中'?'playing':game.status==='已封盘'?'hold':game.status==='心愿单'?'wish':''}">${escapeProductHtml(game.status)}</div>${listSummary}</div>
           </article>`;
-        const sorted=filtered.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
-        if(useLibraryPreferenceTimeline){
-          grid.innerHTML=libraryPreferenceOrder.map((category,index)=>{
-            const rows=sorted.filter(game=>dataModel.normalizeGameCategory(game.category)===category);
-            if(category==='unclassified'&&!rows.length)return '';
-            return `<section class="library-preference-group" data-preference-level="${index}"><div class="library-preference-label">${escapeProductHtml(dataModel.gameCategoryLabel(category))}</div><div class="library-preference-games">${rows.length?rows.map(cardMarkup).join(''):'<span class="library-preference-empty">暂无作品</span>'}</div></section>`;
-          }).join('');
-        }else{
-          grid.innerHTML=sorted.map(cardMarkup).join('');
-        }
+        };
+        grid.innerHTML=sorted.map(cardMarkup).join('');
+        if (activeLibraryView === 'rank') renderLibraryRank(sorted);
         $$p('.game-card').forEach(card => {
-          const open = () => openGameDialog(card.dataset.gameId);
+          const open = () => window.AmoristGameStore?.renderGameDetail?.(card.dataset.gameId);
           card.addEventListener('click', event => {
             if (libraryBatchMode) {
-              if (event.target.closest('.game-to-repo')) return;
               const checkbox = event.target.closest('[data-batch-game]');
               const id = card.dataset.gameId;
               if (checkbox) { checkbox.checked = librarySelected.has(id); return; }
@@ -2816,13 +2886,37 @@
             if (checkbox.checked) librarySelected.add(id); else librarySelected.delete(id);
             updateLibraryBatchCount();
           });
-          card.querySelector('.game-to-repo').addEventListener('click', event => {
-            event.stopPropagation();
-            const game = loadGames().find(item => String(item.id) === String(card.dataset.gameId));
-            if (game) {
-              window.amoristRepoManager?.open?.(game,window.AMORIST_MODE==='public'?{readonly:true}:{});
-              productToast(`已把「${game.name || ''}」带入 REPO`);
-            }
+        });
+      }
+
+      function renderLibraryRank(games) {
+        const axis = $p('#libraryRankAxis');
+        if (!axis) return;
+        let dragging = null;
+        let suppressDragClick = false;
+        const card = game => `<article class="library-rank-card"${window.AMORIST_MODE === 'editor' ? ' draggable="true"' : ''} data-game-id="${escapeProductHtml(game.id)}"><figure><div class="library-rank-cover">${game.cover ? `<img src="${escapeProductHtml(game.cover)}" alt="${escapeProductHtml(game.name)}" loading="lazy" referrerpolicy="no-referrer">` : escapeProductHtml(initials(game.name))}</div><figcaption><strong>${escapeProductHtml(game.name)}</strong><div><span>${escapeProductHtml(String(game.startedAt || game.completedAt || '').slice(0,4))}</span><span>${escapeProductHtml(game.platform || '')}</span></div><em class="${game.status==='进行中'?'playing':game.status==='已封盘'?'hold':game.status==='心愿单'?'wish':''}">${escapeProductHtml(game.status)}</em></figcaption></figure></article>`;
+        axis.innerHTML = libraryPreferenceOrder.map((category,index) => {
+          const rows = games.filter(game => dataModel.normalizeGameCategory(game.category) === category);
+          return `<section class="library-rank-tier" data-tier="${escapeProductHtml(category)}"><header><span>0${index+1}</span><h3>${escapeProductHtml(dataModel.gameCategoryLabel(category))}</h3><small>${escapeProductHtml(String(category).replace(/_/g,' ').toUpperCase())}</small><em>${rows.length} works</em></header><div class="library-rank-track">${rows.length ? rows.map(card).join('') : '<span class="library-rank-empty">尚无作品被放入这一层。</span>'}</div></section>`;
+        }).join('');
+        $p('#libraryRankAxis').querySelectorAll('.library-rank-card').forEach(item => {
+          if (window.AMORIST_MODE === 'editor') {
+            item.addEventListener('dragstart', event => { dragging = item; suppressDragClick = true; item.classList.add('dragging'); event.dataTransfer.effectAllowed='move'; event.dataTransfer.setData('text/plain', item.dataset.gameId); });
+            item.addEventListener('dragend', () => { dragging = null; item.classList.remove('dragging'); setTimeout(() => { suppressDragClick = false; }, 0); });
+          }
+          item.addEventListener('click', () => { if (!suppressDragClick) { const game = games.find(row => String(row.id) === String(item.dataset.gameId)); if (game) window.AmoristGameStore?.renderGameDetail?.(game.id); } });
+        });
+        if (window.AMORIST_MODE !== 'editor') return;
+        $p('#libraryRankAxis').querySelectorAll('.library-rank-tier').forEach(tier => {
+          tier.addEventListener('dragover', event => { event.preventDefault(); tier.classList.add('drop-active'); });
+          tier.addEventListener('dragleave', event => { if (!tier.contains(event.relatedTarget)) tier.classList.remove('drop-active'); });
+          tier.addEventListener('drop', event => {
+            event.preventDefault(); tier.classList.remove('drop-active');
+            const id = event.dataTransfer.getData('text/plain') || dragging?.dataset.gameId;
+            if (!id) return;
+            const category = tier.dataset.tier;
+            saveGames(loadGames().map(game => String(game.id) === String(id) ? {...game,category,updatedAt:Date.now()} : game));
+            renderGameLibrary();
           });
         });
       }
@@ -2839,6 +2933,7 @@
         $p('#libraryGameCategory').value = dataModel.normalizeGameCategory(game?.category);
         $p('#libraryGameCategoryGroup').hidden = false;
         $p('#libraryGameProgress').value = Number(game?.progress || 0);
+        $p('#libraryGameRating')?.querySelectorAll('[data-rating-value]').forEach(button => { const active = Number(button.dataset.ratingValue) <= Math.round(Number(game?.rating)||0); button.textContent = active ? '★' : '☆'; button.classList.toggle('active', active); button.setAttribute('aria-checked', String(Number(button.dataset.ratingValue) === Math.round(Number(game?.rating)||0))); });
         $p('#libraryGameCover').value = game?.cover || '';
         $p('#libraryGameNote').value = game?.note || '';
         const platformField=$p('#libraryGamePlatform'),platform=game?.platform||'';
@@ -2855,6 +2950,7 @@
       }
       function closeGameDialog() { $p('#gameDialogOverlay').classList.remove('open'); }
       $p('#libraryGameStatus').addEventListener('change',()=>{$p('#libraryGameCategoryGroup').hidden=false;});
+      $p('#libraryGameRating')?.addEventListener('click',event=>{const button=event.target.closest('[data-rating-value]');if(!button)return;const value=Number(button.dataset.ratingValue);$p('#libraryGameRating').querySelectorAll('[data-rating-value]').forEach(item=>{const active=Number(item.dataset.ratingValue)<=value;item.textContent=active?'★':'☆';item.classList.toggle('active',active);item.setAttribute('aria-checked',String(Number(item.dataset.ratingValue)===value));});});
       $p('#closeGameDialog').addEventListener('click', closeGameDialog);
       $p('#gameDialogOverlay').addEventListener('click', event => { if (event.target === $p('#gameDialogOverlay')) closeGameDialog(); });
       $p('#gameDialogForm').addEventListener('submit', event => {
@@ -2863,7 +2959,7 @@
         const id = $p('#editingGameId').value;
         const routes=$p('#libraryGameRoutes').value.split(/[，,]/).map(value=>value.trim()).filter(Boolean);
         const previous=games.find(item=>String(item.id)===String(id));
-        const record = { ...previous, id:id || `game-${Date.now()}`, name:$p('#libraryGameName').value.trim(), status:$p('#libraryGameStatus').value, category:dataModel.normalizeGameCategory($p('#libraryGameCategory').value), progress:Math.max(0,Math.min(100,Number($p('#libraryGameProgress').value)||0)), cover:$p('#libraryGameCover').value.trim(), note:$p('#libraryGameNote').value.trim(), platform:$p('#libraryGamePlatform').value.trim(), hours:Number($p('#libraryGameHours').value)||0, routes, startedAt:$p('#libraryGameStartDate')?.value||'', completedAt:$p('#libraryGameCompleteDate')?.value||'', routeSelectionCustomized:true, routeDone:Array.isArray(previous?.routeDone)?previous.routeDone:[], logs:previous?.logs||[], updatedAt:Date.now() };
+        const record = { ...previous, id:id || `game-${Date.now()}`, name:$p('#libraryGameName').value.trim(), status:$p('#libraryGameStatus').value, category:dataModel.normalizeGameCategory($p('#libraryGameCategory').value), progress:Math.max(0,Math.min(100,Number($p('#libraryGameProgress').value)||0)), cover:$p('#libraryGameCover').value.trim(), note:$p('#libraryGameNote').value.trim(), platform:$p('#libraryGamePlatform').value.trim(), hours:Number($p('#libraryGameHours').value)||0, rating:Number($p('#libraryGameRating [aria-checked="true"]')?.dataset.ratingValue)||0, routes, startedAt:$p('#libraryGameStartDate')?.value||'', completedAt:$p('#libraryGameCompleteDate')?.value||'', routeSelectionCustomized:true, routeDone:Array.isArray(previous?.routeDone)?previous.routeDone:[], logs:previous?.logs||[], updatedAt:Date.now() };
         const index = games.findIndex(item => String(item.id) === String(id));
         if (index >= 0) games[index] = record; else games.push(record);
         saveGames(games); closeGameDialog(); renderGameLibrary(); renderDashboard(); productToast('游戏记录已保存');
@@ -3310,6 +3406,7 @@
         $('#libraryGameCategory').value=dataModel.normalizeGameCategory(game?.category);
         $('#libraryGameCategoryGroup').hidden=false;
         $('#libraryGameProgress').value=Number(game?.progress||0);
+        $('#libraryGameRating')?.querySelectorAll('[data-rating-value]').forEach(button=>{const active=Number(button.dataset.ratingValue)<=Math.round(Number(game?.rating)||0);button.textContent=active?'★':'☆';button.classList.toggle('active',active);button.setAttribute('aria-checked',String(Number(button.dataset.ratingValue)===Math.round(Number(game?.rating)||0)));});
         $('#libraryGameCover').value=game?.cover||'';
         $('#libraryGameNote').value=game?.note||'';
         const platformField=$('#libraryGamePlatform'),platform=game?.platform||'';
@@ -3325,6 +3422,8 @@
       }
       window.openEnhancedGameDialog = openEnhancedGameDialog;
 
+      $('#libraryGameRating')?.addEventListener('click',event=>{const button=event.target.closest('[data-rating-value]');if(!button)return;const value=Number(button.dataset.ratingValue);$('#libraryGameRating').querySelectorAll('[data-rating-value]').forEach(item=>{const active=Number(item.dataset.ratingValue)<=value;item.textContent=active?'★':'☆';item.classList.toggle('active',active);item.setAttribute('aria-checked',String(Number(item.dataset.ratingValue)===value));});});
+
       $('#libraryCoverUploadButton').onclick=()=>$('#libraryCoverUploadInput').click();
       $('#libraryCoverUploadInput').onchange=event=>{const file=event.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{const image=new Image();image.onload=()=>{const max=480,scale=Math.min(1,max/Math.max(image.width,image.height)),canvas=document.createElement('canvas');canvas.width=Math.round(image.width*scale);canvas.height=Math.round(image.height*scale);canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);$('#libraryGameCover').value=canvas.toDataURL('image/jpeg',.74);toast('本地封面已压缩并加入档案')};image.src=reader.result};reader.readAsDataURL(file);event.target.value=''};
 
@@ -3333,14 +3432,14 @@
         const rows=games(), id=$('#editingGameId').value || rows.at(-1)?.id, index=rows.findIndex(g=>g.id===id);
         if(index<0)return;
         const old=rows[index];
-const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filter(Boolean),progress=gameRouteProgress(routes,old.routeDone||[]);rows[index]={...old,category:dataModel.normalizeGameCategory($('#libraryGameCategory').value),platform:$('#libraryGamePlatform').value.trim(),hours:Number($('#libraryGameHours').value)||0,routes,startedAt:$('#libraryGameStartDate')?.value||'',completedAt:$('#libraryGameCompleteDate')?.value||'',progress:progress==null?Number($('#libraryGameProgress').value)||0:progress,routeSelectionCustomized:true,routeDone:old.routeDone||[],logs:old.logs||[]};
+const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filter(Boolean),progress=gameRouteProgress(routes,old.routeDone||[]);rows[index]={...old,category:dataModel.normalizeGameCategory($('#libraryGameCategory').value),platform:$('#libraryGamePlatform').value.trim(),hours:Number($('#libraryGameHours').value)||0,rating:Number($('#libraryGameRating [aria-checked="true"]')?.dataset.ratingValue)||0,routes,startedAt:$('#libraryGameStartDate')?.value||'',completedAt:$('#libraryGameCompleteDate')?.value||'',progress:progress==null?Number($('#libraryGameProgress').value)||0:progress,routeSelectionCustomized:true,routeDone:old.routeDone||[],logs:old.logs||[]};
         saveGames(rows);
         const syncGameTimeline=(type,date)=>{const next=readTimelineEvents().filter(event=>!(String(event?.gameId||'')===String(id)&&event.type===type));if(date)next.push(normalizeTimelineEvent({id:timelineGameEventId(id,type),gameId:id,type,occurredAt:date,datePrecision:'day',title:timelineTypeLabel(type),source:'game-edit'}));writeTimelineEvents(next)};
         try{syncGameTimeline('started',$('#libraryGameStartDate')?.value||'');syncGameTimeline('completed',$('#libraryGameCompleteDate')?.value||'')}catch(error){console.warn('游玩时间同步失败',error)}
         updateProfileArchiveStats(); if(!$('#gameDetailPanel').hidden)renderGameDetail(id);
       });
       $('#deleteGameButton').addEventListener('click',()=>setTimeout(updateProfileArchiveStats,0));
-      $$('[data-product-target="library"]').forEach(button=>button.addEventListener('click',()=>{localStorage.removeItem('amoristUi.libraryRoute.v1');if($('#gameDetailPanel')){$('#gameDetailPanel').hidden=true;$('#libraryBrowseView').hidden=false}},true));
+      $$('[data-product-target="library"]').forEach(button=>button.addEventListener('click',()=>{localStorage.removeItem('amoristUi.libraryRoute.v1');window.AmoristLibraryUI?.showBrowse?.()},true));
       $$('[data-open-dashboard-game]').forEach(button=>button.addEventListener('click',event=>{
         event.preventDefault();
         event.stopImmediatePropagation();
@@ -3528,12 +3627,12 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       }
 
       function renderLegacyGameDetail(id){
-        let game=games().find(g=>g.id===id);if(!game)return;
+        let game=games().find(g=>String(g.id)===String(id));if(!game)return;
         if(!$('#libraryBrowseView').hidden){
           libraryBrowseScrollY=window.scrollY||document.documentElement.scrollTop||0;
         }
         localStorage.setItem('amoristUi.libraryRoute.v1',JSON.stringify({screen:'detail',id:String(id)}));
-        $('#libraryBrowseView').hidden=true;$('#gameDetailPanel').hidden=false;
+        window.AmoristLibraryUI?.showDetail?.();
         const routes=gameRouteNames(game);
         const done=Array.isArray(game.routeDone)?game.routeDone:[];
         const calculatedProgress=gameRouteProgress(routes,done);
@@ -3547,7 +3646,7 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
           <section class="game-detail-hero"><button class="game-detail-back" type="button">返回游戏档案</button><div class="game-detail-cover">${game.cover?`<img src="${safe(game.cover)}" alt="${safe(game.name)}" referrerpolicy="no-referrer">`:safe(initial(game.name))}</div><div class="game-detail-copy"><div class="card-eyebrow">${safe(game.status)} · ${safe(game.platform||'平台未记录')}</div><h2>${safe(game.name)}</h2><p>${safe(game.note||'这部作品还没有写下一句话记录。')}</p><div class="game-detail-actions"><button class="product-button" type="button" data-detail-action="repo">REPO</button>${window.AMORIST_MODE==='editor'?'<button class="product-button secondary" type="button" data-detail-action="edit">编辑档案</button>':''}</div></div></section>
           <div class="game-detail-grid"><section class="product-card game-detail-section"><h3>作品进度</h3><div class="detail-stats"><div class="detail-stat"><span>PROGRESS</span><strong>${Number(game.progress)||0}%</strong></div><div class="detail-stat"><span>PLAY TIME</span><strong>${Number(game.hours)||0}h</strong></div><div class="detail-stat"><span>MY RATING</span><strong>${Number(game.rating)?Number(game.rating).toFixed(1):'—'} / 5</strong></div></div><div class="section-head game-route-head"><h3>角色路线</h3>${window.AMORIST_MODE==='editor'?'<button class="product-button secondary small" data-detail-action="edit-routes" type="button">编辑角色</button>':''}</div><div class="route-list">${routes.length?routes.map(route=>window.AMORIST_MODE==='editor'?`<button class="route-chip ${done.includes(route)?'done':''}" data-route="${safe(route)}" type="button">${done.includes(route)?'已通 ':''}${safe(route)}</button>`:`<span class="route-chip ${done.includes(route)?'done':''}">${done.includes(route)?'已通 ':''}${safe(route)}</span>`).join(''):'<span class="playing-meta">作品资料中没有可记录通关的主角。</span>'}</div>${window.AMORIST_MODE==='editor'?'<div id="gameRouteEditor" class="game-route-editor" hidden></div>':''}</section><section class="product-card game-detail-section"><div class="section-head"><h3>游玩日志</h3>${window.AMORIST_MODE==='editor'?'<button class="product-button secondary small" data-detail-action="log" type="button">记录时间</button>':''}</div><div class="game-log-list">${logRowsHtml}</div></section></div><section class="product-card game-detail-section game-source-section" id="gameSourceInfo"><div class="section-head"><h3>作品资料</h3><span class="playing-meta">来自作品资料库</span></div><div class="playing-meta">正在读取作品资料…</div></section>`;
         [...$('#gameDetailPanel').querySelectorAll('.detail-stat')].find(stat=>stat.querySelector('span')?.textContent==='MY RATING')?.remove();
-         $('#gameDetailPanel .game-detail-back').onclick=()=>{localStorage.removeItem('amoristUi.libraryRoute.v1');$('#gameDetailPanel').hidden=true;$('#libraryBrowseView').hidden=false;requestAnimationFrame(()=>window.scrollTo({top:libraryBrowseScrollY,behavior:'auto'}));};
+         $('#gameDetailPanel .game-detail-back').onclick=()=>{localStorage.removeItem('amoristUi.libraryRoute.v1');window.AmoristLibraryUI?.showBrowse?.();requestAnimationFrame(()=>window.scrollTo({top:libraryBrowseScrollY,behavior:'auto'}));};
         $('#gameDetailPanel [data-detail-action="repo"]').onclick=()=>writeGameToRepo(game);
         const editGameButton=$('#gameDetailPanel [data-detail-action="edit"]');
         if(editGameButton)editGameButton.onclick=()=>window.openEnhancedGameDialog(game);
@@ -3564,9 +3663,10 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       }
 
       function renderGameDetail(id){
-        let game=games().find(g=>g.id===id);if(!game)return;
+        let game=games().find(g=>String(g.id)===String(id));if(!game)return;
+        id=game.id;
         if(!$('#libraryBrowseView').hidden)libraryBrowseScrollY=window.scrollY||document.documentElement.scrollTop||0;
-        localStorage.setItem('amoristUi.libraryRoute.v1',JSON.stringify({screen:'detail',id:String(id)}));$('#libraryBrowseView').hidden=true;$('#gameDetailPanel').hidden=false;window.scrollTo({top:0,behavior:'auto'});
+        localStorage.setItem('amoristUi.libraryRoute.v1',JSON.stringify({screen:'detail',id:String(id)}));window.AmoristLibraryUI?.showDetail?.();window.scrollTo({top:0,behavior:'auto'});
         const routes=gameRouteNames(game),done=Array.isArray(game.routeDone)?game.routeDone:[],calculatedProgress=gameRouteProgress(routes,done);
         if(calculatedProgress!=null&&Number(game.progress)!==calculatedProgress){const rows=games(),index=rows.findIndex(row=>row.id===id);if(index>=0){rows[index]={...rows[index],progress:calculatedProgress};saveGames(rows);game={...game,progress:calculatedProgress};}}
         const stored=readTimelineEvents().map(normalizeTimelineEvent).filter(event=>event.gameId===String(game.id)&&['started','completed','session'].includes(event.type));
@@ -3574,16 +3674,17 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
         const dayStamp=event=>{const value=String(event?.occurredAt||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return null;const stamp=Date.parse(`${value}T00:00:00`);return Number.isFinite(stamp)?stamp:null;};
         const isoDate=event=>String(event?.occurredAt||'').slice(0,10),compactDate=event=>{const value=isoDate(event);return /^\d{4}-\d{2}-\d{2}$/.test(value)?value.slice(5).replace('-', '.'):event?.occurredAt?timelineDateLabel(event):'未记录'},fullDate=event=>{const value=isoDate(event);return /^\d{4}-\d{2}-\d{2}$/.test(value)?value.replace(/-/g,'.'):event?.occurredAt?timelineDateLabel(event):'未记录'};
         const merged=[];stored.filter(event=>event.type==='session').sort((a,b)=>(dayStamp(a)??eventSortValue(a))-(dayStamp(b)??eventSortValue(b))).forEach(event=>{const stamp=dayStamp(event),last=merged.at(-1),lastStamp=last?.dates.at(-1)?.stamp;if(stamp!=null&&lastStamp!=null&&stamp-lastStamp<=86400000){last.events.push(event);last.dates.push({stamp,event});}else merged.push({events:[event],dates:[{stamp,event}]});});
-        const sessions=merged.map(group=>{const dates=[...new Map(group.dates.map(row=>[String(row.event.occurredAt).slice(0,10),row])).values()].sort((a,b)=>a.stamp-b.stamp),first=dates[0].event,last=dates.at(-1).event,count=dates.length;return {event:first,type:'session',events:group.events,label:count>1?`${timelineDateLabel(first)}—${timelineDateLabel(last)}`:timelineDateLabel(first),text:count>1?`连续游玩 ${count} 日`:'再次游玩',tag:count>1?'SESSION':'LOG'};});
+        const completedStamp=dayStamp(derived.find(event=>event.type==='completed')||{});
+        const sessions=merged.map(group=>{const dates=[...new Map(group.dates.map(row=>[String(row.event.occurredAt).slice(0,10),row])).values()].sort((a,b)=>a.stamp-b.stamp),first=dates[0].event,last=dates.at(-1).event,count=dates.length,replay=completedStamp!=null&&(dayStamp(first)??0)>completedStamp;return {event:first,type:'session',events:group.events,label:count>1?`${timelineDateLabel(first)}—${timelineDateLabel(last)}`:timelineDateLabel(first),text:count>1?`连续游玩 ${count} 日`:replay?'再次游玩':'游玩记录',tag:count>1?'SESSION':'LOG'};});
         const chronicle=[...derived.map(event=>({event,type:event.type,events:[event],label:timelineDateLabel(event),text:timelineTypeLabel(event.type),tag:{started:'START',completed:'CLEAR'}[event.type]||'LOG'})),...sessions].sort((a,b)=>eventSortValue(b.event)-eventSortValue(a.event));
         const timeEvents=chronicle.flatMap(row=>row.events),rating=Number(game.rating)||0,stars=`${'★'.repeat(Math.max(0,Math.min(5,Math.round(rating))))}${'☆'.repeat(Math.max(0,5-Math.round(rating)))}`,routeTotal=routes.length,routeDone=done.filter(route=>routes.includes(route)).length,startedLabel=derived.find(event=>event.type==='started')?.occurredAt?timelineDateLabel(derived.find(event=>event.type==='started')):'未记录',completedLabel=derived.find(event=>event.type==='completed')?.occurredAt?timelineDateLabel(derived.find(event=>event.type==='completed')):'未记录',archiveNo=String(game.bangumiId||game.id||'').replace(/\D/g,'').slice(-6).padStart(6,'0');
         const sourceCharacters=Array.isArray(game.sourceCharacters)?game.sourceCharacters:[],findCharacter=route=>sourceCharacters.find(character=>[character.name,character.nameCn,character.nameJp,character.title].filter(Boolean).some(value=>String(value).trim()===String(route).trim()));
         const routeHtml=routes.length?routes.map(route=>{const character=findCharacter(route),image=character?.image||character?.images?.large||character?.images?.medium||character?.images?.grid||game.cover||'',subtitle=character?.nameCn||character?.nameJp||character?.alt||'',clear=done.includes(route);return `<div class="route-strip ${clear?'':'off'}"><div class="route-avatar">${image?`<img src="${safe(image)}" alt="${safe(route)}" referrerpolicy="no-referrer">`:safe(initial(route))}</div><div class="route-copy"><b>${safe(route)}</b>${subtitle?`<small>${safe(subtitle)}</small>`:''}</div><div class="route-state"><em>${clear?'CLEAR':'OPEN'}</em></div>${window.AMORIST_MODE==='editor'?`<button class="route-toggle" data-route="${safe(route)}" type="button" aria-label="切换 ${safe(route)} 路线状态">切换</button>`:''}</div>`}).join(''):'<span class="playing-meta">作品资料中没有可记录通关的主角。</span>';
         let chronicleYear='';const logHtml=chronicle.length?chronicle.map(row=>{const year=String(row.event.occurredAt||'').slice(0,4),yearHtml=year&&year!==chronicleYear?(chronicleYear=year,`<div class="chronicle-year">${safe(year)}</div>`):'';return `${yearHtml}<div class="log ${row.type==='completed'?'clear':''}"><time>${safe(row.label)}</time><span>${safe(row.text)}</span><em>${safe(row.tag)}</em></div>`}).join(''):'<span class="playing-meta">还没有游玩日志，去时间线添加日常游玩记录吧。</span>';
-        $('#gameDetailPanel').innerHTML=`<button class="game-detail-back" type="button">← 返回游戏档案</button><article class="archive"><section class="hero"><div class="cover-stage"><div class="game-detail-cover">${game.cover?`<img src="${safe(game.cover)}" alt="${safe(game.name)}" referrerpolicy="no-referrer">`:safe(initial(game.name))}</div></div><div class="hero-copy"><div class="archive-no">ARCHIVE NO. ${archiveNo}</div><h1>${safe(game.name)}</h1><p class="jp-title">${safe(game.nameJp||game.nameAlt||game.nameOriginal||'')}</p><dl class="meta"><dt>发售日期</dt><dd>${safe(game.releaseDate||game.year||'未记录')}</dd><dt>开发商</dt><dd>${safe(game.developer||'未记录')}</dd><dt>游戏平台</dt><dd>${safe(game.platform||'未记录')}</dd><dt>游玩状态</dt><dd><span class="status-dot"></span>${safe(game.status||'尚未分类')}</dd><dt>攻略路线</dt><dd>${routeTotal} 条</dd></dl><div class="rating"><span>MY RATING</span><div class="stars">${stars}</div><b>${rating?rating.toFixed(1):'—'}</b></div><p class="note">${safe(game.note||'这部作品还没有写下一句话记录。')}</p><div class="actions"><button type="button" data-detail-action="repo">OPEN REPO</button>${window.AMORIST_MODE==='editor'?'<button class="secondary" type="button" data-detail-action="edit">EDIT ARCHIVE</button>':''}</div></div><aside class="chronicle"><div class="chronicle-head"><h2>游玩编年</h2><small>PLAY CHRONICLE</small></div><div class="quick-stats"><div><span>START DATE</span><strong>${safe(startedLabel)}</strong></div><div><span>CLEAR DATE</span><strong>${safe(completedLabel)}</strong></div><div><span>PLAY TIME</span><strong>${game.hours?`${Number(game.hours)}h`:'未记录'}</strong></div></div><div class="chronicle-list">${logHtml}</div>${window.AMORIST_MODE==='editor'?'<button class="product-button secondary small chronicle-log-button" data-detail-action="log" type="button">记录时间</button>':''}</aside></section><section class="story-flow"><div class="progress"><div class="progress-label">ROUTE PROGRESS</div><strong>${routeDone} / ${routeTotal}</strong><span>${routeTotal&&routeDone===routeTotal?'ALL CLEAR':routeTotal?`${Math.round(routeDone/routeTotal*100)}% COMPLETE`:'NO ROUTES'}</span><i></i></div><div class="route-chapter"><div class="section-head"><h2>路线进度</h2><small>CHARACTER ROUTES</small>${window.AMORIST_MODE==='editor'?'<button class="product-button secondary small" data-detail-action="edit-routes" type="button">编辑角色</button>':''}</div><div class="route-list">${routeHtml}</div>${window.AMORIST_MODE==='editor'?'<div id="gameRouteEditor" class="game-route-editor" hidden></div>':''}</div></section></article><section class="product-card game-detail-section game-source-section" id="gameSourceInfo"><div class="section-head"><h3>作品资料</h3><span class="playing-meta">来自作品资料库</span></div><div class="playing-meta">正在读取作品资料…</div></section>`;
-        const sourceSection=$('#gameSourceInfo'),detailActions=$('#gameDetailPanel .actions');detailActions?.insertAdjacentHTML('beforeend','<button class="secondary" type="button" data-detail-action="source">游戏资料</button>');sourceSection?.insertAdjacentHTML('afterend','<button class="game-source-close" type="button" data-detail-action="close-source" aria-label="关闭作品资料">×</button>');const closeSource=()=>{sourceSection?.classList.remove('is-modal-open');$('#gameDetailPanel .game-source-close')?.classList.remove('is-visible')};$('#gameDetailPanel [data-detail-action="source"]')?.addEventListener('click',()=>{sourceSection?.classList.add('is-modal-open');$('#gameDetailPanel .game-source-close')?.classList.add('is-visible')});$('#gameDetailPanel [data-detail-action="close-source"]')?.addEventListener('click',closeSource);
+        $('#gameDetailPanel').innerHTML=`<button class="game-detail-back" type="button">← 返回游戏档案</button><article class="archive"><section class="hero"><div class="cover-stage"><div class="game-detail-cover">${game.cover?`<img src="${safe(game.cover)}" alt="${safe(game.name)}" referrerpolicy="no-referrer">`:safe(initial(game.name))}</div></div><div class="hero-copy"><div class="archive-no">ARCHIVE NO. ${archiveNo}</div><h1>${safe(game.name)}</h1><p class="jp-title">${safe(game.nameJp||game.nameAlt||game.nameOriginal||'')}</p><dl class="meta"><dt>发售日期</dt><dd>${safe(game.releaseDate||game.year||'未记录')}</dd><dt>开发商</dt><dd>${safe(game.developer||'未记录')}</dd><dt>游戏平台</dt><dd>${safe(game.platform||'未记录')}</dd><dt>游玩状态</dt><dd><span class="status-dot"></span>${safe(game.status||'尚未分类')}</dd><dt>攻略路线</dt><dd>${routeTotal} 条</dd></dl><div class="rating"><span>MY RATING</span><div class="stars">${stars}</div></div><p class="note">${safe(game.note||'这部作品还没有写下一句话记录。')}</p><div class="actions"><button type="button" data-detail-action="repo">OPEN REPO</button>${window.AMORIST_MODE==='editor'?'<button class="secondary" type="button" data-detail-action="edit">EDIT ARCHIVE</button>':''}</div></div><aside class="chronicle"><div class="chronicle-head"><h2>游玩编年</h2><small>PLAY CHRONICLE</small></div><div class="quick-stats"><div><span>START DATE</span><strong>${safe(startedLabel)}</strong></div><div><span>CLEAR DATE</span><strong>${safe(completedLabel)}</strong></div><div><span>PLAY TIME</span><strong>${game.hours?`${Number(game.hours)}h`:'未记录'}</strong></div></div><div class="chronicle-list">${logHtml}</div>${window.AMORIST_MODE==='editor'?'<button class="product-button secondary small chronicle-log-button" data-detail-action="log" type="button">记录时间</button>':''}</aside></section><section class="story-flow"><div class="progress"><div class="progress-label">ROUTE PROGRESS</div><strong>${routeDone} / ${routeTotal}</strong><span>${routeTotal&&routeDone===routeTotal?'ALL CLEAR':routeTotal?`${Math.round(routeDone/routeTotal*100)}% COMPLETE`:'NO ROUTES'}</span><i></i></div><div class="route-chapter"><div class="section-head"><h2>路线进度</h2><small>CHARACTER ROUTES</small>${window.AMORIST_MODE==='editor'?'<button class="product-button secondary small" data-detail-action="edit-routes" type="button">编辑角色</button>':''}</div><div class="route-list">${routeHtml}</div>${window.AMORIST_MODE==='editor'?'<div id="gameRouteEditor" class="game-route-editor" hidden></div>':''}</div></section></article><section class="product-card game-detail-section game-source-section" id="gameSourceInfo"><div class="section-head"><h3>作品资料</h3><span class="playing-meta">来自作品资料库</span></div><div class="playing-meta">正在读取作品资料…</div></section>`;
+        const sourceSection=$('#gameSourceInfo'),detailActions=$('#gameDetailPanel .actions');detailActions?.insertAdjacentHTML('beforeend','<button class="secondary" type="button" data-detail-action="source">GAME DETAILS</button>');sourceSection?.insertAdjacentHTML('afterend','<button class="game-source-close" type="button" data-detail-action="close-source" aria-label="关闭作品资料">×</button>');const closeSource=()=>{sourceSection?.classList.remove('is-modal-open');$('#gameDetailPanel .game-source-close')?.classList.remove('is-visible')};$('#gameDetailPanel [data-detail-action="source"]')?.addEventListener('click',()=>{sourceSection?.classList.add('is-modal-open');$('#gameDetailPanel .game-source-close')?.classList.add('is-visible')});$('#gameDetailPanel [data-detail-action="close-source"]')?.addEventListener('click',closeSource);
         const logDates=$$('#gameDetailPanel .chronicle-list .log time');chronicle.forEach((row,index)=>{const log=logDates[index]?.closest('.log');if(log&&(row.type==='started'||row.type==='completed'))log.classList.add('log-important');const time=logDates[index];if(!time)return;const first=row.events[0]||row.event,last=row.events.at(-1)||row.event;time.textContent=row.events.length>1?`${compactDate(first)}—${compactDate(last)}`:compactDate(row.event)});const quickStats=$$('#gameDetailPanel .quick-stats strong');if(quickStats[0])quickStats[0].textContent=fullDate(derived.find(event=>event.type==='started'));if(quickStats[1])quickStats[1].textContent=fullDate(derived.find(event=>event.type==='completed'));const chronicleTitle=$('#gameDetailPanel .chronicle h2');if(chronicleTitle)chronicleTitle.textContent='游玩日志';
-        $('#gameDetailPanel .game-detail-back').onclick=()=>{localStorage.removeItem('amoristUi.libraryRoute.v1');$('#gameDetailPanel').hidden=true;$('#libraryBrowseView').hidden=false;requestAnimationFrame(()=>window.scrollTo({top:libraryBrowseScrollY,behavior:'auto'}));};$('#gameDetailPanel [data-detail-action="repo"]').onclick=()=>writeGameToRepo(game);
+        $('#gameDetailPanel .game-detail-back').onclick=()=>{localStorage.removeItem('amoristUi.libraryRoute.v1');window.AmoristLibraryUI?.showBrowse?.();requestAnimationFrame(()=>window.scrollTo({top:libraryBrowseScrollY,behavior:'auto'}));};$('#gameDetailPanel [data-detail-action="repo"]').onclick=()=>writeGameToRepo(game);
         const editGameButton=$('#gameDetailPanel [data-detail-action="edit"]');if(editGameButton)editGameButton.onclick=()=>window.openEnhancedGameDialog(game);$('#gameDetailPanel [data-detail-action="edit-routes"]')?.addEventListener('click',()=>renderGameRouteEditor(id,game));
         const logButton=$('#gameDetailPanel [data-detail-action="log"]');if(logButton)logButton.onclick=()=>window.openTimelineRecordDialog?.(id);$$('#gameDetailPanel [data-time-event]').forEach(button=>button.onclick=()=>{const event=timeEvents.find(row=>row.id===button.dataset.timeEvent);if(!event)return;if(event.type==='session')window.openTimelineSessionDialog?.(event);else window.openTimelineRecordDialog?.(id,event)});
         $$('#gameDetailPanel [data-route]').forEach(btn=>btn.onclick=()=>{const route=btn.dataset.route,wasDone=done.includes(route),next=wasDone?done.filter(x=>x!==route):[...done,route],progress=gameRouteProgress(routes,next);saveGamePatch(id,{routeDone:next,progress:progress==null?game.progress:progress});});loadGameSourceInfo(game);
@@ -3644,13 +3745,6 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
             +`</div><div class="game-source-characters">${charactersHtml||'<div class="playing-meta">暂无角色数据</div>'}</div></div>`;
         }catch{host.innerHTML='<div class="section-head"><h3>作品资料</h3></div><div class="playing-meta">暂时无法读取作品资料库。</div>';}
       }
-
-      $('#gameLibraryGrid').addEventListener('click',event=>{
-        if(event.target.closest('.game-to-repo'))return;
-        const card=event.target.closest('.game-card');if(!card)return;
-        if(card.classList.contains('batch-mode'))return;
-        event.preventDefault();event.stopImmediatePropagation();renderGameDetail(card.dataset.gameId);
-      },true);
 
       document.addEventListener('click',event=>{
         const card=event.target.closest('#gameSourceInfo .game-source-char');
@@ -3837,6 +3931,12 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       let charBatchMode=false;
       const charSelected=new Set();
       const characterPreferenceOrder=dataModel.CHARACTER_PREFERENCES.map(item=>item.id);
+      const characterPreferenceAxisByRole={
+        all:characterPreferenceOrder,
+        route:['favorite','oshi','like','good','curious','normal','difficult','unclassified'],
+        protagonist:['like','good','curious','normal','difficult','unclassified'],
+        sub:['like','good','curious','normal','difficult','excluded','unclassified']
+      };
       function populateGameSelect(){
         const sel=$('#charGame');if(!sel)return;
         const rows=games().filter(game=>window.AmoristCharacterBookVisibility.visibleStatuses.has(String(game.status||'').trim()));
@@ -3877,6 +3977,7 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
         $('#charGameCount').textContent=workIds.size;
         const useTimeline=!normalized&&activeCharPreferenceFilter==='all'&&activeCharRoleFilter!=='unset';
         grid.classList.toggle('character-preference-timeline',useTimeline);
+        grid.classList.toggle('library-rank-axis',useTimeline);
         if(!filtered.length){
           grid.innerHTML='<div class="empty-library"><strong>没有符合条件的角色</strong>可以更换身份或喜好筛选；対象外只会在单独筛选时显示。</div>';
           return;
@@ -3884,8 +3985,6 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
         const sorted=filtered.sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
         const cardMarkup=c=>{
            const game=gameMap[c.gameId],workName=game?.name||'未知作品';
-           const preferenceClass=c.preference==='favorite'?'best':'';
-           const roleLabel=dataModel.characterRoleTypeLabel(c.roleType),preferenceLabel=dataModel.characterPreferenceLabel(c.preference);
            const quickActions=window.AMORIST_MODE==='editor'
              ? '<div class="char-quick-actions"><button class="char-quick-btn" data-char-action="edit" title="编辑角色档案">✎</button></div>'
              : '';
@@ -3893,14 +3992,16 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
              ${charBatchMode?`<input class="batch-select" type="checkbox" data-batch-char="${safe(c.id)}" ${charSelected.has(String(c.id))?'checked':''} aria-label="选择${safe(c.name)}">`:''}
              ${quickActions}
             <div class="char-cover">${c.image?`<img src="${safe(c.image)}" alt="${safe(c.name)}" referrerpolicy="no-referrer">`:safe(initial(c.name))}</div>
-            <div class="char-card-body"><strong>${safe(c.nameCn||c.name)}</strong><span class="char-game-name">${safe(workName)}</span><div class="char-tags"><span class="char-tag char-role-tag">${safe(roleLabel)}</span><span class="char-tag ${preferenceClass}">${safe(preferenceLabel)}</span>${c.cv?`<span class="char-tag">${safe(c.cv)}</span>`:''}</div></div>
+            <div class="char-card-body"><strong>${safe(c.nameCn||c.name)}</strong><span class="char-game-name">${safe(workName)}</span></div>
           </article>`;
         };
         if(useTimeline){
-          grid.innerHTML=characterPreferenceOrder.filter(category=>category!=='excluded').map((category,index)=>{
+          const axis=characterPreferenceAxisByRole[activeCharRoleFilter]||characterPreferenceOrder;
+          grid.innerHTML=axis.map((category,index)=>{
             const rows=sorted.filter(c=>c.preference===category);
-            if(category==='unclassified'&&!rows.length)return '';
-            return `<section class="character-preference-group" data-preference-level="${index}"><div class="character-preference-label">${safe(dataModel.characterPreferenceLabel(category))}</div><div class="character-preference-cards">${rows.length?rows.map(cardMarkup).join(''):'<span class="character-preference-empty">暂无角色</span>'}</div></section>`;
+            const label=dataModel.characterPreferenceLabel(category);
+            const categoryCode=String(category).replace(/_/g,' ').toUpperCase();
+            return `<section class="character-preference-group library-rank-tier" data-tier="${safe(category)}" data-preference-level="${index}"><header><span>${String(index+1).padStart(2,'0')}</span><h3>${safe(label)}</h3><small>${safe(categoryCode)}</small><em>${rows.length} characters</em></header><div class="character-preference-cards library-rank-track">${rows.length?rows.map(cardMarkup).join(''):'<span class="character-preference-empty library-rank-empty">暂无角色</span>'}</div></section>`;
           }).join('');
         }else{
           grid.innerHTML=sorted.map(cardMarkup).join('');

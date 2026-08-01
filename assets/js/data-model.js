@@ -13,7 +13,9 @@
     { id:'favorite', label:'最推し', legacy:['最推し','最推','本命'] },
     { id:'oshi', label:'推し', legacy:['推し','推'] },
     { id:'like', label:'好き', legacy:['好き','喜欢'] },
-    { id:'normal', label:'ふつう', legacy:['ふつう'] },
+    { id:'good', label:'好感', legacy:['好感'] },
+    { id:'curious', label:'気になる', legacy:['気になる','気になる人'] },
+    { id:'normal', label:'普通', legacy:['普通','ふつう'] },
     { id:'difficult', label:'苦手', legacy:['苦手','微妙'] },
     { id:'excluded', label:'対象外', legacy:['対象外','興味なし'] },
     { id:'unclassified', label:'未分類', legacy:['未分類','未分类','一般',''] }
