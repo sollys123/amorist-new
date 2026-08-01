@@ -168,7 +168,7 @@ p,li,dd {text-wrap:pretty}
 
 /* ===== Large-scale editorial layout pass ===== */
 :root {
-  --product-bg:#f4f3f0;
+  --product-bg:#fbf8f2;
   --product-surface:#fffefd;
   --product-surface-2:#ebe9e7;
   --product-ink:#302c36;
