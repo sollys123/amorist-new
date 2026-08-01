@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+  <meta name="color-scheme" content="light">
+  <link id="lxgwFont" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" onerror="this.onerror=null;this.href='https://cdn.bootcdn.net/ajax/libs/lxgw-wenkai-webfont/1.7.0/style.min.css';">
+  <title>Amorist</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" href="./assets/css/amorist.css?v=timeline-ui-20260731">
+  <link rel="stylesheet" href="./assets/css/site-modes.css?v=pure-otome-20260728">
+  <link rel="stylesheet" href="./assets/css/polish.css?v=timeline-ui-20260731">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  <div class="product-shell">
+    <aside class="product-sidebar" aria-label="主要导航">
+      <div class="product-brand">
+        <div class="product-brand-copy"><strong>Amorist</strong><span>OTOME LIFE ARCHIVE</span></div>
+      </div>
+      <div class="product-nav-label">EXPLORE</div>
+      <nav class="product-nav product-nav-discover">
+        <button class="product-nav-btn active" type="button" data-product-target="home"><span class="product-nav-icon">⌂</span><span><b>首页</b><small>今日与最近记录</small></span></button>
+        <button class="product-nav-btn" type="button" data-product-target="bangumi"><span class="product-nav-icon">✦</span><span><b>作品索引</b><small>按声优与制作阵容探索</small></span></button>
+      </nav>
+      <div class="product-nav-label">MY ARCHIVE</div>
+      <nav class="product-nav">
+        <button class="product-nav-btn" type="button" data-product-target="oshi"><span class="product-nav-icon">♧</span><span><b>推角展示</b><small>喜欢的人物与记录</small></span></button>
+        <button class="product-nav-btn" type="button" data-product-target="library"><span class="product-nav-icon">▦</span><span><b>游戏档案</b><small>进度与收藏</small></span></button>
+        <button class="product-nav-btn" type="button" data-product-target="characters"><span class="product-nav-icon">♡</span><span><b>角色图鉴</b><small>角色与人物资料</small></span></button>
+        <button class="product-nav-btn" type="button" data-product-target="timeline"><span class="product-nav-icon">◷</span><span><b>时间线</b><small>游玩编年史</small></span></button>
+      </nav>
+      <div class="product-nav-label">CREATE</div>
+      <nav class="product-nav">
+        <button class="product-nav-btn" type="button" data-product-target="studio"><span class="product-nav-icon">✎</span><span><b>游戏 REPO</b><small>短评、长评与截图</small></span></button>
+        <button class="product-nav-btn" type="button" data-product-target="forms"><span class="product-nav-icon">⊞</span><span><b>图文创作</b><small>九宫格、Tier 与偏好卡</small></span></button>
+      </nav>
+      <div class="product-nav-label">PERSONAL</div>
+      <div class="product-sidebar-foot">
+        <button class="sidebar-profile-button" type="button" data-product-target="profile">
+          <span class="product-avatar" id="sidebarAvatar">A</span>
+          <span><strong id="sidebarName">玩家</strong><small>查看与编辑我的自介</small></span>
+          <i>›</i>
+        </button>
+      </div>
+    </aside>
+
+    <div class="product-main" id="main-content" tabindex="-1">
+      <section class="product-view active" data-product-view="home">
+        <div class="home-page-head">
+          <div>
+            <div class="page-eyebrow">OTOME ARCHIVE</div>
+            <h1 id="homeGreeting" aria-live="polite"></h1>
+            <p>好きなものだけ。</p>
+          </div>
+        </div>
+
+        <div class="home-feature-grid">
+          <section class="home-journey-card">
+            <div class="journey-cover" id="dashboardPlayingCover"><span>AMORIST</span></div>
+            <div class="journey-copy">
+              <div class="journey-heading"><div class="card-eyebrow">NOW PLAYING</div><label class="dashboard-playing-switch" id="dashboardPlayingSwitchWrap" hidden><span>切换展示</span><select id="dashboardPlayingSelect" aria-label="切换首页正在游玩的游戏"><option value="">自动选择</option></select></label></div>
+              <h2 id="dashboardPlayingTitle">暂无进行中的游戏</h2>
+              <p id="dashboardPlayingMeta">在游戏档案中将状态设为「进行中」</p>
+              <div class="journey-progress-line"><span>进度</span><strong id="dashboardProgressText">0%</strong></div>
+              <div class="progress-track"><i id="dashboardProgressBar"></i></div>
+              <div class="journey-actions">
+                <button class="text-action" type="button" data-product-target="library" data-open-dashboard-game-direct>游戏档案 <span>→</span></button>
+              </div>
+            </div>
+          </section>
+          <section class="home-omikuji-card" id="homeOmikujiCard">
+            <header class="home-omikuji-head">
+              <div><span>今日の御籤</span></div>
+              <div class="home-omikuji-head-actions"><time id="homeOmikujiDate"></time><button type="button" id="homeOmikujiCollapse" aria-label="收起御签" hidden>⌃</button></div>
+            </header>
+            <div class="home-omikuji-sealed" id="homeOmikujiSealed">
+              <div class="home-omikuji-seal">縁</div>
+              <button type="button" id="homeOmikujiDraw">引く</button>
+              <small>一日一籤</small>
+            </div>
+            <div class="home-omikuji-result" id="homeOmikujiResult" hidden>
+              <div class="home-omikuji-portrait" id="homeOmikujiPortrait"></div>
+              <div class="home-omikuji-copy">
+                <h2 id="homeOmikujiName"></h2>
+                <p class="home-omikuji-work" id="homeOmikujiWork"></p>
+                <div class="home-omikuji-grade-row"><strong id="homeOmikujiGrade"></strong><i aria-hidden="true">縁</i></div>
+                <p class="home-omikuji-message" id="homeOmikujiMessage"></p>
+                <p class="home-omikuji-attribution" id="homeOmikujiAttribution"></p>
+                <button type="button" id="homeOmikujiOpen">查看角色 →</button>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <section class="home-metrics-strip">
+          <div><span>GAMES</span><strong id="metricGames">0</strong><small>游戏</small></div>
+          <i></i>
+          <div><span>FINISHED</span><strong id="metricFinished">0</strong><small>全通</small></div>
+          <i></i>
+          <div><span>REPO</span><strong id="metricCreated">0</strong><small>存档</small></div>
+          <i></i>
+          <div><span>PLAY TIME</span><strong id="metricHours">0h</strong><small>时长</small></div>
+        </section>
+
+        <div class="home-content-grid">
+          <section class="product-card home-section-card home-recent-section">
+            <div class="section-head"><div><span class="section-kicker">RECENT</span><h2>最近游戏</h2></div><button class="text-button" type="button" data-product-target="library">游戏档案 <span>→</span></button></div>
+            <div class="recent-list" id="dashboardRecentGames"></div>
+          </section>
+          <section class="product-card home-section-card home-character-section">
+            <div class="section-head"><div><span class="section-kicker">CHARACTERS</span><h2>最近角色</h2></div><button class="text-button" type="button" data-product-target="characters">角色图鉴 <span>→</span></button></div>
+            <div id="homeCharacterSpotlight" class="home-character-spotlight"><div class="spotlight-empty">暂无角色记录</div></div>
+          </section>
+        </div>
+
+        <section class="home-resource-discovery">
+          <section class="resource-discovery-hero">
+            <div class="resource-discovery-copy">
+              <span class="section-kicker light">DISCOVER</span>
+              <h2>どこまでも行くんです。</h2>
+              <div class="resource-hero-actions">
+                <button class="resource-primary-action" type="button" data-resource-action="random">随机一部</button>
+                <button class="resource-secondary-action" type="button" data-resource-action="old">旧作漫游</button>
+                <button class="resource-secondary-action" type="button" data-home-open-search>精确检索 →</button>
+              </div>
+            </div>
+            <div class="resource-feature-card" id="bangumiDiscoveryFeature">
+              <div class="feature-placeholder"><span>✦</span><strong>等待一次发现</strong><small>资料加载后，这里会出现一部随机作品。</small></div>
+            </div>
+          </section>
+          <section class="resource-explore-rails" id="bangumiDiscoveryRails">
+            <div class="resource-rail">
+              <div class="resource-rail-head"><span>01 / VOICE ACTOR</span><div class="resource-rail-title"><b>随机声优</b><button class="resource-cycle-button" type="button" data-resource-cycle="cv" aria-label="随机换一批声优" title="随机换一批">↻</button></div></div>
+              <div class="resource-chip-list" id="bangumiCvChips"><span class="resource-chip-skeleton"></span><span class="resource-chip-skeleton"></span><span class="resource-chip-skeleton"></span></div>
+            </div>
+            <div class="resource-rail">
+              <div class="resource-rail-head"><span>02 / SCENARIO</span><div class="resource-rail-title"><b>随机剧本娘</b><button class="resource-cycle-button" type="button" data-resource-cycle="writer" aria-label="随机换一批剧本娘" title="随机换一批">↻</button></div></div>
+              <div class="resource-chip-list" id="bangumiWriterChips"><span class="resource-chip-skeleton"></span><span class="resource-chip-skeleton"></span></div>
+            </div>
+            <div class="resource-rail">
+              <div class="resource-rail-head"><span>03 / STUDIO</span><div class="resource-rail-title"><b>随机厂商</b><button class="resource-cycle-button" type="button" data-resource-cycle="maker" aria-label="随机换一批厂商" title="随机换一批">↻</button></div></div>
+              <div class="resource-chip-list" id="bangumiMakerChips"><span class="resource-chip-skeleton"></span><span class="resource-chip-skeleton"></span></div>
+            </div>
+            <div class="resource-rail resource-era-rail"><div class="resource-rail-head"><span>04 / ERA</span><div class="resource-rail-title"><b>按年代</b></div></div><div class="resource-chip-list"><button type="button" data-resource-year="2020s">2020s</button><button type="button" data-resource-year="2010s">2010s</button><button type="button" data-resource-year="2000s">2000s</button><button type="button" data-resource-year="1990s">1990s</button></div></div>
+          </section>
+        </section>
+
+      </section>
+
+      <section class="product-view" data-product-view="oshi">
+        <div class="product-page-head oshi-page-head">
+          <div><div class="page-eyebrow">PORTRAITS OF AFFECTION</div><h1>好きな人たち</h1><p>把最喜欢的人物，编排成一页只属于你的总览。</p></div>
+          <div class="oshi-head-actions">
+            <nav class="oshi-view-switch" aria-label="展示模式"><button class="active" type="button" data-oshi-view-mode="flow" aria-pressed="true">FLOW</button><button type="button" data-oshi-view-mode="magazine" aria-pressed="false">MAGAZINE</button></nav>
+            <span class="oshi-count" id="oshiCount">0</span>
+            <button class="product-button secondary" id="oshiEditButton" type="button" data-oshi-editor-only>编辑图片</button>
+          </div>
+        </div>
+        <div class="oshi-hub-view" id="oshiHubView">
+          <div class="oshi-canvas-shell">
+            <section class="oshi-canvas" id="oshiCanvas" aria-label="推角展示总览">
+            </section>
+          </div>
+          <section class="oshi-index">
+            <div class="oshi-index-title"><span>INDEX</span><strong>全部人物</strong></div>
+            <div class="oshi-index-list" id="oshiIndexList"></div>
+          </section>
+          <p class="oshi-help" id="oshiHelp" hidden>可在下方拖动人物名字调整排名；上方图片顺序与排名互不影响。</p>
+        </div>
+        <div class="oshi-detail-view" id="oshiDetailView" hidden>
+          <div class="oshi-detail-topbar"><button class="oshi-back-link" id="oshiBackButton" type="button">← 全部人物</button><nav class="oshi-detail-tabs" id="oshiDetailTabs"></nav><button class="product-button secondary small" id="oshiEditDetailButton" type="button" data-oshi-editor-only>编辑</button></div>
+          <section class="oshi-profile">
+            <div class="oshi-profile-copy"><div><span class="oshi-section-label" id="oshiIssueLabel">ISSUE</span><h2 id="oshiProfileName"></h2><div class="oshi-profile-alt" id="oshiProfileAlt"></div><p class="oshi-profile-note" id="oshiProfileShort"></p></div><dl class="oshi-profile-meta"><div><dt>VOICE</dt><dd id="oshiProfileCv"></dd></div><div><dt>FROM</dt><dd id="oshiProfileGame"></dd></div><div><dt>FIRST MET</dt><dd id="oshiProfileSince"></dd></div></dl></div>
+            <figure class="oshi-profile-visual" id="oshiProfileVisual"><img id="oshiProfileImage" alt="角色主视觉"></figure>
+          </section>
+          <section class="oshi-editorial-info"><article class="oshi-why"><span class="oshi-micro" id="oshiReasonEyebrow">WHY HIM</span><h3 id="oshiReasonTitle">偏爱的理由</h3><blockquote id="oshiReviewLead"></blockquote><div class="oshi-review" id="oshiReviewBody"></div><div class="oshi-tags" id="oshiTags"></div></article><aside class="oshi-character-data"><span class="oshi-micro" id="oshiFactsEyebrow">PROFILE</span><h3 id="oshiFactsTitle">资料</h3><div class="oshi-character-facts" id="oshiCharacterFacts"></div></aside></section>
+          <section class="oshi-collections" id="oshiCollections"></section>
+          <div class="oshi-add-collection"><button id="oshiAddCollection" type="button" data-oshi-editor-only>＋ 新建图片集</button></div>
+        </div>
+        <aside class="oshi-editor-drawer" id="oshiEditorDrawer" aria-label="推角展示编辑" hidden>
+          <div class="oshi-drawer-head"><div><span class="oshi-micro">EDITOR</span><h2 id="oshiDrawerTitle">编辑</h2></div><button class="oshi-drawer-close" id="oshiDrawerClose" type="button" aria-label="关闭推角展示编辑">×</button></div>
+          <div id="oshiHubEditor">
+            <div class="oshi-form-grid">
+              <label>人物<select id="oshiHubCharacterSelect"></select></label>
+              <label>总览图片<input id="oshiHubImageUpload" type="file" accept="image/*"></label>
+              <label>图片宽度 <output id="oshiWidthValue"></output><input id="oshiWidth" type="range" min="12" max="42" step="1"></label>
+              <label>横向位置<input id="oshiX" type="range" min="0" max="88" step="1"></label>
+              <label>纵向位置<input id="oshiY" type="range" min="2" max="86" step="1"></label>
+              <label>姓名位置<select id="oshiCaption"><option value="bottom">图片下方</option><option value="right">图片右侧</option><option value="left">图片左侧</option><option value="hidden">不显示</option></select></label>
+              <div><span class="oshi-field-label">层级</span><div class="oshi-inline-actions"><button class="product-button secondary small" id="oshiBringFront" type="button">置于最前</button><button class="product-button secondary small" id="oshiSendBack" type="button">置于最后</button></div></div>
+              <div><span class="oshi-field-label">单个人物位置</span><button class="product-button secondary small" id="oshiResetSelected" type="button">恢复默认</button></div>
+            </div>
+            <div class="oshi-drawer-actions"><button class="product-button rose" id="oshiHubDone" type="button">完成</button><button class="product-button secondary" id="oshiResetAll" type="button">恢复全部默认位置</button></div>
+          </div>
+          <div id="oshiDetailEditor" hidden>
+            <div class="oshi-form-grid">
+              <label>角色<select id="oshiDetailCharacterSelect"></select></label>
+              <label>展示名<input id="oshiEditName"></label>
+              <label>原名 / 作品名<input id="oshiEditAlt"></label>
+              <label>短评<textarea id="oshiEditShort"></textarea></label>
+              <label>评价<textarea id="oshiEditReview"></textarea></label>
+              <label>标签（逗号分隔）<input id="oshiEditTags"></label>
+              <label>个人页主视觉<input id="oshiProfileUpload" type="file" accept="image/*"></label>
+              <label>ARTWORKS 图片（追加）<input id="oshiArtworksUpload" type="file" accept="image/*" multiple></label>
+              <label>CG 图片（追加）<input id="oshiCgUpload" type="file" accept="image/*" multiple></label>
+              <label>新建图片集<div class="oshi-new-collection"><input id="oshiNewCollectionTitle" placeholder="输入标题"><button class="product-button secondary small" id="oshiCreateCollection" type="button">新建</button></div></label>
+              <div class="oshi-collection-editor-list" id="oshiCollectionEditorList"></div>
+            </div>
+            <div class="oshi-drawer-actions"><button class="product-button rose" id="oshiSaveDetail" type="button">应用</button><button class="product-button secondary" id="oshiResetDetail" type="button">恢复默认</button></div>
+          </div>
+        </aside>
+        <div class="oshi-drawer-backdrop" id="oshiDrawerBackdrop" hidden></div>
+        <div class="oshi-lightbox" id="oshiLightbox" hidden><button id="oshiLightboxClose" type="button" aria-label="关闭图片预览">×</button><img id="oshiLightboxImage" alt="图片预览"></div>
+      </section>
+
+      <section class="product-view" data-product-view="library">
+        <div class="product-page-head"><div><h1>游戏档案</h1><p>Whatever our souls are made of, his and mine are the same</p></div></div>
+        <div id="libraryBrowseView"><div class="library-controls"><div class="filter-pills library-status-tabs" id="libraryFilters"><button class="filter-pill active" data-library-filter="全部">全部</button><button class="filter-pill" data-library-filter="已全通">已全通</button><button class="filter-pill" data-library-filter="进行中">进行中</button><button class="filter-pill" data-library-filter="已封盘">已封盘</button><button class="filter-pill" data-library-filter="已买未打">已买未打</button><button class="filter-pill" data-library-filter="心愿单">心愿单</button><button class="filter-pill" data-library-filter="尚未分类">尚未分类</button></div><span id="libraryCountText" class="playing-meta">0 部作品</span><button class="product-button secondary small" id="libraryBatchToggle" type="button">批量管理</button></div><div class="batch-actions" id="libraryBatchActions" hidden><span class="playing-meta">已选 <strong id="librarySelectedCount">0</strong> 部</span><button class="product-button secondary small" id="libraryBatchAll" type="button">全选</button><select class="product-select small" id="libraryBatchStatus"><option value="">批量状态…</option><option>已全通</option><option>进行中</option><option>已封盘</option><option>已买未打</option><option>心愿单</option><option>尚未分类</option></select><select class="product-select small" id="libraryBatchCategory"><option value="">批量归类…</option><option value="hall_of_fame">殿堂入り</option><option value="love">大好き</option><option value="like">好き</option><option value="normal">普通</option><option value="difficult">苦手</option><option value="unclassified">未分類</option></select><button class="product-button secondary small" id="libraryBatchApply" type="button">应用更改</button><button class="product-button danger small" id="libraryBatchDelete" type="button">删除所选</button><button class="product-button secondary small" id="libraryBatchCancel" type="button">取消</button></div><div class="game-library-grid" id="gameLibraryGrid"></div></div>
+        <div class="game-detail" id="gameDetailPanel" hidden></div>
+      </section>
+
+      <section class="product-view" data-product-view="profile">
+        <div class="product-page-head">
+              <div><h1>我的自介</h1><p>Wir lieben einander wie Mohn und Gedächtnis</p></div>
+          <div class="profile-page-nav">
+            <button class="product-button small profile-page-btn active" type="button" data-profile-page="1">属性表 / 01</button>
+            <button class="product-button small profile-page-btn" type="button" data-profile-page="2">偏好页 / 02</button>
+            <button class="product-button" id="profileCaptureButton" type="button">保存当前页图片</button>
+          </div>
+        </div>
+        <div class="profile-layout">
+          <aside class="product-card profile-editor" id="profileEditor">
+            <div class="profile-editor-tabs">
+              <button class="profile-tab active" type="button" data-profile-tab="basic">基础</button>
+              <button class="profile-tab" type="button" data-profile-tab="prefs">偏好</button>
+              <button class="profile-tab" type="button" data-profile-tab="works">作品</button>
+            </div>
+            <div class="profile-editor-section active" data-profile-section="basic">
+              <div class="editor-group"><label>显示名字</label><input class="product-input profile-field" data-profile-key="name" maxlength="24" placeholder="HARU"></div>
+              <div class="editor-group"><label>社交账号 / 昵称</label><input class="product-input profile-field" data-profile-key="handle" maxlength="40" placeholder="@yourname"></div>
+              <div class="editor-group"><label>关于我</label><textarea class="product-textarea profile-field" data-profile-key="bio" maxlength="220" placeholder="喜欢故事里无法被替代的相遇…"></textarea></div>
+              <div class="editor-group"><label>年龄</label><input class="product-input profile-field" data-profile-key="age" maxlength="10" placeholder="20"></div>
+              <div class="editor-group"><label>平台 ID</label><input class="product-input profile-field" data-profile-key="platformId" maxlength="40" placeholder="有人弄乱这些玫瑰"></div>
+              <div class="editor-group"><label>同担拒否</label><input class="product-input profile-field" data-profile-key="sameFan" maxlength="20" placeholder="拒 / 不拒 / 选拒"></div>
+              <div class="editor-group"><label>入坑年份</label><input class="product-input profile-field" data-profile-key="years" maxlength="20" placeholder="2020"></div>
+              <div class="editor-group"><label>游玩平台（用逗号分隔）</label><input class="product-input profile-field" data-profile-key="platforms" maxlength="80" placeholder="PC, Switch, PSV, PSP"></div>
+              <div class="editor-group"><label>可玩语言（用逗号分隔）</label><input class="product-input profile-field" data-profile-key="languages" maxlength="60" placeholder="中文, 日语, 英语"></div>
+              <div class="editor-group"><label>我的关键词（用逗号分隔）</label><input class="product-input profile-field" data-profile-key="tags" maxlength="80" placeholder="乙女游戏, 剧情党, 长评选手"></div>
+            </div>
+            <div class="profile-editor-section" data-profile-section="prefs">
+              <div class="editor-group"><label>偏好类型</label><input class="product-input profile-field" data-profile-key="type" maxlength="60" placeholder="强剧情 · 成长型角色"></div>
+              <div class="editor-group"><label>推角 / 推 CP（每行一个）</label><textarea class="product-textarea profile-field" data-profile-key="oshiChars" maxlength="300" placeholder="辉夜姬&#10;有村乃亚&#10;久世円"></textarea></div>
+              <div class="editor-group"><label>玩法</label><input class="product-input profile-field" data-profile-key="playstyle" maxlength="80" placeholder="代入 / 磕代"></div>
+              <div class="editor-group"><label>喜欢的声优</label><textarea class="product-textarea profile-field" data-profile-key="voiceActors" maxlength="200" placeholder="内田雄马 小野友树&#10;没有特别喜好，视角色而定"></textarea></div>
+              <div class="editor-group"><label>XP / 角色偏好</label><textarea class="product-textarea profile-field" data-profile-key="xp" maxlength="200" placeholder="温柔 轻飘飘 天然呆&#10;天降竹马 浪漫 命运 骑士役"></textarea></div>
+              <div class="editor-group"><label>世界观偏好</label><textarea class="product-textarea profile-field" data-profile-key="worldview" maxlength="200" placeholder="最喜欢西幻&#10;暗黑童话就更好了"></textarea></div>
+              <div class="editor-group"><label>剧本娘</label><textarea class="product-textarea profile-field" data-profile-key="scriptWriters" maxlength="200" placeholder="藤文 中村幸代&#10;中山智美 七雾花男"></textarea></div>
+            </div>
+            <div class="profile-editor-section" data-profile-section="works">
+              <div class="editor-group"><label>本命作品</label><input class="product-input profile-field" data-profile-key="favorite" maxlength="60" placeholder="大正对称爱丽丝"></div>
+              <div class="editor-group"><label>喜欢的作品（每行一个）</label><textarea class="product-textarea profile-field" data-profile-key="likedWorks" maxlength="300" placeholder="终远&#10;茉莉花&#10;时计"></textarea></div>
+              <div class="editor-group"><label>待打 / 待购入（每行一个）</label><textarea class="product-textarea profile-field" data-profile-key="wishlist" maxlength="300" placeholder="吉原彼岸花&#10;妖怪米饭&#10;黑蝶幻境"></textarea></div>
+              <div class="editor-group" style="padding-top:10px;border-top:1px dashed var(--product-line);margin-top:6px"><label>正在玩 / 全通游戏</label></div>
+            </div>
+          </aside>
+          <div class="profile-canvas-wrap">
+            <article class="profile-canvas active" id="profileCanvas1" data-profile-card="1">
+              <div class="profile-index">OTOME PLAYER PROFILE / 01</div>
+              <h2 class="profile-display-name" id="profileDisplayName">HARU</h2>
+              <div class="profile-handle" id="profileDisplayHandle">@yourname</div>
+              <div class="profile-rule"></div>
+              <div class="profile-bio" id="profileDisplayBio"></div>
+              <div class="profile-facts">
+                <div class="profile-fact"><span>PLAYING SINCE</span><strong id="profileDisplayYears">—</strong></div>
+                <div class="profile-fact"><span>AGE</span><strong id="profileDisplayAge">—</strong></div>
+                <div class="profile-fact"><span>PLATFORM ID</span><strong id="profileDisplayPlatformId">—</strong></div>
+                <div class="profile-fact"><span>同担拒否</span><strong id="profileDisplaySameFan">—</strong></div>
+              </div>
+              <div class="profile-section-divider"></div>
+              <div class="profile-chip-section">
+                <span class="profile-section-label">PLAYING ON</span>
+                <div class="profile-chips" id="profileDisplayPlatforms"></div>
+              </div>
+              <div class="profile-chip-section">
+                <span class="profile-section-label">LANGUAGES</span>
+                <div class="profile-chips" id="profileDisplayLanguages"></div>
+              </div>
+              <div class="profile-list-section">
+                <span class="profile-section-label">推角 / 推 CP</span>
+                <div class="profile-list" id="profileDisplayOshi"></div>
+              </div>
+              <div class="profile-inline-section">
+                <span class="profile-section-label">MY TYPE</span>
+                <strong id="profileDisplayType">—</strong>
+              </div>
+              <div class="profile-inline-section">
+                <span class="profile-section-label">玩法</span>
+                <strong id="profileDisplayPlaystyle">—</strong>
+              </div>
+              <div class="profile-tags" id="profileDisplayTags"></div>
+            </article>
+            <article class="profile-canvas" id="profileCanvas2" data-profile-card="2" style="display:none">
+              <div class="profile-index">OTOME PLAYER PROFILE / 02</div>
+              <h2 class="profile-display-name-sm" id="profileDisplayName2">HARU</h2>
+              <div class="profile-rule"></div>
+              <div class="profile-two-col">
+                <div class="profile-col">
+                  <div class="profile-block">
+                    <span class="profile-section-label">喜欢的声优</span>
+                    <div class="profile-block-text" id="profileDisplayVA"></div>
+                  </div>
+                  <div class="profile-block">
+                    <span class="profile-section-label">XP / 角色偏好</span>
+                    <div class="profile-block-text" id="profileDisplayXP"></div>
+                  </div>
+                </div>
+                <div class="profile-col">
+                  <div class="profile-block">
+                    <span class="profile-section-label">世界观偏好</span>
+                    <div class="profile-block-text" id="profileDisplayWorld"></div>
+                  </div>
+                  <div class="profile-block">
+                    <span class="profile-section-label">剧本娘</span>
+                    <div class="profile-block-text" id="profileDisplayScript"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="profile-section-divider"></div>
+              <div class="profile-game-section">
+                <span class="profile-section-label">ALL-TIME FAVORITE</span>
+                <strong class="profile-game-title" id="profileDisplayFavorite">—</strong>
+              </div>
+              <div class="profile-game-section">
+                <span class="profile-section-label">喜欢的作品</span>
+                <div class="profile-game-chips" id="profileDisplayLiked"></div>
+              </div>
+              <div class="profile-game-section profile-game-sync">
+                <span class="profile-section-label">正在玩 <em>← 游戏档案</em></span>
+                <div class="profile-game-chips" id="profileDisplayPlaying"></div>
+              </div>
+              <div class="profile-game-section profile-game-sync">
+                <span class="profile-section-label">已全通 <em>← 游戏档案</em></span>
+                <div class="profile-game-chips" id="profileDisplayFinished"></div>
+              </div>
+              <div class="profile-game-section">
+                <span class="profile-section-label">待打 / 待购入</span>
+                <div class="profile-game-chips" id="profileDisplayWishlist"></div>
+              </div>
+              <div class="profile-archive-foot">
+                <strong id="profileArchiveStats">游戏档案 0 · 全通 0</strong>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="product-view" data-product-view="forms">
+        <div class="product-page-head"><div><h1>图文创作</h1><p>در ازل پرتوِ حُسنت ز تجلی دَم زد ,عشق پیدا شد و آتش به همه عالم زد</p></div><button class="product-button secondary" id="backToTemplates" type="button" hidden>返回模板</button></div>
+        <div class="forms-grid" id="formTemplates">
+          <article class="product-card form-template visual-template" data-form-template="grid"><div class="template-preview preview-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><h3>作品九宫格</h3><p>从游戏档案挑选九部作品，给每一格写下自己的短标题。</p><div class="form-template-foot"><span>图片 × 9</span><strong>开始制作 →</strong></div></article>
+          <article class="product-card form-template visual-template" data-form-template="tier"><div class="template-preview preview-tier"><b>S</b><i></i><i></i><b>A</b><i></i><i></i><b>B</b><i></i><i></i></div><h3>作品 Tier 排名</h3><p>点击作品依次移动等级，用视觉层级表达喜好，不必写成长问卷。</p><div class="form-template-foot"><span>5 个等级</span><strong>开始排列 →</strong></div></article>
+          <article class="product-card form-template visual-template" data-form-template="contrast"><div class="template-preview preview-contrast"><i></i><span>盲狙</span><span>真爱</span><i></i></div><h3>盲狙与真爱</h3><p>按作品并列记录开玩前的盲狙与通关后的实际本命。</p><div class="form-template-foot"><span>对照卡</span><strong>开始制作 →</strong></div></article>
+          <article class="product-card form-template visual-template" data-form-template="mood"><div class="template-preview preview-mood"><i></i><i></i><i></i><strong>我的乙游属性</strong></div><h3>玩家属性图</h3><p>头像、作品封面和简短偏好组合成一张内容丰富的自介副页。</p><div class="form-template-foot"><span>图文混排</span><strong>开始制作 →</strong></div></article>
+          <article class="product-card form-template visual-template" data-form-template="char9"><div class="template-preview preview-char9"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><h3>角色九宫格</h3><p>九位最心动的角色，从角色图鉴直接拖入，每格标注角色名与出处。</p><div class="form-template-foot"><span>角色 × 9</span><strong>开始制作 →</strong></div></article>
+          <article class="product-card form-template visual-template" data-form-template="pref"><div class="template-preview preview-pref"><i></i><i></i><i></i><i></i><i></i><i></i></div><h3>角色偏好表</h3><p>按作品列出最好感与最无感的角色，图文对照一目了然。</p><div class="form-template-foot"><span>对照卡</span><strong>开始制作 →</strong></div></article>
+          <article class="product-card form-template visual-template" data-form-template="custom"><div class="template-preview preview-custom"><i></i><i></i><i></i><i></i><i></i><i></i></div><h3>自定义表格</h3><p>自由选择两列或三列，放入角色图与自定义文字，制作专属对比卡。</p><div class="form-template-foot"><span>2/3 列</span><strong>开始制作 →</strong></div></article>
+          <article class="product-card form-template visual-template" data-form-template="attr"><div class="template-preview preview-attr"><i></i><div class="attr-lines"><i></i><i></i><i></i><i></i></div></div><h3>玩家属性卡</h3><p>头像、推角列表、游玩平台与偏好标签，一张浓缩的玩家名片。</p><div class="form-template-foot"><span>图文名片</span><strong>开始制作 →</strong></div></article>
+        </div>
+        <div class="form-workspace visual-workspace" id="formWorkspace"><article class="visual-sheet" id="visualSheet"><header class="visual-sheet-head"><div><div class="card-eyebrow">AMORIST VISUAL NOTE</div><input id="activeFormTitle" aria-label="图文表格标题"></div><span id="visualSheetOwner">HARU</span></header><div id="visualCanvas"></div></article><aside class="product-card form-side"><h3>编辑这张图</h3><p class="playing-meta">点击画布里的图片格，从你的游戏档案选择作品；标题和短句可以直接修改。</p><button class="product-button rose" id="saveFormAnswers" type="button">保存当前作品</button><button class="product-button" id="captureFormAnswers" type="button">导出分享图片</button><button class="product-button secondary" id="clearFormAnswers" type="button">清空画布</button></aside></div>
+      </section>
+
+      <section class="product-view" data-product-view="studio">
+  <div class="product-page-head repo-product-head">
+    <div><h1>REPO</h1><p>やは肌のあつき血汐にふれも見で，さびしからずや道を説く君</p></div>
+    <div class="repo-product-actions" id="repoProductActions"></div>
+  </div>
+  <main class="app">
+    <section class="toolbar" id="toolbar">
+      <div class="toolbar-group toolbar-brand">
+        <span class="toolbar-title">乙女游戏 REPO Maker</span>
+        <span class="toolbar-status" id="saveStatus">当前为临时草稿 · 已自动保存</span>
+      </div>
+      <div class="toolbar-group" id="paletteList" aria-label="选择配色"></div>
+      <div class="page-switch" id="pageSwitch" role="group" aria-label="选择 REPO 页面">
+        <button class="page-switch-btn active" type="button" data-repo-page="full" aria-pressed="true">完整页</button>
+        <div id="longPageButtons" class="long-page-buttons"></div>
+        <button class="page-add-btn" id="addLongPageBtn" type="button" title="增加新的长评页面">＋长评页</button>
+      </div>
+      <div class="toolbar-group">
+        <button class="tool-btn" id="repoBackToGame" type="button">返回游戏</button>
+        <button class="tool-btn" id="archiveBtn" type="button">存档<span class="archive-count" id="archiveCount">0</span></button>
+        <button class="tool-btn danger" id="resetBtn" type="button">清空</button>
+        <button class="tool-btn primary" id="screenshotBtn" type="button">截图当前页</button>
+      </div>
+    </section>
+
+    <section class="viewport">
+      <div id="canvasShell">
+        <article id="repoCard" class="repo-page">
+          <header class="repo-header">
+            <div class="main-title-wrap">
+              <div class="eyebrow">Omnia vincit Amor</div>
+              <input class="main-title persist" id="workTitle" data-key="workTitle" value="乙女游戏 REPO" aria-label="标题">
+            </div>
+            <div class="maker-block">
+              <div class="maker-line"><span>制表人</span><strong class="maker-fixed">HARU</strong></div>
+              <div class="maker-line"><label for="fillerName">填表人</label><input class="maker-input persist" id="fillerName" data-key="fillerName"></div>
+            </div>
+          </header>
+
+          <section class="top-grid">
+            <div class="image-tile cover-tile image-picker" data-target="cover" tabindex="0" role="button" aria-label="选择作品封面">
+              <img id="coverImg" alt="作品封面">
+              <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">搜索或上传<br>作品封面</span></div>
+            </div>
+
+            <div class="info-ratings">
+              <div class="basic-info">
+                <div class="field">
+                  <label>作品名称</label>
+                  <input class="persist" id="gameName" data-key="gameName" aria-label="作品名称">
+                </div>
+                <div class="field">
+                  <label>时长</label>
+                  <input class="persist" id="playTime" data-key="playTime" aria-label="游玩时长">
+                </div>
+                <div class="field">
+                  <label>是否全通</label>
+                  <div class="completion" id="completionToggle">
+                    <button type="button" data-value="yes">是</button>
+                    <button type="button" data-value="no">否</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="choice-row">
+                <div class="choice-box">
+                  <div class="choice-title">游玩平台</div>
+                  <div class="choice-pills" id="platformChoices">
+                    <button class="choice-pill" type="button" data-value="NS">NS</button>
+                    <button class="choice-pill" type="button" data-value="STEAM">STEAM</button>
+                    <button class="choice-pill" type="button" data-value="PC碟">PC碟</button>
+                    <button class="choice-pill" type="button" data-value="PSP">PSP</button>
+                    <button class="choice-pill" type="button" data-value="PSV">PSV</button>
+                    <button class="choice-pill" type="button" data-value="其他">其他</button>
+                  </div>
+                </div>
+                <div class="choice-box">
+                  <div class="choice-title">游玩语言</div>
+                  <div class="choice-pills" id="languageChoices">
+                    <button class="choice-pill" type="button" data-value="中文">中文</button>
+                    <button class="choice-pill" type="button" data-value="日语">日语</button>
+                    <button class="choice-pill" type="button" data-value="英语">英语</button>
+                    <button class="choice-pill" type="button" data-value="其他">其他</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="rating-panel">
+                <div class="rating-head"><strong>评分</strong></div>
+                <div class="ratings" id="ratings"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="ranking-section">
+            <div class="rank-row">
+              <span class="rank-label">剧情喜好排序</span>
+              <input class="rank-input persist" id="plotRank" data-key="plotRank" aria-label="剧情喜好排序">
+            </div>
+            <div class="rank-row">
+              <span class="rank-label">角色好感排序</span>
+              <input class="rank-input persist" id="charRank" data-key="charRank" aria-label="角色好感排序">
+            </div>
+            <div class="rank-row">
+              <span class="rank-label">最喜爱END</span>
+              <input class="rank-input persist" id="favoriteEnd" data-key="favoriteEnd" aria-label="最喜爱结局">
+            </div>
+          </section>
+
+          <section class="bottom-grid">
+            <div class="character-card favorite-card">
+              <div class="image-tile image-picker" data-target="favorite" tabindex="0" role="button" aria-label="选择最喜爱人物图片">
+                <img id="favoriteImg" alt="最喜爱人物">
+                <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">搜索或上传人物</span></div>
+                <div class="favorite-overlay-label">最喜爱</div>
+              </div>
+              <div class="favorite-review">
+                <textarea class="favorite-review-text persist auto-fit-text" id="favoriteReview" data-key="favoriteReview" data-max-font="17" data-min-font="4.5" data-line-height="1.38" aria-label="最喜爱角色简评"></textarea>
+              </div>
+            </div>
+
+            <div class="preference-side">
+              <div class="preference-grid" aria-label="人物喜好条目">
+                <div class="preference-card">
+                  <div class="image-tile image-picker" data-target="tasteBlind" tabindex="0" role="button" aria-label="选择盲狙人物头像">
+                    <img id="tasteBlindImg" alt="盲狙人物头像">
+                    <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">搜索或上传人物</span></div>
+                  </div>
+                  <div class="preference-label">盲狙</div>
+                </div>
+                <div class="preference-card">
+                  <div class="image-tile image-picker" data-target="tasteLooks" tabindex="0" role="button" aria-label="选择外貌最喜欢人物头像">
+                    <img id="tasteLooksImg" alt="外貌最喜欢人物头像">
+                    <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">搜索或上传人物</span></div>
+                  </div>
+                  <div class="preference-label">最喜欢外表</div>
+                </div>
+                <div class="preference-card">
+                  <div class="image-tile image-picker" data-target="tasteVoice" tabindex="0" role="button" aria-label="选择声音最喜欢人物头像">
+                    <img id="tasteVoiceImg" alt="声音最喜欢人物头像">
+                    <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">搜索或上传人物</span></div>
+                  </div>
+                  <div class="preference-label">最喜欢声音</div>
+                </div>
+                <div class="preference-card">
+                  <div class="image-tile image-picker" data-target="tastePersonality" tabindex="0" role="button" aria-label="选择性格最喜欢人物头像">
+                    <img id="tastePersonalityImg" alt="性格最喜欢人物头像">
+                    <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">搜索或上传人物</span></div>
+                  </div>
+                  <div class="preference-label">最喜欢性格</div>
+                </div>
+                <div class="preference-card">
+                  <div class="image-tile image-picker" data-target="tastePlot" tabindex="0" role="button" aria-label="选择剧情最喜欢人物头像">
+                    <img id="tastePlotImg" alt="剧情最喜欢人物头像">
+                    <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">搜索或上传人物</span></div>
+                  </div>
+                  <div class="preference-label">最喜欢剧情</div>
+                </div>
+                <div class="preference-card">
+                  <div class="image-tile image-picker" data-target="tasteDynamic" tabindex="0" role="button" aria-label="选择关系性最喜欢人物头像">
+                    <img id="tasteDynamicImg" alt="关系性最喜欢人物头像">
+                    <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">搜索或上传人物</span></div>
+                  </div>
+                  <div class="preference-label">最喜欢关系性</div>
+                </div>
+              </div>
+            </div>
+
+            <section class="repo-note">
+              <div class="repo-note-title">感想</div>
+              <textarea class="repo-text persist auto-fit-text" id="repoText" data-key="repoText" data-max-font="18" data-min-font="4.5" data-line-height="1.42" aria-label="感想"></textarea>
+            </section>
+          </section>
+        </article>
+        <article id="longRepoCard" class="repo-page long-repo-page" data-page-id="long-1" hidden>
+          <header class="long-repo-header">
+            <div class="long-repo-title-wrap">
+              <div class="eyebrow">Et nos cedamus Amori</div>
+              <input class="long-repo-title persist" id="longRepoTitle" data-key="longRepoTitle" value="标题" aria-label="长评标题">
+            </div>
+            <div class="long-repo-page-mark"><input class="long-repo-page-number persist" id="longRepoPageNumber" data-key="longRepoPageNumber" value="01" maxlength="3" inputmode="numeric" aria-label="长评页码"><span>TEXT PAGE</span></div>
+          </header>
+          <section class="long-repo-meta" aria-label="长评信息">
+            <label><span>作品 / 路线</span><input class="persist" id="longRepoSubject" data-key="longRepoSubject"></label>
+            <label><span>关键词</span><input class="persist" id="longRepoKeywords" data-key="longRepoKeywords"></label>
+          </section>
+          <section class="long-repo-writing">
+            <div class="long-repo-writing-head">
+              <span>LONG REVIEW / 长评正文</span>
+              <span id="longRepoCount">0 字</span>
+            </div>
+            <textarea class="long-repo-text persist auto-fit-text" id="longRepoText" data-key="longRepoText" data-max-font="24" data-min-font="1" data-line-height="1.72" aria-label="长评正文"></textarea>
+          </section>
+          <footer class="long-repo-footer">
+            <span>OTOME GAME REPO</span>
+            <span>LONG FORM REVIEW</span>
+          </footer>
+        </article>
+      </div>
+    </section>
+  </main>
+      </section>
+
+      <section class="product-view" data-product-view="characters">
+        <div class="product-page-head"><div><h1>角色图鉴</h1><p>L’amour est comme la fièvre, il naît et s’éteint sans que la volonté y ait la moindre part</p></div><button class="product-button rose" id="addCharButton" type="button">＋ 添加角色</button></div>
+        <div class="char-stat-row">
+          <section class="product-card char-stat-card"><div class="card-eyebrow">TOTAL</div><div class="metric-value" id="charTotalCount">0</div><div class="metric-label">收藏角色</div></section>
+          <section class="product-card char-stat-card"><div class="card-eyebrow">BEST</div><div class="metric-value" id="charBestCount">0</div><div class="metric-label">最推し角色</div></section>
+          <section class="product-card char-stat-card"><div class="card-eyebrow">FROM</div><div class="metric-value" id="charGameCount">0</div><div class="metric-label">来自作品</div></section>
+        </div>
+        <div class="char-filter-bar">
+          <input class="product-search" id="charSearchInput" placeholder="搜索角色名或作品名">
+          <div class="char-filter-group"><span class="char-filter-label">身份</span><div class="filter-pills" id="charRoleFilters">
+            <button class="filter-pill active" data-char-role-filter="all">全部</button><button class="filter-pill" data-char-role-filter="protagonist">主人公</button><button class="filter-pill" data-char-role-filter="route">攻略対象</button><button class="filter-pill" data-char-role-filter="sub">サブキャラ</button><button class="filter-pill" data-char-role-filter="unset">未設定</button>
+          </div></div>
+          <div class="char-filter-group"><span class="char-filter-label">喜好</span><div class="filter-pills" id="charPreferenceFilters">
+            <button class="filter-pill active" data-char-preference-filter="all">全部</button><button class="filter-pill" data-char-preference-filter="favorite">最推し</button><button class="filter-pill" data-char-preference-filter="oshi">推し</button><button class="filter-pill" data-char-preference-filter="like">好き</button><button class="filter-pill" data-char-preference-filter="normal">ふつう</button><button class="filter-pill" data-char-preference-filter="difficult">苦手</button><button class="filter-pill" data-char-preference-filter="excluded">対象外</button><button class="filter-pill" data-char-preference-filter="unclassified">未分類</button>
+          </div></div>
+          <span id="charCountText" class="playing-meta">0 位角色</span><span class="playing-meta char-filter-note">“全部”默认不显示対象外</span><button class="product-button secondary small" id="charBatchToggle" type="button">批量管理</button>
+        </div>
+        <div class="batch-actions char-batch-actions" id="charBatchActions" hidden><span class="playing-meta">已选 <strong id="charSelectedCount">0</strong> 位</span><button class="product-button secondary small" id="charBatchAll" type="button">全选</button><select class="product-select small" id="charBatchPreference"><option value="">批量修改喜好…</option><option value="favorite">最推し</option><option value="oshi">推し</option><option value="like">好き</option><option value="normal">ふつう</option><option value="difficult">苦手</option><option value="excluded">対象外</option><option value="unclassified">未分類</option></select><button class="product-button secondary small" id="charBatchApplyPreference" type="button">应用喜好</button><select class="product-select small" id="charBatchRoleType"><option value="">批量修改身份…</option><option value="protagonist">主人公</option><option value="route">攻略対象</option><option value="sub">サブキャラ</option><option value="unset">未設定</option></select><button class="product-button secondary small" id="charBatchApplyRole" type="button">应用身份</button><button class="product-button danger small" id="charBatchDelete" type="button">删除所选</button><button class="product-button secondary small" id="charBatchCancel" type="button">取消</button></div>
+        <div class="character-grid" id="characterGrid"></div>
+      </section>
+
+      <section class="product-view" data-product-view="bangumi">
+        <div class="resource-page-head">
+          <div>
+            <div class="page-eyebrow">OTOME INDEX</div>
+            <h1>作品索引</h1>
+            <p>Estar contigo o no estar contigo es la medida de mi tiempo</p>
+          </div>
+          <div class="resource-head-actions bangumi-db-stats" id="bangumiDbStats">
+            <span id="bangumiDbStatsText">正在读取资料库</span>
+            <button class="product-button secondary" id="bangumiDbBatchToggle" type="button">批量导入</button>
+            <button class="icon-text-button" id="bangumiDbManage" type="button">资料更新</button>
+          </div>
+        </div>
+
+        <div class="resource-screen active" data-resource-screen="search">
+          <section class="resource-filter-panel">
+            <div class="resource-filter-title"><span>筛选条件</span><strong id="bangumiDbCount"></strong></div>
+            <div class="bangumi-db-toolbar">
+              <label class="resource-filter-field resource-filter-game"><span>作品</span><div class="bgm-combo" id="comboGame"><input class="product-search bangumi-filter-input" id="bangumiDbSearch" placeholder="输入作品名称" autocomplete="off"><div class="bgm-combo-list" hidden></div></div></label>
+              <label class="resource-filter-field"><span>厂商</span><div class="bgm-combo" id="comboMaker"><input class="product-search bangumi-filter-input" id="bangumiDbMaker" placeholder="选择或输入厂商" autocomplete="off"><div class="bgm-combo-list" hidden></div></div></label>
+              <label class="resource-filter-field"><span>声优</span><div class="bgm-combo" id="comboCv"><input class="product-search bangumi-filter-input" id="bangumiDbCv" placeholder="选择或输入声优" autocomplete="off"><div class="bgm-combo-list" hidden></div></div></label>
+              <label class="resource-filter-field"><span>剧本娘</span><div class="bgm-combo" id="comboWriter"><input class="product-search bangumi-filter-input" id="bangumiDbWriter" placeholder="选择或输入剧本娘" autocomplete="off"><div class="bgm-combo-list" hidden></div></div></label>
+              <div class="resource-filter-actions"><button class="clear-filter-button" id="bangumiDbClear" type="button">清空条件</button><div class="bangumi-db-sort" id="bangumiDbSort" aria-label="时间排序"><span>发售时间</span><button class="active" type="button" data-bangumi-sort="desc">新 → 旧</button><button type="button" data-bangumi-sort="asc">旧 → 新</button></div></div>
+            </div>
+            <div class="active-discovery-filter" id="bangumiActiveDiscovery" hidden></div>
+          </section>
+          <div class="batch-actions bangumi-batch-actions" id="bangumiDbBatchActions" hidden>
+            <span class="playing-meta">已选 <strong id="bangumiDbSelectedCount">0</strong> 部</span>
+            <button class="product-button secondary small" id="bangumiDbBatchAll" type="button">全选当前结果</button>
+            <button class="product-button rose small" id="bangumiDbBatchImport" type="button">导入所选及角色</button>
+            <button class="product-button secondary small" id="bangumiDbBatchCancel" type="button">取消</button>
+          </div>
+          <div class="bangumi-db-progress" id="bangumiDbProgress" hidden><div class="bangumi-db-progress-bar"><i id="bangumiDbProgressBar"></i></div><span id="bangumiDbProgressText"></span></div>
+          <div class="bangumi-db-body" id="bangumiDbBody"><div class="bangumi-db-grid" id="bangumiDbGrid"></div></div>
+        </div>
+
+        <div class="resource-screen resource-detail-screen bangumi-db-detail" data-resource-screen="detail" id="bangumiDbDetail" hidden>
+          <button class="back-to-resource" id="bangumiDbBack" type="button">← 返回检索结果</button>
+          <div class="bangumi-db-hero" id="bangumiDbHero"></div>
+          <section class="bangumi-db-info-section" id="bangumiDbInfoSection" hidden></section>
+          <div class="bangumi-db-chars-section"><div class="bangumi-db-chars-head"><strong>作品角色</strong><label class="bangumi-import-chars-toggle"><input type="checkbox" id="bangumiImportChars" checked> 导入游戏时同时加入角色图鉴</label></div><div id="bangumiDbCharsGrid"></div></div>
+          <div class="bangumi-db-actions" id="bangumiDbActions"><button class="product-button rose" id="bangumiDbImport" type="button">加入我的游戏档案</button><button class="product-button secondary small" id="bangumiDbDelete" type="button" hidden>删除作品资料</button></div>
+        </div>
+      </section>
+      <div class="bangumi-db-manage-modal" id="bangumiDbManageModal" hidden>
+        <section class="bangumi-db-manage" role="dialog" aria-modal="true" aria-labelledby="bangumiDbManageTitle">
+          <div class="bangumi-db-manage-head"><button class="bangumi-db-manage-minimize" id="bangumiDbManageMinimize" type="button" aria-label="最小化">−</button><button class="bangumi-db-manage-close" id="bangumiDbManageClose" type="button" aria-label="关闭">×</button></div>
+          <h2 id="bangumiDbManageTitle">作品索引资料更新</h2>
+          <p>公开站点优先从随站点发布的 JSON 载入；维护者也可以同步 Bangumi、补齐详情，再导出新的公共资料 JSON。</p>
+          <div class="playing-meta" id="bangumiDbManageStatus">准备就绪</div>
+          <div class="bangumi-single-import" id="bangumiSingleImport">
+            <label for="bangumiSingleSearch">单个搜索 Bangumi 游戏</label>
+            <div class="bangumi-single-search-row"><input class="product-search" id="bangumiSingleSearch" type="search" placeholder="输入游戏名称" autocomplete="off"><button class="product-button secondary" id="bangumiSingleSearchButton" type="button">搜索</button></div>
+            <div class="bangumi-single-results" id="bangumiSingleResults" aria-live="polite"></div>
+          </div>
+          <div class="bangumi-db-manage-actions">
+            <button class="product-button rose" id="bangumiDbLoadJson" type="button">↓ 从站点 JSON 载入</button>
+            <button class="product-button secondary" id="bangumiDbImportLocalJson" type="button">从本地 JSON 导入（合并）</button>
+            <input id="bangumiDbLocalJsonFile" type="file" accept=".json,application/json" hidden>
+            <button class="product-button secondary" id="bangumiDbSync" type="button">⟳ 从 Bangumi 同步</button>
+            <button class="product-button secondary" id="bangumiDbDetailSync" type="button">补齐剩余详情</button>
+            <button class="product-button secondary" id="bangumiDbExportJson" type="button">导出公共 JSON</button>
+            <button class="product-button secondary" id="bangumiDbCancel" type="button" hidden>暂停</button>
+          </div>
+        </section>
+      </div>
+      <div class="bangumi-char-modal" id="bangumiCharModal" hidden>
+        <section class="bangumi-char-panel" role="dialog" aria-modal="true" aria-labelledby="bangumiCharTitle">
+          <div class="bangumi-char-head"><button class="bangumi-char-close" id="bangumiCharClose" type="button" aria-label="关闭">×</button></div>
+          <div id="bangumiCharBody"></div>
+        </section>
+      </div>
+
+      <section class="product-view" data-product-view="timeline">
+        <div class="product-page-head"><div><h1>游玩时间线</h1><p>Amor, ch’a nullo amato amar perdona</p></div></div>
+        <div class="timeline-wrap" id="timelineContent"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <nav class="mobile-nav" aria-label="移动端主要导航">
+    <button class="product-nav-btn active" type="button" data-product-target="home"><span class="product-nav-icon">⌂</span><span>首页</span></button>
+    <button class="product-nav-btn" type="button" data-product-target="library"><span class="product-nav-icon">▦</span><span>游戏</span></button>
+    <button class="product-nav-btn" type="button" data-product-target="characters"><span class="product-nav-icon">♡</span><span>角色</span></button>
+    <button class="product-nav-btn" type="button" data-product-target="timeline"><span class="product-nav-icon">◷</span><span>时间线</span></button>
+    <button class="product-nav-btn" type="button" data-product-target="studio"><span class="product-nav-icon">✎</span><span>REPO</span></button>
+    <button class="product-nav-btn" type="button" id="mobileMoreToggle"><span class="product-nav-icon">•••</span><span>更多</span></button>
+  </nav>
+  <div class="mobile-more-sheet" id="mobileMoreSheet" hidden>
+    <button class="mobile-more-backdrop" id="mobileMoreBackdrop" type="button" aria-label="关闭"></button>
+    <section role="dialog" aria-modal="true" aria-labelledby="mobileMoreTitle"><div class="mobile-more-head"><div><span>AMORIST</span><strong id="mobileMoreTitle">更多空间</strong></div><button id="mobileMoreClose" type="button" aria-label="关闭更多菜单">×</button></div>
+      <div class="mobile-more-grid">
+        <button type="button" data-product-target="bangumi"><span>✦</span><b>作品索引</b><small>按声优与制作阵容探索</small></button>
+        <button type="button" data-product-target="oshi"><span>♡</span><b>推角展示</b><small>人物主页与记录</small></button>
+        <button type="button" data-product-target="forms"><span>⊞</span><b>图文创作</b><small>九宫格、Tier 与偏好卡</small></button>
+        <button type="button" data-product-target="profile"><span>◎</span><b>我的自介</b><small>编辑玩家名片</small></button>
+      </div>
+    </section>
+  </div>
+
+  <div class="product-overlay" id="gameDialogOverlay" role="dialog" aria-modal="true" aria-labelledby="gameDialogTitle">
+    <form class="product-dialog" id="gameDialogForm"><div class="product-dialog-head"><h2 id="gameDialogTitle">添加到游戏档案</h2><button class="product-dialog-close" id="closeGameDialog" type="button" aria-label="关闭游戏编辑">×</button></div><div class="product-dialog-grid">
+      <div class="editor-group wide"><label for="libraryGameName">作品名称</label><input class="product-input" id="libraryGameName" required maxlength="60"></div>
+      <div class="editor-group"><label for="libraryGameStatus">游玩状态</label><select class="product-select" id="libraryGameStatus"><option>已全通</option><option>进行中</option><option>已封盘</option><option>已买未打</option><option>心愿单</option><option>尚未分类</option></select></div>
+      <div class="editor-group" id="libraryGameCategoryGroup"><label for="libraryGameCategory">喜好分类</label><select class="product-select" id="libraryGameCategory"><option value="unclassified">未分類</option><option value="hall_of_fame">殿堂入り</option><option value="love">大好き</option><option value="like">好き</option><option value="normal">普通</option><option value="difficult">苦手</option></select></div>
+      <div class="editor-group"><label for="libraryGameProgress">进度（0—100）</label><input class="product-input" id="libraryGameProgress" type="number" min="0" max="100" value="0"></div>
+      <div class="editor-group"><label for="libraryGamePlatform">游玩平台</label><select class="product-select" id="libraryGamePlatform"><option value="">请选择平台</option><option value="NS">NS</option><option value="PC碟">PC碟</option><option value="STEAM">STEAM</option><option value="DLsite">DLsite</option><option value="PSP">PSP</option></select></div>
+      <div class="editor-group"><label for="libraryGameHours">累计时长</label><input class="product-input" id="libraryGameHours" type="number" min="0" step="0.5" placeholder="小时"></div>
+      <div class="editor-group"><label for="libraryGameRoutes">角色 / 路线</label><input class="product-input" id="libraryGameRoutes" maxlength="160" placeholder="用逗号分隔"></div>
+      <div class="editor-group"><label for="libraryGameStartDate">开始游玩日期</label><input class="product-input" id="libraryGameStartDate" type="date"></div>
+      <div class="editor-group"><label for="libraryGameCompleteDate">游戏全通日期</label><input class="product-input" id="libraryGameCompleteDate" type="date"></div>
+      <div class="editor-group wide"><label for="libraryGameCover">封面图片网址（可选）</label><input class="product-input" id="libraryGameCover" type="text" placeholder="https://..."></div>
+      <div class="editor-group wide"><label>或使用本地封面</label><button class="product-button secondary" id="libraryCoverUploadButton" type="button">选择本地图片</button><input id="libraryCoverUploadInput" type="file" accept="image/*" hidden></div>
+      <div class="editor-group wide"><label for="libraryGameNote">一句话记录</label><textarea class="product-textarea" id="libraryGameNote" maxlength="120"></textarea></div>
+    </div><input id="editingGameId" type="hidden"><div class="product-dialog-actions"><button class="product-button secondary" id="deleteGameButton" type="button" hidden>删除</button><button class="product-button rose" type="submit">保存游戏</button></div></form>
+  </div>
+
+  <div class="product-overlay" id="charDialogOverlay" role="dialog" aria-modal="true" aria-labelledby="charDialogTitle">
+    <form class="product-dialog" id="charDialogForm"><div class="product-dialog-head"><h2 id="charDialogTitle">从 Bangumi 添加角色</h2><button class="product-dialog-close" id="closeCharDialog" type="button" aria-label="关闭角色编辑">×</button></div>
+      <div id="charSearchPanel" class="char-search-panel"><div class="editor-group wide"><label for="charSearchKeyword">搜索 Bangumi 角色</label><div class="char-search-row"><input class="product-input" id="charSearchKeyword" placeholder="输入角色名（日文 / 中文 / 英文）"><button class="product-button rose" id="charSearchButton" type="button">搜索</button></div></div><div id="charSearchResults" class="char-search-results"><span class="playing-meta">搜索后选择角色，系统会自动生成角色主页。</span></div></div>
+      <div class="product-dialog-grid" id="charManualFields">
+      <div class="editor-group wide"><label for="charName">角色名</label><input class="product-input" id="charName" required maxlength="40"></div>
+      <div class="editor-group wide"><label for="charGame">所属作品</label><select class="product-select" id="charGame"><option value="">— 选择作品 —</option></select></div>
+      <div class="editor-group"><label for="charRoleType">角色身份</label><select class="product-select" id="charRoleType"><option value="unset">未設定</option><option value="protagonist">主人公</option><option value="route">攻略対象</option><option value="sub">サブキャラ</option></select><small class="playing-meta" id="charRoleTypeSourceHint"></small></div><div class="editor-group"><label for="charPreference">喜好分类</label><select class="product-select" id="charPreference"><option value="unclassified">未分類</option><option value="favorite">最推し</option><option value="oshi">推し</option><option value="like">好き</option><option value="normal">ふつう</option><option value="difficult">苦手</option><option value="excluded">対象外</option></select></div>
+      <div class="editor-group"><label for="charCV">声优</label><input class="product-input" id="charCV" maxlength="30" placeholder="声优名"></div>
+      <div class="editor-group wide"><label for="charImage">角色图片网址（可选）</label><input class="product-input" id="charImage" type="text" placeholder="https://..."></div>
+      <div class="editor-group wide"><label>或使用本地图片</label><button class="product-button secondary" id="charUploadButton" type="button">选择本地图片</button><input id="charUploadInput" type="file" accept="image/*" hidden></div>
+      <div class="editor-group wide"><label for="charNote">备注</label><textarea class="product-textarea" id="charNote" maxlength="100" placeholder="印象、台词、心动瞬间…"></textarea></div>
+      </div><input id="editingCharId" type="hidden"><div class="product-dialog-actions" id="charManualActions"><button class="product-button secondary" id="deleteCharButton" type="button" hidden>删除</button><button class="product-button rose" type="submit">保存角色</button></div></form>
+  </div>
+
+
+  <div class="product-overlay" id="assetPickerOverlay" role="dialog" aria-modal="true" aria-labelledby="assetPickerTitle">
+    <section class="product-dialog"><div class="product-dialog-head"><div><h2 id="assetPickerTitle">选择图片素材</h2><p class="playing-meta">从游戏档案或角色图鉴选择，也可以上传自定义图片。</p></div><button class="product-dialog-close" id="closeAssetPicker" type="button" aria-label="关闭图片素材选择">×</button></div>
+    <div class="asset-picker-tabs" id="assetPickerTabs">
+      <button class="asset-picker-tab active" data-asset-tab="games" type="button">游戏档案</button>
+      <button class="asset-picker-tab" data-asset-tab="chars" type="button">角色图鉴</button>
+      <button class="asset-picker-tab" data-asset-tab="upload" type="button">上传</button>
+    </div>
+    <div class="product-dialog-actions" style="justify-content:flex-start;margin:0 0 14px"><button class="product-button secondary small" id="clearVisualSlot" type="button">清空当前格</button></div><div class="asset-picker-list" id="assetPickerList"></div></section>
+  </div>
+
+  <div class="modal-backdrop" id="imageModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal image-modal-v24">
+      <div class="modal-head">
+        <h2 id="modalTitle">选择图片</h2>
+        <button class="icon-btn" id="closeModal" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="tabs image-tabs">
+        <button class="tab-btn active" type="button" data-tab="search">联网搜索</button>
+        <button class="tab-btn" type="button" data-tab="library">图片库</button>
+        <button class="tab-btn" type="button" data-tab="upload">本地上传</button>
+        <button class="tab-btn" type="button" data-tab="url">图片网址</button>
+        <button class="tab-btn" type="button" data-tab="crop">图片裁剪</button>
+      </div>
+
+      <div class="tab-panel active" data-panel="search">
+        <div class="search-bar">
+          <input class="modal-input" id="searchInput" placeholder="输入作品名或角色名（支持中文、日文、英文）">
+          <button class="search-btn" id="searchImageBtn" type="button">搜索</button>
+        </div>
+        <div class="search-tip">选中的图片会自动加入图片库。</div>
+        <div class="results" id="searchResults"><div class="empty-results">输入关键词后开始搜索</div></div>
+      </div>
+
+      <div class="tab-panel" data-panel="library">
+        <div class="library-toolbar">
+          <input class="modal-input" id="librarySearch" placeholder="搜索本地图片库">
+          <span class="library-count" id="libraryCount">0 张</span>
+        </div>
+        <div class="search-tip">已保存的图片可以直接重复使用。</div>
+        <div class="library-grid" id="imageLibraryGrid"><div class="empty-results">图片库还是空的</div></div>
+      </div>
+
+      <div class="tab-panel" data-panel="upload">
+        <div class="upload-box">
+          <p><strong>选择手机或电脑里的图片</strong></p>
+          <p class="search-tip">支持 JPG、PNG、WEBP，导入后会自动加入图片库。</p>
+          <input id="fileInput" type="file" accept="image/*">
+        </div>
+      </div>
+
+      <div class="tab-panel" data-panel="url">
+        <div class="url-row">
+          <input class="modal-input" id="urlInput" placeholder="粘贴图片直链：https://...">
+          <button class="search-btn" id="useUrlBtn" type="button">使用</button>
+        </div>
+        <div class="search-tip">图片将作为外链显示并加入图片库。联网时可继续使用，系统截图不受 Canvas 跨域限制。</div>
+      </div>
+
+      <div class="tab-panel" data-panel="crop">
+        <div class="crop-workspace">
+          <div class="crop-frame" id="cropFrame"><img id="cropPreviewImg" alt="裁切预览"><div class="crop-empty" id="cropEmpty">先选择一张图片</div></div>
+          <div class="crop-controls">
+            <label>横向焦点 <input id="cropX" type="range" min="0" max="100" step="1"></label>
+            <label>纵向焦点 <input id="cropY" type="range" min="0" max="100" step="1"></label>
+            <label>图片缩放 <input id="cropScale" type="range" min="1" max="3" step="0.02"></label>
+            <div class="crop-presets">
+              <button class="tool-btn" type="button" data-crop-preset="top">靠上</button>
+              <button class="tool-btn" type="button" data-crop-preset="center">居中</button>
+              <button class="tool-btn" type="button" data-crop-preset="close">轻微特写</button>
+              <button class="tool-btn danger" id="removeCurrentImage" type="button">移除图片</button>
+            </div>
+            <p class="crop-tip">拖动预览图调整取景位置，也可使用滑杆精细裁剪。裁剪参数会单独保存在当前图片格中，并应用到截图。</p>
+            <div class="crop-actions">
+              <button class="tool-btn" id="resetCropBtn" type="button">重置裁剪</button>
+              <button class="tool-btn primary" id="finishCropBtn" type="button">完成使用</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-status" id="modalStatus"></div>
+    </div>
+  </div>
+
+  <div class="save-preview" id="savePreview" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+    <div class="preview-card">
+      <div class="preview-head">
+        <h3 id="previewTitle">图片已生成</h3>
+        <button class="icon-btn" id="closePreview" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="preview-scroll"><img id="previewImage" alt="生成的日乙 Repo 图片"></div>
+      <p class="preview-tip">iPhone 或浏览器下载无反应时，可长按上方图片并选择“存储到照片/保存图片”。安卓也可以直接点击“下载 PNG”。</p>
+      <div class="preview-actions">
+        <button class="tool-btn" id="downloadPreview" type="button">下载 PNG</button>
+        <button class="tool-btn primary" id="sharePreview" type="button">系统分享</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="archive-backdrop" id="archiveBackdrop" role="dialog" aria-modal="true" aria-labelledby="archiveTitle">
+    <aside class="archive-panel">
+      <div class="archive-head">
+        <h2 id="archiveTitle">本地存档</h2>
+        <button class="icon-btn" id="closeArchive" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="archive-current" id="archiveCurrent">当前：<strong>自动草稿</strong><br>未加入列表，页面仍会自动恢复。</div>
+      <div class="archive-primary-actions">
+        <button class="tool-btn primary" id="saveArchiveBtn" type="button">保存当前</button>
+        <button class="tool-btn" id="newArchiveBtn" type="button">新建空白</button>
+      </div>
+      <div class="archive-view-tabs">
+        <button class="archive-view-tab active" id="activeArchivesTab" type="button">存档列表</button>
+        <button class="archive-view-tab" id="trashArchivesTab" type="button">最近删除 <span id="trashCount">0</span></button>
+      </div>
+      <div class="archive-search-wrap">
+        <input class="archive-search" id="archiveSearch" placeholder="搜索作品名称或填表人">
+      </div>
+      <div class="archive-list" id="archiveList"></div>
+      <div class="archive-foot">
+        <div class="archive-backup-actions">
+          <button class="tool-btn" id="exportArchivesBtn" type="button">导出全部备份</button>
+          <button class="tool-btn" id="importArchivesBtn" type="button">导入备份</button>
+          <input id="archiveImportInput" type="file" accept="application/json,.json" hidden>
+        </div>
+        <p class="archive-note">备份会包含存档、当前草稿、图片库、裁切位置和主题设置。最近删除保留 7 天。</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="theme-backdrop" id="themeBackdrop" role="dialog" aria-modal="true" aria-labelledby="themeTitle" aria-hidden="true">
+    <section class="theme-panel" tabindex="-1">
+      <div class="theme-head">
+        <div><h2 id="themeTitle">选择主题</h2><p>主题按气质分组，并随当前风格切换。</p></div>
+        <button class="icon-btn" id="closeTheme" type="button" aria-label="关闭">×</button>
+      </div>
+      <div class="color-style-switch" id="colorStyleSwitch" role="group" aria-label="选择配色风格">
+        <button class="color-style-btn" type="button" data-color-style="gradient">渐变</button>
+        <button class="color-style-btn" type="button" data-color-style="solid">浅色</button>
+        <button class="color-style-btn" type="button" data-color-style="dark">深色</button>
+      </div>
+      <div class="theme-actions">
+        <button class="tool-btn" id="randomThemeBtn" type="button">随机主题</button>
+        <button class="tool-btn" id="favoriteThemeFilter" type="button">只看收藏</button>
+      </div>
+      <div class="theme-groups" id="themeGroups"></div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  
+  
+  
+  
+  
+
+    
+
+
+
+
+
+  <script>window.AMORIST_MODE = 'public';</script>
+  <script src="./assets/js/image-store.js"></script>
+  <script src="./assets/js/data-model.js"></script>
+  <script src="./assets/js/public-bootstrap.js?v=timeline-ui-20260731"></script>
+</body>
+</html>

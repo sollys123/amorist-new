@@ -1,0 +1,91 @@
+/* Public/editor mode additions. Desktop layout from Amorist 2.3 remains unchanged. */
+.amorist-public-badge {
+  display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border:1px solid var(--product-line);
+  border-radius:999px;font-size:10px;letter-spacing:.16em;color:var(--product-muted);background:var(--product-surface);
+  white-space:nowrap;
+}
+.public-load-banner {display:flex;gap:12px;align-items:center;justify-content:center;padding:12px 18px;background:#fff1f2;color:#7f1d1d;border-bottom:1px solid #fecdd3;font-size:13px;position:relative;z-index:10000}
+.public-load-banner span {opacity:.8}
+
+body.public-mode #libraryBatchToggle,
+body.public-mode #dashboardPlayingSwitchWrap,
+body.public-mode #libraryBatchActions,
+body.public-mode #addCharButton,
+body.public-mode #charBatchToggle,
+body.public-mode #charBatchActions,
+body.public-mode #bangumiDbBatchToggle,
+body.public-mode #bangumiDbBatchActions,
+body.public-mode #bangumiDbImport,
+body.public-mode #bangumiDbManage,
+body.public-mode #libraryCoverUploadButton,
+body.public-mode #charManualActions,
+body.public-mode .profile-editor,
+body.public-mode .mobile-profile-switch,
+body.public-mode .batch-select,
+body.public-mode .library-delete,
+body.public-mode .workshop-edit-controls,
+body.public-mode #workshopSave,
+body.public-mode #workshopSaveTemplate {display:none !important}
+body.public-mode [data-detail-action="edit-routes"] {display:none !important}
+body.public-mode .profile-layout {grid-template-columns:minmax(0,1fr) !important;max-width:1000px;margin-inline:auto}
+body.public-mode .profile-canvas-wrap {width:100%}
+body.public-mode input[aria-readonly="true"],
+body.public-mode textarea[aria-readonly="true"],
+body.public-mode select[data-public-locked="true"] {cursor:default}
+body.public-mode #bangumiDbStatsText::after {content:' · 公共资料浏览';opacity:.65}
+
+.editor-data-sidebar {flex:0 0 auto;margin:10px 0 0;padding:9px 8px 0;border-top:1px solid rgba(255,255,255,.1)}
+.editor-data-sidebar > span {display:block;color:#aaa1af;font-size:9px;letter-spacing:.05em;line-height:1.5}
+.editor-data-sidebar .site-data-open {width:100%;margin-top:6px;padding:7px 9px;font-size:10px}
+.site-data-open {white-space:nowrap}
+@media(max-width:900px){.editor-data-sidebar{display:none}}
+.amorist-site-data-backdrop {position:fixed;inset:0;z-index:12000;background:rgba(27,21,36,.58);display:grid;place-items:center;padding:24px;backdrop-filter:blur(10px)}
+.amorist-site-data-backdrop[hidden] {display:none}
+.amorist-site-data-panel {width:min(760px,100%);max-height:min(860px,calc(100vh - 48px));overflow:auto;background:var(--product-bg);border:1px solid var(--product-line);border-radius:28px;box-shadow:0 28px 80px rgba(25,18,33,.28)}
+.amorist-site-data-head {display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:28px 30px 22px;border-bottom:1px solid var(--product-line);background:var(--product-surface)}
+.amorist-site-data-head h2 {margin:6px 0 5px;font-family:Georgia,'Times New Roman',serif;font-size:30px;font-weight:500}
+.amorist-site-data-head p {margin:0;color:var(--product-muted);font-size:13px;line-height:1.6}
+.amorist-site-data-content {display:grid;gap:16px;padding:22px}
+.site-data-section {display:grid;gap:14px;padding:20px;border:1px solid var(--product-line);border-radius:20px;background:var(--product-surface)}
+.site-data-section h3 {margin:0;font-size:15px;font-weight:650}
+.site-data-section > label {display:grid;gap:7px;font-size:12px;color:var(--product-muted)}
+.site-data-check-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.site-data-check-grid label {display:flex;align-items:center;gap:9px;min-height:42px;padding:10px 12px;border:1px solid var(--product-line);border-radius:13px;background:var(--product-bg);font-size:13px;color:var(--product-ink)}
+.site-data-check-grid input {accent-color:var(--product-accent)}
+.site-data-actions {display:flex;flex-wrap:wrap;gap:10px}
+.site-data-hint,.private-backup-section p {margin:0;color:var(--product-muted);font-size:12px;line-height:1.65}
+.site-data-publish-note {display:flex;flex-direction:column;gap:5px;padding:17px 20px;border-radius:18px;background:rgba(124,114,153,.12);color:var(--product-ink);font-size:13px;line-height:1.6}
+.site-data-publish-note code,.site-data-hint code {font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
+body.site-data-modal-open {overflow:hidden}
+
+@media (max-width:900px) {
+  .amorist-public-badge {display:none}
+  .site-data-open {width:auto !important;min-width:42px;padding-inline:12px !important;font-size:0}
+  .site-data-open::after {content:'数据';font-size:12px}
+  .amorist-site-data-backdrop {align-items:end;padding:0}
+  .amorist-site-data-panel {width:100%;max-height:92vh;border-radius:25px 25px 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom)}
+  .amorist-site-data-head {padding:22px 20px 18px}
+  .amorist-site-data-head h2 {font-size:25px}
+  .amorist-site-data-content {padding:14px;gap:12px}
+  .site-data-section {padding:16px;border-radius:17px}
+  .site-data-check-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .site-data-actions .product-button {flex:1 1 150px}
+  .public-load-banner {align-items:flex-start;flex-direction:column;gap:3px}
+  body.public-mode .profile-layout[data-mobile-pane] .profile-canvas-wrap {display:block !important}
+}
+@media (max-width:420px) {
+  .site-data-check-grid {grid-template-columns:1fr}
+  .site-data-actions {display:grid;grid-template-columns:1fr}
+}
+body.public-mode select[data-public-locked="true"]:disabled {opacity:1;color:inherit;-webkit-text-fill-color:currentColor;background-color:inherit}
+
+.site-data-folder-status{display:block;color:var(--product-muted);font-size:12px;line-height:1.5}
+.site-data-report{padding:14px 16px;border:1px solid var(--product-line);border-radius:14px;background:var(--product-bg);font-size:12px}
+.site-data-report strong{display:block;margin-bottom:10px;font-size:13px}
+.site-data-report>span{display:block;white-space:pre-wrap;color:var(--product-muted);line-height:1.6}
+.site-data-report dl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0}
+.site-data-report dl div{padding:9px;border:1px solid var(--product-line);border-radius:10px;background:var(--product-surface)}
+.site-data-report dt{color:var(--product-muted);font-size:10px}
+.site-data-report dd{margin:3px 0 0;font-weight:700;font-size:13px}
+.site-data-report p{margin:10px 0 0;color:var(--product-muted);line-height:1.55}
+@media(max-width:620px){.site-data-report dl{grid-template-columns:repeat(2,minmax(0,1fr))}}

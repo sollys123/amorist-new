@@ -1,0 +1,20 @@
+# Local editor and development helpers (keep these out of GitHub Pages)
+editor.html
+assets/js/editor-tools.js
+serve.mjs
+serve.ps1
+start-*.bat
+start-*.command
+START_HERE.txt
+
+# Local documentation, reports, and generated inventories
+docs/
+.editor-text-inventory.json
+MODIFICATION_REPORT.md
+OSHI_EDITORIAL_V3_1_CHANGELOG.md
+OSHI_EDITORIAL_V3_REPORT.md
+OSHI_MAGAZINE_REPORT.md
+
+# Common local artifacts
+node_modules/
+*.log
