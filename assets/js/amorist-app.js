@@ -4710,11 +4710,11 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       if(manageStatus)manageStatus.textContent=txt+(total?('  '+done+' / '+total):'');
     }
     function setStats(){
-      const el=$('#bangumiDbStatsText');if(!el)return;
+      const el=$('#bangumiDbTotal');if(!el)return;
       dbAll().then(list=>{
         const total=list.length,ok=list.filter(g=>g.synced).length;
-        el.textContent=total?('已收录 '+total+' 部'):'暂未收录作品';
-      }).catch(()=>{el.textContent='暂未收录作品';});
+        el.textContent=total||0;
+      }).catch(()=>{el.textContent='—';});
     }
     function syncCharacterBookLinks(game){
       const linkedGame=games().find(x=>String(x.bangumiId||'')===String(game.id));if(!linkedGame||!Array.isArray(game.chars)||!game.chars.length)return;
