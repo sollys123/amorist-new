@@ -770,6 +770,7 @@
 
       const $ = (selector, root=document) => root.querySelector(selector);
       const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
+      const longRepoTemplate = $('#longRepoCard')?.cloneNode(true);
 
       function showToast(message) {
         const toast = $('#toast');
@@ -795,7 +796,7 @@
           button.classList.toggle('active', button.dataset.repoPage === activeRepoPage);
           button.addEventListener('click', () => applyRepoPage(button.dataset.repoPage, true));
           entry.appendChild(button);
-          if (longRepoPages().length > 1) {
+          if (longRepoPages().length >= 1) {
             const remove = document.createElement('button');
             remove.type = 'button'; remove.className = 'long-page-delete'; remove.textContent = '×'; remove.title = `删除${button.textContent}`;
             remove.addEventListener('click', event => { event.stopPropagation(); removeLongRepoPage(card.dataset.pageId); });
@@ -807,20 +808,20 @@
 
       function removeLongRepoPage(pageId) {
         const pages = longRepoPages();
-        if (pages.length <= 1) return;
         const card = pages.find(item => item.dataset.pageId === pageId);
         if (!card) return;
         const wasActive = activeRepoPage === pageId;
         card.remove();
         renderPageSwitch();
-        if (wasActive) applyRepoPage(longRepoPages()[Math.max(0, pages.indexOf(card) - 1)]?.dataset.pageId || 'long-1', true);
+        if (wasActive) applyRepoPage('full', true);
         else { renderPageSwitch(); saveState(); }
       }
 
       function addLongRepoPage(activate=true) {
         const pages = longRepoPages();
         const index = pages.length + 1;
-        const base = $('#longRepoCard');
+        const base = $('#longRepoCard') || longRepoTemplate;
+        if (!base) return null;
         const card = base.cloneNode(true);
         card.id = `longRepoCard-${index}`;
         card.dataset.pageId = `long-${index}`;
@@ -841,9 +842,11 @@
         return card;
       }
 
-      function ensureLongRepoPages(count=1) {
-        const target = Math.max(1, Number(count) || 1);
+      function ensureLongRepoPages(count=0) {
+        const target = Math.max(0, Number(count) || 0);
+        while (longRepoPages().length > target) longRepoPages().at(-1)?.remove();
         while (longRepoPages().length < target) addLongRepoPage(false);
+        if (!longRepoPages().some(card => card.dataset.pageId === activeRepoPage)) activeRepoPage='full';
         renderPageSwitch();
       }
 
@@ -1333,7 +1336,7 @@
         result.imageTransforms = transforms;
         result.fields = { ...(result.fields || {}) };
         const pageKeys = Object.keys(result.fields).map(key => key.match(/^longRepo(?:Title|PageNumber|Subject|Keywords|Text)-(\d+)$/)?.[1]).filter(Boolean).map(Number);
-        result.longPageCount = Math.max(1, Number(result.longPageCount) || 1, ...(pageKeys.length ? pageKeys : [1]));
+        result.longPageCount = Math.max(0, Number(result.longPageCount) || 0, ...(pageKeys.length ? pageKeys : [0]));
         result.schemaVersion = BACKUP_VERSION;
         return result;
       }
@@ -2077,7 +2080,10 @@
 
       async function imageForCanvas(src) {
         if (!src) return null;
-        try { return await loadImageSource(src); }
+        try {
+          const safeSource = /^https?:\/\//i.test(src) ? await fetchImageData(src) : src;
+          return await loadImageSource(safeSource);
+        }
         catch (error) { return null; }
       }
 
@@ -2122,6 +2128,7 @@
         ctx.fillStyle = rgba(colors.primary,.12);
         for (let yy=10; yy<1000; yy+=22) for (let xx=10; xx<750; xx+=22) { ctx.beginPath(); ctx.arc(xx,yy,1.25,0,Math.PI*2); ctx.fill(); }
         ctx.lineWidth = 2; ctx.strokeStyle = mix(colors.line, '#ffffff', .25); roundedPath(ctx,1,1,748,998,27); ctx.stroke();
+        ctx.fillStyle = colors.accent; ctx.fillRect(28,0,104,4);
 
         // Header
         ctx.fillStyle = colors.accent; setFont(ctx,11,900); ctx.fillText('Omnia vincit Amor',28,39);
@@ -2272,20 +2279,106 @@
         }
       }
 
-      async function generatePng() {
-        const button = $('#saveImageBtn');
+      async function loadHtml2Canvas() {
+        if (window.html2canvas) return window.html2canvas;
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+        return window.html2canvas;
+      }
+
+      async function renderRepoExportCanvas() {
+        const activePage = activeRepoPage === 'full' ? $('#repoCard') : $(`[data-page-id="${CSS.escape(activeRepoPage)}"]`);
+        const sourcePages = [activePage].filter(Boolean);
+        if (activeRepoPage === 'full') return renderRepoCanvas();
+        const render = await loadHtml2Canvas();
+        const host = document.createElement('div');
+        host.style.cssText = 'position:fixed;left:-100000px;top:0;width:750px;height:1000px;display:block;background:#fff;z-index:-1;';
+        const exportStyle = document.createElement('style');
+        exportStyle.textContent = '.repo-export-page{isolation:isolate!important}';
+        host.appendChild(exportStyle);
+        const imageJobs = [];
+
+        sourcePages.forEach(sourcePage => {
+          const clone = sourcePage.cloneNode(true);
+          clone.hidden = false;
+          clone.classList.add('repo-export-page');
+          clone.style.cssText = 'position:relative;top:0;left:0;transform:none;display:block;width:750px;height:1000px;margin:0;';
+          const sourceControls = sourcePage.querySelectorAll('input,textarea,select');
+          const cloneControls = clone.querySelectorAll('input,textarea,select');
+          sourceControls.forEach((sourceControl, index) => {
+            const targetControl = cloneControls[index];
+            if (!targetControl) return;
+            if (sourceControl instanceof HTMLInputElement && ['checkbox','radio'].includes(sourceControl.type)) targetControl.checked = sourceControl.checked;
+            else targetControl.value = sourceControl.value;
+          });
+          clone.querySelectorAll('img').forEach(image => {
+            const source = image.currentSrc || image.src;
+            if (!/^https?:\/\//i.test(source)) return;
+            imageJobs.push(fetchImageData(source).then(dataUrl => {
+              image.src = dataUrl;
+              return image.decode?.();
+            }).catch(() => undefined));
+          });
+          host.appendChild(clone);
+        });
+
+        document.body.appendChild(host);
+        try {
+          await Promise.all(imageJobs);
+          const resolvedStyles = new Map();
+          const resolveModernColors = (property, value) => {
+            const cacheKey = `${property}:${value}`;
+            if (resolvedStyles.has(cacheKey)) return resolvedStyles.get(cacheKey);
+            const probe = document.createElement('span');
+            probe.style.setProperty(property, value);
+            document.body.appendChild(probe);
+            let resolved = getComputedStyle(probe).getPropertyValue(property);
+            probe.remove();
+            resolved = resolved.replace(/color\(\s*srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/gi, (_, red, green, blue, alpha) => {
+              const channels = [red, green, blue].map(channel => Math.round(Math.max(0, Math.min(1, Number(channel))) * 255));
+              return alpha === undefined ? `rgb(${channels.join(',')})` : `rgba(${channels.join(',')},${alpha})`;
+            });
+            const safe = /color\(|color-mix\(/i.test(resolved) ? '' : resolved;
+            resolvedStyles.set(cacheKey, safe);
+            return safe;
+          };
+          const exportElements = [host, ...host.querySelectorAll('*')];
+          exportElements.forEach(element => {
+            const computed = getComputedStyle(element);
+            for (let index = 0; index < computed.length; index += 1) {
+              const property = computed[index];
+              const value = computed.getPropertyValue(property);
+              if (!/color\(|color-mix\(/i.test(value)) continue;
+              if (property.startsWith('--')) continue;
+              const resolved = resolveModernColors(property, value);
+              if (resolved) element.style.setProperty(property, resolved, 'important');
+            }
+          });
+          return await render(host, { scale:2, useCORS:true, allowTaint:false, backgroundColor:null, logging:false });
+        } finally {
+          host.remove();
+        }
+      }
+
+      async function generatePng(trigger=$('#screenshotBtn')) {
+        const button = trigger || $('#screenshotBtn');
         const oldText = button.textContent;
         button.disabled = true;
         button.textContent = '正在生成…';
         if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
         try {
           if (document.fonts?.ready) await document.fonts.ready;
-          const canvas = await renderRepoCanvas();
+          const canvas = await renderRepoExportCanvas();
           const blob = await new Promise((resolve,reject)=>canvas.toBlob(value=>value?resolve(value):reject(new Error('图片生成失败')),'image/png',1));
           if (currentExportUrl) URL.revokeObjectURL(currentExportUrl);
           currentExportBlob = blob;
           currentExportUrl = URL.createObjectURL(blob);
-          currentExportFilename = `${($('#gameName').value || '日乙repo').replace(/[\\/:*?"<>|]+/g,'_').trim()}_repo.png`;
+          currentExportFilename = `${($('#workTitle')?.value || '日乙repo').replace(/[\\/:*?"<>|]+/g,'_').trim()}_repo.png`;
           $('#previewImage').src = currentExportUrl;
           const shareButton = $('#sharePreview');
           shareButton.style.display = navigator.share ? '' : 'none';
@@ -3317,7 +3410,7 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
            finally { window.AMORIST_REPO_READONLY_LOADING=previousReadonlyLoad; }
           activeRepoDirty=false;
           setRepoReadonly(activeRepoReadonly);
-          window.amoristProductNavigate?.('studio');
+          if(!options.inline)window.amoristProductNavigate?.('studio');
         },
         enterEditor(){
           saveActiveGameRepo(true);
@@ -3372,11 +3465,21 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
         if(id)setTimeout(()=>renderGameDetail(id),30);
       });
       window.addEventListener('pagehide',()=>saveActiveGameRepo(true),{capture:true});
-      function writeGameToRepo(game){
+      function writeLegacyGameToRepo(game){
         // Game detail pages are part of the public index and only showcase
         // the saved repo.  The sidebar button remains the editing entrypoint.
         window.amoristRepoManager.open(game,window.AMORIST_MODE==='public'?{readonly:true}:{});
         toast(`已打开「${game.name}」的 REPO`);
+      }
+
+      function writeGameToRepo(game){
+        if(window.AMORIST_MODE==='public'){
+          window.amoristRepoManager.open(game,{readonly:true,inline:true});$('#publicRepoPreview')?.remove();
+          const source=$('#repoCard');if(!source)return;
+          const overlay=document.createElement('div');overlay.id='publicRepoPreview';overlay.className='public-repo-preview';overlay.innerHTML='<div class="public-repo-preview-head"><span>游戏 REPO</span><button type="button" aria-label="关闭 REPO 预览">×</button></div><div class="public-repo-preview-stage"></div>';
+          const pages=[source,...$$('.long-repo-page')].map((page,index)=>{const paper=page.cloneNode(true);if(index===0)paper.id='repoCard';else{paper.removeAttribute('id');paper.removeAttribute('hidden')}paper.querySelectorAll('input,textarea,select,button').forEach(control=>{control.disabled=true;control.tabIndex=-1});return paper});pages.forEach(paper=>overlay.querySelector('.public-repo-preview-stage').appendChild(paper));document.body.appendChild(overlay);const close=()=>overlay.remove();overlay.querySelector('button').onclick=close;overlay.addEventListener('click',event=>{if(event.target===overlay)close()});return;
+        }
+        window.amoristRepoManager.open(game,{});toast(`已打开「${game.name}」的 REPO`);
       }
 
       function saveGamePatch(id,patch){
