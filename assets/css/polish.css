@@ -306,7 +306,8 @@ body {font-size:14px;background:var(--product-bg)}
 
 /* Oshi hub: keep the editorial canvas, but stop empty pages becoming a blank wall. */
 .product-view[data-product-view="oshi"] {padding-top:30px}
-.product-view[data-product-view="oshi"]>.oshi-page-head {display:none!important}
+.product-view[data-product-view="oshi"]>.oshi-page-head {display:grid!important}
+.product-view[data-product-view="oshi"]:has(> .oshi-detail-view:not([hidden]))>.oshi-page-head {display:none!important}
 .product-view[data-product-view="oshi"] .product-page-head {max-width:var(--layout-max)!important}
 .oshi-hub-view,.oshi-detail-view {width:100%;max-width:var(--layout-max);margin-inline:auto}
 .product-view[data-product-view="oshi"] .oshi-canvas-shell {padding:0!important;filter:none}

@@ -315,8 +315,7 @@
     anchor.after(preview,focus,slot,fit,x,y);
   }
   function ensureHubChrome(){
-    const canvas=$('oshiCanvas'),actions=document.querySelector('.product-view[data-product-view="oshi"] .oshi-head-actions');
-    if(canvas&&actions&&actions.parentElement!==canvas){actions.classList.add('oshi-canvas-actions');canvas.appendChild(actions);}
+    // Keep the view switch in the page header; moving it into the canvas hides it in the archive shell.
   }
   function populateMagazineControls(){
     const rows=visualEntries(),focus=$('oshiDefaultFocus'),slot=$('oshiMagazineSlot');if(!focus||!slot)return;
