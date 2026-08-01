@@ -5809,6 +5809,29 @@ body:has(.product-view[data-product-view="oshi"].active),body:has(.product-view[
   .product-view[data-product-view="oshi"] .oshi-count{font-size:24px;}
 }
 
+/* Magazine view: let the artwork occupy the page once the copy is removed. */
+.oshi-canvas.oshi-magazine-layout .oshi-magazine-copy{display:none!important;}
+@media(min-width:761px){
+  .oshi-canvas.oshi-magazine-layout .oshi-magazine-stage{inset:0 1.2% 3.5%;}
+  .oshi-canvas.oshi-magazine-layout .oshi-magazine-stage::before{left:10%;right:10%;}
+  .oshi-canvas.oshi-magazine-layout .oshi-figure[data-mag-slot="0"]{left:12%!important;width:30%!important;height:82%!important;top:0!important;}
+  .oshi-canvas.oshi-magazine-layout .oshi-figure[data-mag-slot="1"]{left:44%!important;width:21%!important;height:40%!important;top:0!important;}
+  .oshi-canvas.oshi-magazine-layout .oshi-figure[data-mag-slot="2"]{left:67%!important;width:21%!important;height:36%!important;top:4%!important;}
+  .oshi-canvas.oshi-magazine-layout .oshi-figure[data-mag-slot="3"]{left:44%!important;width:21%!important;height:34%!important;top:49%!important;}
+  .oshi-canvas.oshi-magazine-layout .oshi-figure[data-mag-slot="4"]{left:67%!important;width:21%!important;height:42%!important;top:50%!important;}
+}
+.product-view[data-product-view="oshi"] .oshi-hub-view .oshi-canvas-shell{padding-bottom:78px!important;}
+@media(min-width:761px){
+  .oshi-canvas.oshi-auto-layout:not(.oshi-magazine-layout) .oshi-figure{top:42%!important;}
+}
+@media(max-width:760px){
+  .oshi-canvas.oshi-magazine-layout .oshi-magazine-stage{inset:0;}
+  .oshi-canvas.oshi-magazine-layout .oshi-figure[data-mag-slot="0"]{left:8%!important;width:84%!important;top:7%!important;height:58%!important;}
+  .oshi-canvas.oshi-magazine-layout .oshi-figure[data-mag-slot="1"]{left:6%!important;width:42%!important;top:68%!important;height:25%!important;}
+  .oshi-canvas.oshi-magazine-layout .oshi-figure[data-mag-slot="2"]{left:52%!important;width:42%!important;top:68%!important;height:25%!important;}
+  .oshi-canvas.oshi-auto-layout:not(.oshi-magazine-layout) .oshi-figure{top:46%!important;}
+}
+
 /* Keep the two character fields aligned despite the role-source hint below the first one. */
 #charManualFields{align-items:start;}
 #charManualFields>.editor-group{align-self:start;align-content:start;}

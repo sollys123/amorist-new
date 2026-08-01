@@ -424,10 +424,10 @@ body {font-size:14px;background:var(--product-bg)}
 
 /* Oshi detail: one archive system, with the portrait as the single editorial gesture. */
 .product-view[data-product-view="oshi"] .oshi-detail-view:not([hidden]) {
-  overflow:hidden;
-  border:1px solid var(--product-line-soft);
-  border-radius:14px;
-  background:var(--product-surface);
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
 }
 .product-view[data-product-view="oshi"] .oshi-detail-topbar {
   min-height:48px!important;
@@ -978,7 +978,7 @@ body.theme-dialog-open {overflow:hidden!important}
 
 @media (max-width:760px) {
   .product-view[data-product-view="oshi"] .oshi-detail-view:not([hidden]) {
-    border-radius:12px;
+    border-radius:0;
   }
   .product-view[data-product-view="oshi"] .oshi-detail-topbar {
     padding:8px 16px!important;
@@ -1067,4 +1067,114 @@ body.theme-dialog-open {overflow:hidden!important}
   .product-view[data-product-view="oshi"] .oshi-gallery-cluster {
     columns:1;
   }
+}
+
+/* Timeline calendar: fixed editorial cells, compact covers, quiet metadata. */
+.product-view[data-product-view="timeline"] {
+  min-height:calc(100vh - 70px);
+  padding:24px clamp(28px,5vw,74px) 78px!important;
+  background:#fbf8f2!important;
+  color:#4d4958;
+}
+.product-view[data-product-view="timeline"] .timeline-page-head {
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:end;
+  gap:30px;
+  max-width:1280px;
+  min-height:96px;
+  margin:0 auto 18px!important;
+  padding:0 0 18px!important;
+  border:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.product-view[data-product-view="timeline"] .timeline-page-head h1 {
+  margin:9px 0 7px!important;
+  color:#2f2934!important;
+  font:400 clamp(34px,4vw,50px)/1 Georgia,"Songti SC",serif!important;
+  letter-spacing:-.04em;
+}
+.product-view[data-product-view="timeline"] .timeline-page-head p {margin:0;color:#918992;font:400 11px/1.7 Georgia,"Songti SC",serif}
+.product-view[data-product-view="timeline"] .timeline-page-head p,.product-view[data-product-view="timeline"] .timeline-calendar-aside p {display:none!important}
+.product-view[data-product-view="timeline"] .timeline-page-head>div:first-child:before {display:none}
+.product-view[data-product-view="timeline"] .timeline-page-head {display:none!important}
+.product-view[data-product-view="timeline"] .timeline-page-head .page-eyebrow {display:block;color:#76628b;font:700 9px/1 Georgia,serif;letter-spacing:.22em}
+.timeline-head-actions {display:flex;align-items:flex-end;gap:22px}
+.timeline-head-metric {display:grid;gap:8px;min-width:72px;text-align:center}
+.timeline-head-metric span {color:#8e8790;font:700 8px/1 Georgia,serif;letter-spacing:.14em}
+.timeline-head-metric strong {color:#332d39;font:400 25px/1 Georgia,serif}
+.timeline-head-metric+.timeline-head-metric {padding-left:20px;border-left:1px solid #d6d0d2}
+.timeline-head-actions .product-button {margin-bottom:0;border:0;border-radius:0;padding:12px 22px;background:#332d39;color:#fff;font:700 10px/1 Georgia,serif;white-space:nowrap}
+.timeline-head-actions .product-button.secondary {background:transparent;color:#705681;box-shadow:inset 0 0 0 1px #d6d0d2}
+.public-mode #timelineSessionAddTop {display:none!important}
+.public-mode #timelineBatchImportTop {display:none!important}
+.public-mode .timeline-bottom-actions {display:none!important}
+.timeline-bottom-actions {display:flex;justify-content:flex-end;gap:12px;margin:16px 0 0}
+.product-view[data-product-view="timeline"] .timeline-wrap {max-width:1280px;margin:0 auto}
+.timeline-session-add {display:flex;justify-content:flex-end;gap:12px;margin:0 0 12px;padding:0;border:0;background:transparent}
+.product-view[data-product-view="timeline"] .timeline-session-add {display:none!important}
+.timeline-session-add #timelineSessionAdd {display:none}
+.timeline-toolbar {display:flex;align-items:center;gap:14px;min-height:42px;margin:0 0 20px;padding:0;border:0;background:transparent;box-shadow:none;border-radius:0}
+.timeline-filter-label {flex:0 0 auto;color:#8e8790;font:700 8px/1 Georgia,serif;letter-spacing:.16em}
+.timeline-toolbar .timeline-view-switch {order:5;margin-left:auto;padding:0;border:0;border-radius:0;background:transparent}
+.timeline-toolbar .timeline-view-button {border:0;border-radius:0;padding:13px 10px 11px;background:transparent;color:#9a9299;font:700 9px/1 Georgia,serif;letter-spacing:.14em}
+.timeline-toolbar .timeline-view-button.active {color:#705681;background:transparent;box-shadow:inset 0 -2px #705681}
+.timeline-toolbar .product-select {height:32px;min-width:86px;border:0;border-bottom:1px solid #d6d0d2;border-radius:0;padding:4px 20px 4px 0;background:transparent;color:#4d4958;font:400 11px Georgia,"Songti SC",serif;outline:0}
+.timeline-toolbar .product-select:focus {border-bottom-color:#705681}
+.timeline-toolbar .timeline-check {display:flex;align-items:center;gap:6px;color:#8e8790;font:400 10px Georgia,"Songti SC",serif;white-space:nowrap}
+.timeline-toolbar .timeline-check input {accent-color:#705681}
+.timeline-calendar {display:grid;grid-template-columns:125px minmax(0,1000px);gap:30px;margin:0;padding:20px 0 0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.timeline-calendar-aside {padding:30px 0 0 12px;color:#4d4958}
+.timeline-calendar-month-number {display:block;color:#76628b;font:400 66px/.82 Georgia,serif;letter-spacing:-.08em}
+.timeline-calendar-aside strong {display:block;margin-top:18px;color:#332d39;font:400 21px/1 Georgia,serif;letter-spacing:.14em}
+.timeline-calendar-aside small {display:block;margin-top:8px;color:#918992;font:700 9px/1 Georgia,serif;letter-spacing:.18em}
+.timeline-calendar-aside i {display:block;width:42px;height:3px;margin:24px 0;color:#74856b;background:#74856b}
+.timeline-calendar-aside p {max-width:120px;margin:0;color:#918992;font:400 10px/1.7 Georgia,"Songti SC",serif}
+.timeline-calendar-aside dl {display:grid;gap:18px;margin:42px 0 0;padding:0}
+.timeline-calendar-aside dl div {display:grid;gap:6px}
+.timeline-calendar-aside dt {color:#918992;font:700 8px/1 Georgia,serif;letter-spacing:.16em}
+.timeline-calendar-aside dd {margin:0;color:#332d39;font:400 19px/1 Georgia,serif}
+.timeline-calendar-main {min-width:0}
+.timeline-calendar-head {display:flex;align-items:end;justify-content:flex-end;min-height:24px;margin:0;padding:0 0 4px;border:0;background:transparent}
+.timeline-calendar-month-title {display:none}
+.timeline-calendar-actions {display:flex;gap:16px}.timeline-calendar-nav {width:22px;height:22px;border:0;border-radius:0;background:transparent;color:#76628b;font:400 18px/1 Georgia,serif;cursor:pointer}
+.timeline-calendar-weekdays,.timeline-calendar-grid {display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.timeline-calendar-weekdays {color:#8e8790;font:700 8px/1 Georgia,serif;letter-spacing:.16em;text-align:center}
+.timeline-calendar-weekdays span {padding:10px 0}
+.timeline-calendar-grid {border-top:0;border-left:0;grid-auto-rows:100px}
+.timeline-calendar-day {position:relative;min-width:0;border-right:1px solid #d8d1c8;border-bottom:1px solid #d8d1c8;background:transparent}
+.timeline-calendar-day.is-today {background:rgba(116,133,107,.045)}
+.timeline-calendar-number {position:absolute;left:10px;top:10px;color:#8e8790;font:400 9px/1 Georgia,serif}
+.timeline-calendar-events {position:absolute;inset:28px 5px 5px;min-width:0}
+.timeline-calendar-event {position:absolute;top:0;left:50%;display:block!important;width:44px;height:55px;padding:0;border:0;border-radius:0;background:transparent!important;box-shadow:0 5px 12px rgba(53,43,55,.08);cursor:pointer;transform:translateX(-50%);transition:none;z-index:2;overflow:hidden}
+.timeline-calendar-event-1 {transform:translateX(-50%);z-index:3}.timeline-calendar-event-2 {transform:translateX(-50%);z-index:4}
+.timeline-calendar-event:hover,.timeline-calendar-event:focus-visible,.timeline-calendar-event-1:hover,.timeline-calendar-event-1:focus-visible,.timeline-calendar-event-2:hover,.timeline-calendar-event-2:focus-visible {transform:translateX(-50%)}
+.timeline-calendar-event > img,.timeline-calendar-event > .timeline-calendar-fallback {position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;border:0!important;border-radius:0!important;object-fit:cover!important;object-position:center!important}
+.timeline-calendar-fallback {display:grid!important;place-items:center;color:#705681;font:italic 24px Georgia,serif}
+.timeline-calendar-events:has(.timeline-calendar-event-1) .timeline-calendar-event-0 {left:25%}
+.timeline-calendar-events:has(.timeline-calendar-event-1) .timeline-calendar-event-1 {left:75%}
+.timeline-calendar-events:has(.timeline-calendar-event-2) .timeline-calendar-event-0 {left:20%}
+.timeline-calendar-events:has(.timeline-calendar-event-2) .timeline-calendar-event-1 {left:50%}
+.timeline-calendar-events:has(.timeline-calendar-event-2) .timeline-calendar-event-2 {left:80%}
+.timeline-calendar-event-name {position:absolute;left:0;right:0;bottom:0;padding:18px 4px 4px;overflow:hidden;color:#fff;background:rgba(47,41,52,.76);font:400 9px/1.2 Georgia,"Songti SC",serif;text-overflow:ellipsis;white-space:nowrap;opacity:0;transition:opacity .15s}
+.timeline-calendar-event:hover .timeline-calendar-event-name,.timeline-calendar-event:focus-visible .timeline-calendar-event-name {opacity:1}
+.timeline-calendar-badges {position:absolute;left:0;right:0;top:0;bottom:auto;display:flex;gap:0;justify-items:stretch}.timeline-calendar-badge {flex:1;padding:5px 3px;color:#fff;text-align:center;font:700 6px/1 Georgia,serif;letter-spacing:.12em}.timeline-calendar-badge.begin {background:#705681}.timeline-calendar-badge.clear {background:#74856b}.timeline-calendar-badge.log {display:none}
+.timeline-calendar-more {position:absolute;right:3px;bottom:2px;color:#705681;font:700 9px/1 Georgia,serif}
+.timeline-calendar-legend {display:none!important}
+@media(max-width:900px){
+  .product-view[data-product-view="timeline"] {padding:28px 24px 82px!important}
+  .product-view[data-product-view="timeline"] .timeline-page-head {grid-template-columns:1fr;gap:22px;align-items:start}
+  .timeline-head-actions {justify-content:flex-start}
+  .timeline-toolbar {flex-wrap:wrap;gap:10px;padding:10px 0}
+  .timeline-toolbar .timeline-view-switch {order:0;margin-left:auto}
+  .timeline-calendar {grid-template-columns:1fr;gap:16px;padding-top:14px}.timeline-calendar-aside {display:grid;grid-template-columns:auto auto auto 1fr;align-items:end;gap:10px;padding:0}.timeline-calendar-month-number {font-size:48px}.timeline-calendar-aside strong{margin:0}.timeline-calendar-aside small{margin:0}.timeline-calendar-aside i,.timeline-calendar-aside p,.timeline-calendar-aside dl{display:none}
+  .timeline-calendar-grid {grid-auto-rows:82px}.timeline-calendar-event {width:42px;height:50px}
+}
+@media(max-width:560px){
+  .product-view[data-product-view="timeline"] {padding:22px 16px 74px!important}
+  .product-view[data-product-view="timeline"] .timeline-page-head h1 {font-size:44px!important}
+  .timeline-head-actions {gap:14px;flex-wrap:wrap}.timeline-head-metric{min-width:58px}.timeline-head-actions .product-button{margin-left:auto}
+  .timeline-toolbar .product-select {flex:1 1 calc(50% - 8px);min-width:0}.timeline-toolbar .timeline-view-switch{width:100%;margin-left:0;justify-content:flex-start}.timeline-toolbar .timeline-check{width:100%}
+  .timeline-calendar-grid {grid-auto-rows:62px}.timeline-calendar-events{inset:23px 2px 2px}.timeline-calendar-number{left:5px;top:6px}.timeline-calendar-event{width:24px;height:33px}.timeline-calendar-event-1,.timeline-calendar-event-2,.timeline-calendar-event-1:hover,.timeline-calendar-event-1:focus-visible,.timeline-calendar-event-2:hover,.timeline-calendar-event-2:focus-visible{transform:translateX(-50%)}.timeline-calendar-events:has(.timeline-calendar-event-1) .timeline-calendar-event-0{left:25%}.timeline-calendar-events:has(.timeline-calendar-event-1) .timeline-calendar-event-1{left:75%}.timeline-calendar-events:has(.timeline-calendar-event-2) .timeline-calendar-event-0{left:20%}.timeline-calendar-events:has(.timeline-calendar-event-2) .timeline-calendar-event-1{left:50%}.timeline-calendar-events:has(.timeline-calendar-event-2) .timeline-calendar-event-2{left:80%}.timeline-calendar-badge{padding:2px 3px;font-size:5px}.timeline-calendar-event-name{display:none}.timeline-calendar-legend{justify-content:flex-start;gap:8px;flex-wrap:wrap}
 }

@@ -27,9 +27,14 @@
 
 
 
-  <link rel="stylesheet" href="./assets/css/amorist.css?v=oshi-shell-20260801-2">
+  <link rel="stylesheet" href="./assets/css/amorist.css?v=oshi-shell-20260801-7">
   <link rel="stylesheet" href="./assets/css/site-modes.css?v=pure-otome-20260728">
-  <link rel="stylesheet" href="./assets/css/polish.css?v=timeline-ui-20260731">
+  <link rel="stylesheet" href="./assets/css/polish.css?v=timeline-calendar-20260801-16">
+  <style>
+    .product-view[data-product-view="oshi"] .oshi-canvas-shell{filter:none!important}
+    .product-view[data-product-view="oshi"] .oshi-canvas{background:#fbf8f2!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+    .product-view[data-product-view="oshi"] .oshi-magazine-copy{display:none!important}
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main-content">跳到主要内容</a>
@@ -48,7 +53,7 @@
         <button class="product-nav-btn" type="button" data-product-target="oshi"><span class="product-nav-icon">♧</span><span><b>推角展示</b><small>喜欢的人物与记录</small></span></button>
         <button class="product-nav-btn" type="button" data-product-target="library"><span class="product-nav-icon">▦</span><span><b>游戏档案</b><small>进度与收藏</small></span></button>
         <button class="product-nav-btn" type="button" data-product-target="characters"><span class="product-nav-icon">♡</span><span><b>角色图鉴</b><small>角色与人物资料</small></span></button>
-        <button class="product-nav-btn" type="button" data-product-target="timeline"><span class="product-nav-icon">◷</span><span><b>时间线</b><small>游玩编年史</small></span></button>
+        <button class="product-nav-btn" type="button" data-product-target="timeline"><span class="product-nav-icon">◷</span><span><b>游玩日历</b><small>游玩编年史</small></span></button>
       </nav>
       <div class="product-nav-label">CREATE</div>
       <nav class="product-nav">
@@ -171,7 +176,7 @@
 
       <section class="product-view" data-product-view="oshi">
         <div class="product-page-head oshi-page-head">
-          <div><div class="page-eyebrow">PORTRAITS OF AFFECTION</div><h1>好きな人たち</h1><p>把最喜欢的人物，编排成一页只属于你的总览。</p></div>
+          <div><div class="page-eyebrow">PORTRAITS OF AFFECTION</div><h1>好きな人たち</h1><p>Liebe ist, daß Du mir das Messer bist, mit dem ich in mir wühle.</p></div>
           <div class="oshi-head-actions">
             <nav class="oshi-view-switch" aria-label="展示模式"><button class="active" type="button" data-oshi-view-mode="flow" aria-pressed="true">FLOW</button><button type="button" data-oshi-view-mode="magazine" aria-pressed="false">MAGAZINE</button></nav>
             <span class="oshi-count" id="oshiCount">0</span>
@@ -688,8 +693,9 @@
       </div>
 
       <section class="product-view" data-product-view="timeline">
-        <div class="product-page-head"><div><h1>游玩时间线</h1><p>Amor, ch’a nullo amato amar perdona</p></div></div>
+        <div class="product-page-head timeline-page-head"><div><div class="page-eyebrow">PLAY CHRONICLE</div><h1>游玩日历</h1><p>只留下日期、封面与状态。作品名在需要时出现，不再占据每一个日历格。</p></div><div class="timeline-head-actions"><div class="timeline-head-metric"><span>ACTIVE DAYS</span><strong id="timelineActiveDays">0</strong></div><div class="timeline-head-metric"><span>RECORDS</span><strong id="timelineRecordCount">0</strong></div></div></div>
         <div class="timeline-wrap" id="timelineContent"></div>
+        <div class="timeline-bottom-actions" data-timeline-editor-only><button class="product-button" id="timelineSessionAddTop" type="button">＋ 记录游玩</button><button class="product-button secondary" id="timelineBatchImportTop" type="button">批量记录</button></div>
       </section>
 
     </div>
@@ -699,7 +705,7 @@
     <button class="product-nav-btn active" type="button" data-product-target="home"><span class="product-nav-icon">⌂</span><span>首页</span></button>
     <button class="product-nav-btn" type="button" data-product-target="library"><span class="product-nav-icon">▦</span><span>游戏</span></button>
     <button class="product-nav-btn" type="button" data-product-target="characters"><span class="product-nav-icon">♡</span><span>角色</span></button>
-    <button class="product-nav-btn" type="button" data-product-target="timeline"><span class="product-nav-icon">◷</span><span>时间线</span></button>
+    <button class="product-nav-btn" type="button" data-product-target="timeline"><span class="product-nav-icon">◷</span><span>游玩日历</span></button>
     <button class="product-nav-btn" type="button" data-product-target="studio"><span class="product-nav-icon">✎</span><span>REPO</span></button>
     <button class="product-nav-btn" type="button" id="mobileMoreToggle"><span class="product-nav-icon">•••</span><span>更多</span></button>
   </nav>
@@ -913,6 +919,6 @@
   <script>window.AMORIST_MODE = 'public';</script>
   <script src="./assets/js/image-store.js"></script>
   <script src="./assets/js/data-model.js?v=characters-preferences-20260801-1"></script>
-  <script src="./assets/js/public-bootstrap.js?v=oshi-shell-20260801-2"></script>
+  <script src="./assets/js/public-bootstrap.js?v=timeline-calendar-20260801-5"></script>
 </body>
 </html>
