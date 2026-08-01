@@ -5490,7 +5490,7 @@ body[data-color-style="dark"] .repo-note{background:color-mix(in srgb,var(--soft
 
 /* ponytail: keep the archive redesign in one override block; existing data and actions stay shared. */
 .product-view[data-product-view="library"] #gameDetailPanel{max-width:none;margin:0 -28px;padding:34px 46px 48px;background:#fbf8f2;color:#262329}
-.product-view[data-product-view="library"] #gameDetailPanel .game-detail-back{position:relative;right:auto;top:auto;display:block;margin:0 auto 18px;max-width:1220px;padding:0;border:0;background:transparent;color:#65517a;font-size:11px}
+.product-view[data-product-view="library"] #gameDetailPanel .game-detail-back{position:relative;right:auto;top:auto;display:block;width:min(1220px,100%);margin:0 auto 18px;padding:0;border:0;background:transparent;color:#65517a;font-size:11px;text-align:left}
 .product-view[data-product-view="library"] #gameDetailPanel .archive{max-width:1220px;margin:0 auto;position:relative}
 .product-view[data-product-view="library"] #gameDetailPanel .hero{position:relative;display:grid;grid-template-columns:270px minmax(0,1fr) 285px;gap:38px;align-items:start;padding-bottom:38px}
 .product-view[data-product-view="library"] #gameDetailPanel .hero::after{content:"";position:absolute;left:308px;right:0;bottom:0;height:1px;background:#d8d1c8}
