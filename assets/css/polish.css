@@ -1394,3 +1394,125 @@ body:has(.product-view[data-product-view="omikuji"].active) .product-main{backgr
 @media(max-width:760px){.omikuji-sanctuary[data-view="ink"]{height:calc(100dvh - 82px);padding:13px 16px 10px}.kotodama-ritual-head>button{left:18px;bottom:88px;padding:7px 1px}.kotodama-stage{height:calc(100dvh - 154px);min-height:430px;max-height:none}.kotodama-well{left:50%;top:54%;width:278px;height:274px}.kotodama-roof{height:63px}.kotodama-post{top:48px;height:160px;width:14px}.kotodama-post.left{left:35px}.kotodama-post.right{right:35px}.kotodama-rope{top:52px;height:110px}.kotodama-mouth{bottom:18px;width:194px;height:81px;border-width:15px}.kotodama-result{left:50%;right:auto;top:49%;width:min(340px,calc(100% - 28px));grid-template-columns:43px minmax(0,1fr);gap:16px;transform:translate(-46%,-42%)}.kotodama-result.is-visible{transform:translate(-50%,-50%)}.kotodama-result::before{inset:-54px -32px}.kotodama-seal{width:39px;height:39px;font-size:20px}.kotodama-copy{padding-left:16px}.kotodama-result h3{margin:13px 0 8px;font-size:28px}.kotodama-result em{margin-top:15px;font-size:8.5px}.kotodama-result footer{gap:17px;margin-top:18px}.kotodama-result button{font-size:8px}.kotodama-stage::after{right:17px;bottom:15px;font-size:25px}.omikuji-sanctuary[data-kotodama-phase="result"] .kotodama-well{opacity:.18}}
 @keyframes sakuraPaperFallMobile{0%,57%{opacity:0;clip-path:inset(2% 47%);transform:translate(50%,-50%) scale(.9,.72)}62%{opacity:.82;clip-path:inset(2% 45%);transform:translate(50%,-50%) scale(.92,.78)}78%{opacity:1;clip-path:inset(1% 24%);transform:translate(50%,-50%) scale(.96,.92)}100%{opacity:1;clip-path:inset(0);transform:translate(50%,-50%) scale(1)}}
 @media(prefers-reduced-motion:reduce){.map-sakura,.map-pond,.ema-tile{animation:none}.sakura-action,.sakura-action button,.sakura-result,.bell-result,.ema-result,.ema-result-inner,.kotodama-result{transition:none}.sakura-result.is-falling{animation:none}.omikuji-sanctuary[data-bell-phase="ringing"] .bell-action button,.omikuji-sanctuary[data-bell-phase="ringing"] .bell-body,.omikuji-sanctuary[data-bell-phase="ringing"] .bell-clapper,.omikuji-sanctuary[data-bell-phase="ringing"] .bell-echoes i,.omikuji-sanctuary[data-bell-phase="ringing"] .bell-companions i,.omikuji-sanctuary[data-kotodama-phase="summoning"] .kotodama-rope,.omikuji-sanctuary[data-kotodama-phase="summoning"] .kotodama-mouth i{animation:none}}
+
+/* ===== workspaceControlAlignment ===== */
+/* REPO and visual creation use the same square, quiet control language as the archives. */
+:is(.product-view[data-product-view="studio"],.product-view[data-product-view="forms"]){
+  --workspace-line:#d9d0c4;
+  --workspace-line-strong:#c8bcae;
+  --workspace-surface:#fbf8f1;
+  --workspace-control:#f7f3eb;
+}
+
+.product-view[data-product-view="studio"] :is(.toolbar,.viewport),
+.product-view[data-product-view="forms"] :is(.workshop-shell,.workshop-sidebar,.workshop-main,.workshop-library-sidebar,.workshop-sheet,.form-template,.visual-sheet,.form-side){
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+
+.product-view[data-product-view="studio"] :is(.toolbar,.viewport){
+  border:1px solid var(--workspace-line)!important;
+}
+.product-view[data-product-view="studio"] .toolbar{
+  background:var(--workspace-surface)!important;
+}
+.product-view[data-product-view="studio"] .viewport{
+  background:#e8e4df!important;
+}
+.product-view[data-product-view="studio"] :is(.tool-btn,.theme-current-btn,.page-switch-btn,.page-add-btn,.color-style-btn,.product-button){
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.product-view[data-product-view="studio"] :is(.tool-btn,.theme-current-btn,.page-switch-btn,.page-add-btn,.color-style-btn){
+  border-color:var(--workspace-line-strong)!important;
+}
+.product-view[data-product-view="studio"] .toolbar :is(input:not([type="checkbox"]):not([type="range"]),select,textarea){
+  border:0!important;
+  border-bottom:1px solid var(--workspace-line)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.product-view[data-product-view="studio"] .toolbar :is(input:not([type="checkbox"]):not([type="range"]),select,textarea):focus{
+  border-bottom-color:var(--product-plum)!important;
+  box-shadow:none!important;
+}
+.product-view[data-product-view="studio"] :is(.page-switch,.color-style-switch){border-radius:0!important}
+.product-view[data-product-view="studio"] .long-page-delete{border-radius:0!important}
+
+.product-view[data-product-view="forms"] :is(.workshop-sidebar,.workshop-main,.workshop-library-sidebar){
+  border:1px solid var(--workspace-line)!important;
+  background:var(--workspace-surface)!important;
+}
+.product-view[data-product-view="forms"] :is(.form-template,.visual-sheet,.form-side){
+  border:1px solid var(--workspace-line)!important;
+  background:var(--workspace-surface)!important;
+}
+.product-view[data-product-view="forms"] :is(.workshop-size-presets,.workshop-settings,.workshop-main-head,.workshop-sheet-head){
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.product-view[data-product-view="forms"] :is(.product-button,.workshop-new,.workshop-tools button,.workshop-size-presets button,.workshop-color-row button,.workshop-palette-card,.workshop-picker-tabs button,.workshop-search button,.workshop-preset,.workshop-list-delete){
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.product-view[data-product-view="forms"] :is(.product-button,.workshop-new,.workshop-tools button,.workshop-search button){
+  min-height:38px!important;
+  border:1px solid var(--workspace-line-strong)!important;
+}
+.product-view[data-product-view="forms"] :is(.workshop-sidebar,.workshop-library-sidebar,.workshop-main-head,.workshop-settings,.workshop-search,.form-side,.visual-sheet-head) :is(input:not([type="checkbox"]):not([type="range"]),select,textarea){
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.product-view[data-product-view="forms"] :is(.workshop-sidebar,.workshop-library-sidebar,.workshop-main-head,.workshop-settings,.workshop-search,.form-side) :is(input:not([type="checkbox"]):not([type="range"]),select,textarea){
+  border:0!important;
+  border-bottom:1px solid var(--workspace-line)!important;
+  background:transparent!important;
+}
+.product-view[data-product-view="forms"] :is(.workshop-sidebar,.workshop-library-sidebar,.workshop-main-head,.workshop-settings,.workshop-search,.form-side) :is(input:not([type="checkbox"]):not([type="range"]),select,textarea):focus{
+  border-bottom-color:var(--product-plum)!important;
+  box-shadow:none!important;
+}
+.product-view[data-product-view="forms"] .visual-sheet-head input{
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.product-view[data-product-view="forms"] .workshop-picker{
+  border-radius:0!important;
+}
+
+@media(max-width:900px){
+  .product-view[data-product-view="studio"] :is(.toolbar,.viewport),
+  .product-view[data-product-view="forms"] :is(.workshop-sidebar,.workshop-main,.workshop-library-sidebar,.workshop-sheet,.form-template,.visual-sheet,.form-side){
+    border-radius:0!important;
+  }
+}
+
+/* These explicit selectors win over the older editor-only panel rules. */
+html body:not(.screenshot-mode) .product-view[data-product-view="studio"] .toolbar,
+html body:not(.screenshot-mode) .product-view[data-product-view="studio"] .viewport{
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar :is(.tool-btn,.theme-current-btn,.page-switch-btn,.page-add-btn,.color-style-btn),
+html body .product-view[data-product-view="studio"] .repo-product-actions button{
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+html body .product-view[data-product-view="studio"] .repo-product-actions #screenshotBtn{
+  border-radius:0!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-sidebar,
+html body .product-view[data-product-view="forms"] .workshop-main,
+html body .product-view[data-product-view="forms"] .workshop-library-sidebar,
+html body .product-view[data-product-view="forms"] .workshop-sheet,
+html body .product-view[data-product-view="forms"] .form-template,
+html body .product-view[data-product-view="forms"] .visual-sheet,
+html body .product-view[data-product-view="forms"] .form-side{
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+html body .product-view[data-product-view="forms"] :is(.product-button,.workshop-new,.workshop-tools button,.workshop-size-presets button,.workshop-color-row button,.workshop-palette-card,.workshop-picker-tabs button,.workshop-search button,.workshop-preset,.workshop-list-delete){
+  border-radius:0!important;
+  box-shadow:none!important;
+}

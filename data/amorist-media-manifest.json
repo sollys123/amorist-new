@@ -1,7 +1,7 @@
 {
   "type": "amorist-media-manifest",
   "schemaVersion": 1,
-  "generatedAt": "2026-08-02T12:16:50.557Z",
+  "generatedAt": "2026-08-02T16:40:30.302Z",
   "files": {
     "img-63f3f3a3d61332264d1cc369.webp": {
       "sourceHash": "63f3f3a3d61332264d1cc369a3cce530d248e010c35a4e56f67147d2d436ef55",
@@ -37,9 +37,15 @@
       "sourceHash": "1ba4b9403b4c1808654f2800eeae7b88b8a5ab2675b0b95e89536c0ae8174310",
       "mime": "image/webp",
       "bytes": 197616
+    },
+    "img-891ce2f7f0b27dacd1353767.webp": {
+      "sourceHash": "891ce2f7f0b27dacd13537670e0191f985a21dd560874f03cef9dde102992ccd",
+      "mime": "image/webp",
+      "bytes": 113250
     }
   },
   "possiblyUnused": [
-    "enmusubi-shrine-map.png"
+    "enmusubi-shrine-map.png",
+    "img-5054f3c2868da5988137d059.webp"
   ]
 }

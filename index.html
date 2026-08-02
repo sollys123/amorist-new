@@ -29,7 +29,7 @@
 
   <link rel="stylesheet" href="./assets/css/amorist.css?v=oshi-shell-20260801-7">
   <link rel="stylesheet" href="./assets/css/site-modes.css?v=pure-otome-20260728">
-<link rel="stylesheet" href="./assets/css/polish.css?v=kotodama-ritual-20260802-3">
+<link rel="stylesheet" href="./assets/css/polish.css?v=workspace-controls-20260803-2">
   <link rel="stylesheet" href="./assets/css/profile-home.css?v=profile-home-v15-20260802-27">
   <style>
     .product-view[data-product-view="oshi"] .oshi-canvas-shell{filter:none!important}
@@ -646,6 +646,7 @@
       <div class="editor-group"><label for="libraryGameRoutes">角色 / 路线</label><input class="product-input" id="libraryGameRoutes" maxlength="160" placeholder="用逗号分隔"></div>
       <div class="editor-group"><label for="libraryGameStartDate">开始游玩日期</label><input class="product-input" id="libraryGameStartDate" type="date"></div>
       <div class="editor-group"><label for="libraryGameCompleteDate">游戏全通日期</label><input class="product-input" id="libraryGameCompleteDate" type="date"></div>
+      <div class="editor-group wide game-log-setting"><label for="libraryGameHideOverlappingLogs"><input id="libraryGameHideOverlappingLogs" type="checkbox">隐藏与开始 / 全通日期重合的普通游玩记录</label><small>仅影响这部作品主页的游玩日志，游玩日历和全局时间线仍会保留这些记录。</small></div>
       <div class="editor-group wide"><label for="libraryGameCover">封面图片网址（可选）</label><input class="product-input" id="libraryGameCover" type="text" placeholder="https://..."></div>
       <div class="editor-group wide"><label>或使用本地封面</label><button class="product-button secondary" id="libraryCoverUploadButton" type="button">选择本地图片</button><input id="libraryCoverUploadInput" type="file" accept="image/*" hidden></div>
       <div class="editor-group wide"><label for="libraryGameNote">一句话记录</label><textarea class="product-textarea" id="libraryGameNote" maxlength="120"></textarea></div>
