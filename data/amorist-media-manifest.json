@@ -1,7 +1,7 @@
 {
   "type": "amorist-media-manifest",
   "schemaVersion": 1,
-  "generatedAt": "2026-08-02T18:50:43.311Z",
+  "generatedAt": "2026-08-02T20:17:09.192Z",
   "files": {
     "img-63f3f3a3d61332264d1cc369.webp": {
       "sourceHash": "63f3f3a3d61332264d1cc369a3cce530d248e010c35a4e56f67147d2d436ef55",
@@ -42,10 +42,33 @@
       "sourceHash": "891ce2f7f0b27dacd13537670e0191f985a21dd560874f03cef9dde102992ccd",
       "mime": "image/webp",
       "bytes": 113250
+    },
+    "img-577a62a791da1ffce394b241.webp": {
+      "sourceHash": "577a62a791da1ffce394b241b92a8f957b3b2dcaebceb82ca27fbdc2599d95b3",
+      "mime": "image/webp",
+      "bytes": 429626
+    },
+    "img-9e9c3aecc54fc6954c85998a.webp": {
+      "sourceHash": "9e9c3aecc54fc6954c85998a241eed6027a7192603f9b7be7511f8ca0b73ba01",
+      "mime": "image/webp",
+      "bytes": 360850
+    },
+    "img-14a37758e7ec8187c60fe454.webp": {
+      "sourceHash": "14a37758e7ec8187c60fe454a7695b903c1c0525ea0318ecfcebc81c375ef685",
+      "mime": "image/webp",
+      "bytes": 570118
+    },
+    "img-4993b88565309378b030a933.webp": {
+      "sourceHash": "4993b88565309378b030a933704b80af2821631069d0636da84aac3324e0cbb6",
+      "mime": "image/webp",
+      "bytes": 102280
     }
   },
   "possiblyUnused": [
     "enmusubi-shrine-map.png",
-    "img-5054f3c2868da5988137d059.webp"
+    "img-5054f3c2868da5988137d059.webp",
+    "img-59b899344cc2a21ce467a00e.webp",
+    "img-5d3aff6dbe584429491773be.webp",
+    "img-a00119066c026add482b13fe.webp"
   ]
 }
