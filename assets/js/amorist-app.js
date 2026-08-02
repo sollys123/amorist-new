@@ -84,8 +84,8 @@
 
 /* ===== homeOmikuji ===== */
 (()=>{
-  const card=document.getElementById('homeOmikujiCard');
-  if(!card)return;
+  const root=document.getElementById('omikujiSanctuary');
+  if(!root)return;
   const $=id=>document.getElementById(id);
   const VERSION='amorist-omikuji-v1',CHAR_KEY='amorist-character-book-v1',GAME_KEY='amorist-game-library-v1';
   const RESULT_KEY='amorist.omikuji.result';
@@ -154,40 +154,496 @@
     if(!result)return;
     try{localStorage.setItem(`${RESULT_KEY}.${date}`,JSON.stringify({date,result,hasDrawn:true}))}catch{}
   }
-  // Keep the result collapsed on every page load. Drawing can reveal it for
-  // the current session, while a refresh returns to the quieter sealed state.
-  let dailyResult=null,isRevealed=false;
-  function updateView(animate=false){
-    const sealed=$('homeOmikujiSealed'),panel=$('homeOmikujiResult'),collapse=$('homeOmikujiCollapse');
-    if(!dailyResult){sealed.hidden=true;panel.hidden=false;collapse.hidden=true;setText('homeOmikujiName','');setText('homeOmikujiWork','');setText('homeOmikujiGrade','');setText('homeOmikujiMessage','今日はまだ、誰も来ていません。');setText('homeOmikujiAttribution','');$('homeOmikujiOpen').hidden=true;return}
-    setText('homeOmikujiName',dailyResult.name);setText('homeOmikujiWork',dailyResult.workTitle);setText('homeOmikujiGrade',dailyResult.grade);setText('homeOmikujiMessage',dailyResult.message);setText('homeOmikujiAttribution',dailyResult.attribution);$('homeOmikujiOpen').hidden=false;collapse.hidden=!isRevealed;
-    const portrait=$('homeOmikujiPortrait');portrait.innerHTML=dailyResult.image?`<img src="${esc(dailyResult.image)}" alt="${esc(dailyResult.name)}" loading="lazy" referrerpolicy="no-referrer">`:esc(dailyResult.name.trim().slice(0,1)||'縁');
-    sealed.hidden=isRevealed;panel.hidden=!isRevealed;
-    if(animate){const active=isRevealed?panel:sealed;active.classList.remove('is-visible');active.classList.add('is-revealing');requestAnimationFrame(()=>{active.classList.remove('is-revealing');active.classList.add('is-visible')})}
+  let dailyResult=null,drawTimer=0;
+  const canvas=$('omikujiCanvas'),stage=$('omikujiWaterStage'),ctx=canvas?.getContext('2d');
+  const sakuraCanvas=$('sakuraCanvas'),sakuraStage=$('sakuraStage'),sakuraCtx=sakuraCanvas?.getContext('2d');
+  const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
+  const pointer={x:0,y:0,active:false,lastRipple:0};
+  let width=0,height=0,dpr=1,lastFrame=0,phaseStarted=0,animationFrame=0;
+  let slips=[],ripples=[],petals=[];
+  let sakuraWidth=0,sakuraHeight=0,sakuraDpr=1,sakuraStarted=0,sakuraDropAt=0,sakuraShakeStarted=0,sakuraRevealTimer=0,sakuraFlightAnimation=null,sakuraCharacter=null,sakuraLastKey='';
+  let bellActor=null,bellLastName='',bellRevealTimer=0,toriiWork=null,toriiLastKey='',toriiRevealTimer=0,emaMaker=null,emaLastName='',emaRevealTimer=0,kotodamaWriter=null,kotodamaLastName='',kotodamaRevealTimer=0;
+  let sakuraBranches=[],sakuraBlooms=[],sakuraFalling=[],sakuraVotives=[];
+  const sakuraPointer={x:0,y:0,active:false};
+  const slipSeeds=[.12,.27,.43,.58,.72,.84,.93];
+  const clamp=(value,min,max)=>Math.min(max,Math.max(min,value));
+  const ease=value=>1-Math.pow(1-clamp(value,0,1),3);
+  function buildSlips(){
+    slips=slipSeeds.map((seed,index)=>({
+      x:width*(.08+seed*.82),y:height*(.23+(index%3)*.2+(index%2)*.035),
+      vx:(index%2?.012:-.01),vy:(index%3-1)*.004,
+      angle:(index-3)*.17+(index%2?.09:-.04),spin:index%2?1:-1,
+      w:clamp(width*.024,22,34),h:clamp(height*(.21+(index%3)*.018),118,176),seed:index*.83+.4
+    }));
   }
+  function buildPetals(){
+    const count=clamp(Math.round(width/82),9,16);
+    petals=Array.from({length:count},(_,index)=>({
+      x:(index+.35)/count*width+(index%3-1)*19,y:height*(.08+((index*37)%82)/100),
+      vx:.018+(index%4)*.007,vy:.004+(index%3)*.003,
+      size:5.4+(index%5)*.9,angle:index*.91,turn:(index%2?1:-1)*(.0007+(index%3)*.00018),phase:index*.77,
+      alpha:.34+(index%4)*.055,tone:index%3
+    }));
+  }
+  function resizeCanvas(){
+    if(!canvas||!stage||!ctx)return;
+    const rect=stage.getBoundingClientRect();
+    width=Math.max(320,rect.width);height=Math.max(480,rect.height);dpr=Math.min(window.devicePixelRatio||1,1.75);
+    canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;
+    ctx.setTransform(dpr,0,0,dpr,0,0);buildSlips();buildPetals();
+  }
+  function addRipple(x,y,strength=1){
+    ripples.push({x,y,r:5,alpha:.28*strength,speed:.48+strength*.14});
+    if(ripples.length>14)ripples.shift();
+  }
+  function roundedRect(context,x,y,w,h,r){
+    const radius=Math.min(r,w/2,h/2);context.beginPath();context.moveTo(x+radius,y);context.arcTo(x+w,y,x+w,y+h,radius);context.arcTo(x+w,y+h,x,y+h,radius);context.arcTo(x,y+h,x,y,radius);context.arcTo(x,y,x+w,y,radius);context.closePath();
+  }
+  function drawWater(time){
+    ctx.save();ctx.lineWidth=.7;
+    for(let row=0;row<13;row++){
+      const y=height*(.12+row*.07);ctx.beginPath();
+      for(let x=-20;x<=width+20;x+=20){
+        const wave=Math.sin(x*.013+time*.00022+row*.74)*3.6+Math.sin(x*.004-time*.00012)*2;
+        if(x===-20)ctx.moveTo(x,y+wave);else ctx.lineTo(x,y+wave);
+      }
+      ctx.strokeStyle=`rgba(230,224,235,${.022+(row%3)*.008})`;ctx.stroke();
+    }
+    ripples=recentRipples(ripples);
+    ctx.restore();
+  }
+  function recentRipples(rows){
+    return rows.filter(ripple=>{
+      ripple.r+=ripple.speed;ripple.alpha*=.987;
+      ctx.beginPath();ctx.ellipse(ripple.x,ripple.y,ripple.r*1.8,ripple.r*.52,0,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(237,229,241,${ripple.alpha})`;ctx.lineWidth=.8;ctx.stroke();
+      if(ripple.r>18){ctx.beginPath();ctx.ellipse(ripple.x,ripple.y,ripple.r*1.25,ripple.r*.36,0,0,Math.PI*2);ctx.strokeStyle=`rgba(190,176,201,${ripple.alpha*.48})`;ctx.stroke()}
+      return ripple.alpha>.012&&ripple.r<150;
+    });
+  }
+  function drawPetals(time,delta){
+    ctx.save();
+    petals.forEach(petal=>{
+      petal.x+=(petal.vx+Math.sin(time*.00018+petal.phase)*.012)*delta;
+      petal.y+=(petal.vy+Math.cos(time*.00014+petal.phase)*.004)*delta;
+      petal.angle+=petal.turn*delta;
+      if(petal.x>width+18){petal.x=-18;petal.y=height*(.08+((petal.phase*31)%78)/100)}
+      if(petal.y>height+12)petal.y=-12;
+      ctx.save();ctx.translate(petal.x,petal.y);ctx.rotate(petal.angle+Math.sin(time*.00022+petal.phase)*.18);ctx.scale(1,.7);
+      ctx.beginPath();ctx.moveTo(0,petal.size);ctx.bezierCurveTo(-petal.size*.82,petal.size*.48,-petal.size,-petal.size*.26,-petal.size*.52,-petal.size*.72);ctx.bezierCurveTo(-petal.size*.25,-petal.size,petal.size*.02,-petal.size*.58,0,-petal.size*.36);ctx.bezierCurveTo(petal.size*.18,-petal.size*.64,petal.size*.45,-petal.size,petal.size*.7,-petal.size*.62);ctx.bezierCurveTo(petal.size*1.06,-petal.size*.05,petal.size*.74,petal.size*.55,0,petal.size);ctx.closePath();
+      const colors=['rgba(218,174,184,','rgba(237,205,207,','rgba(197,151,165,'];ctx.fillStyle=`${colors[petal.tone]}${petal.alpha})`;ctx.fill();
+      ctx.restore();
+    });ctx.restore();
+  }
+  function drawSlip(slip,time,opacity=1){
+    ctx.save();ctx.translate(slip.x,slip.y);ctx.rotate(slip.angle);ctx.globalAlpha=opacity;
+    ctx.shadowColor='rgba(20,15,29,.2)';ctx.shadowBlur=18;ctx.shadowOffsetY=8;
+    roundedRect(ctx,-slip.w/2,-slip.h/2,slip.w,slip.h,2);ctx.fillStyle='#eee9df';ctx.fill();
+    ctx.shadowColor='transparent';ctx.strokeStyle='rgba(130,55,66,.6)';ctx.lineWidth=.7;ctx.stroke();
+    ctx.fillStyle='rgba(137,55,67,.72)';ctx.font=`${Math.max(8,slip.w*.3)}px "Songti SC",serif`;ctx.textAlign='center';ctx.fillText('御',0,-slip.h*.3);
+    ctx.strokeStyle='rgba(137,55,67,.35)';ctx.beginPath();ctx.moveTo(-slip.w*.24,-slip.h*.18);ctx.lineTo(slip.w*.24,-slip.h*.18);ctx.moveTo(0,-slip.h*.08);ctx.lineTo(0,slip.h*.28);ctx.stroke();
+    ctx.beginPath();ctx.arc(0,slip.h*.34,slip.w*.17,0,Math.PI*2);ctx.strokeStyle='rgba(137,55,67,.62)';ctx.stroke();ctx.restore();
+  }
+  function seededRandom(seed){let value=seed>>>0;return()=>{value=Math.imul(value^value>>>15,1|value);value^=value+Math.imul(value^value>>>7,61|value);return((value^value>>>14)>>>0)/4294967296}}
+  function buildSakuraTree(){
+    if(!sakuraWidth||!sakuraHeight)return;
+    const random=seededRandom(hash(`${Math.round(sakuraWidth)}|${Math.round(sakuraHeight)}|enmusubi-tree`));
+    sakuraBranches=[];sakuraBlooms=[];sakuraVotives=[];
+    const grow=(x,y,length,angle,depth)=>{
+      if(depth>5)return;
+      const bend=(random()-.5)*length*.5,ex=x+Math.cos(angle)*length,ey=y+Math.sin(angle)*length;
+      const cx=(x+ex)/2+Math.cos(angle+Math.PI/2)*bend,cy=(y+ey)/2+Math.sin(angle+Math.PI/2)*bend;
+      const delay=180+depth*85+random()*1450;
+      sakuraBranches.push({x,y,cx,cy,ex,ey,depth,delay,tone:random(),phase:random()*Math.PI*2});
+      if(depth>=2){
+        const blossomCount=depth===2?4:depth===3?6:depth===4?8:10;
+        for(let i=0;i<blossomCount;i++){
+          const t=.14+random()*.9,point=quadraticPoint({x,y,cx,cy,ex,ey},Math.min(1,t)),scatter=9+depth*3.2,theta=random()*Math.PI*2,radius=Math.sqrt(random())*scatter;
+          sakuraBlooms.push({x:point.x+Math.cos(theta)*radius,y:point.y+Math.sin(theta)*radius,size:3.5+random()*4.1,delay:delay+random()*1150,phase:random()*Math.PI*2,tone:Math.floor(random()*3)});
+        }
+      }
+      if(depth===5)return;
+      const childCount=depth===0?3:(depth<3&&random()>.58?3:2),spread=.55-depth*.018;
+      for(let i=0;i<childCount;i++){
+        const slot=childCount===1?0:(i/(childCount-1)-.5),bias=(random()-.5)*(depth<2?.34:.46);
+        grow(ex,ey,length*(.62+random()*.14),angle+slot*spread*(1.48+random()*.54)+bias,depth+1);
+      }
+    };
+    grow(sakuraWidth*.31,sakuraHeight*.965,sakuraHeight*.285,-Math.PI*.505,0);
+    const trunk=sakuraBranches[0],sideAnchor=trunk?quadraticPoint(trunk,.94):{x:sakuraWidth*.31,y:sakuraHeight*.7},sideLength=Math.min(sakuraWidth*.11,sakuraHeight*.19);
+    grow(sideAnchor.x-2,sideAnchor.y,sideLength,-Math.PI*.86,2);
+    grow(sideAnchor.x+3,sideAnchor.y-4,sideLength*.94,-Math.PI*.16,2);
+    const coreAnchor=trunk?quadraticPoint(trunk,.98):sideAnchor,coreLength=Math.min(sakuraWidth*.072,sakuraHeight*.14);
+    grow(coreAnchor.x-5,coreAnchor.y-13,coreLength,-Math.PI*.57,3);
+    grow(coreAnchor.x+5,coreAnchor.y-16,coreLength*.92,-Math.PI*.43,3);
+    const innerAnchor=trunk?quadraticPoint(trunk,.82):sideAnchor,innerLength=Math.min(sakuraWidth*.082,sakuraHeight*.155);
+    grow(innerAnchor.x-3,innerAnchor.y-6,innerLength,-Math.PI*.72,2);
+    grow(innerAnchor.x+4,innerAnchor.y-10,innerLength*.9,-Math.PI*.3,2);
+    const votiveCandidates=sakuraBranches.filter(branch=>branch.depth>=1&&branch.depth<=3&&branch.ey<sakuraHeight*.67&&branch.ex>sakuraWidth*.08&&branch.ex<sakuraWidth*.57);
+    for(let i=votiveCandidates.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[votiveCandidates[i],votiveCandidates[j]]=[votiveCandidates[j],votiveCandidates[i]]}
+    const votiveCount=sakuraWidth<620?5:7;
+    votiveCandidates.some(branch=>{
+      const point=quadraticPoint(branch,.48+random()*.34);
+      if(sakuraVotives.some(item=>Math.hypot(item.x-point.x,item.y-point.y)<58))return false;
+      sakuraVotives.push({x:point.x,y:point.y,type:sakuraVotives.length%3===1?'tag':'ribbon',length:17+random()*12,size:7+random()*2.5,phase:random()*Math.PI*2,tone:random()>.45?0:1,delay:1450+random()*900});
+      return sakuraVotives.length>=votiveCount;
+    });
+  }
+  function resizeSakuraCanvas(){
+    if(!sakuraCanvas||!sakuraStage||!sakuraCtx)return;
+    const rect=sakuraStage.getBoundingClientRect();if(rect.width<1||rect.height<1)return;
+    sakuraWidth=Math.max(320,rect.width);sakuraHeight=Math.max(430,rect.height);sakuraDpr=Math.min(window.devicePixelRatio||1,1.75);
+    sakuraCanvas.width=Math.round(sakuraWidth*sakuraDpr);sakuraCanvas.height=Math.round(sakuraHeight*sakuraDpr);sakuraCanvas.style.width=`${sakuraWidth}px`;sakuraCanvas.style.height=`${sakuraHeight}px`;
+    sakuraCtx.setTransform(sakuraDpr,0,0,sakuraDpr,0,0);buildSakuraTree();sakuraFalling=[];
+  }
+  function quadraticPoint(branch,t){const u=1-t;return{x:u*u*branch.x+2*u*t*branch.cx+t*t*branch.ex,y:u*u*branch.y+2*u*t*branch.cy+t*t*branch.ey}}
+  function drawSakuraBranch(branch,progress){
+    if(progress<=0)return;const steps=Math.max(4,Math.ceil(progress*20)),startWidth=Math.max(.7,13.5*Math.pow(.62,branch.depth)),endWidth=Math.max(.5,startWidth*.56);
+    sakuraCtx.lineCap='round';sakuraCtx.lineJoin='round';sakuraCtx.strokeStyle=branch.tone>.52?'rgba(82,76,66,.88)':'rgba(96,83,72,.9)';
+    for(let i=1;i<=steps;i++){
+      const from=quadraticPoint(branch,progress*(i-1)/steps),to=quadraticPoint(branch,progress*i/steps);
+      sakuraCtx.beginPath();sakuraCtx.moveTo(from.x,from.y);sakuraCtx.lineTo(to.x,to.y);sakuraCtx.lineWidth=startWidth+(endWidth-startWidth)*(i/steps);sakuraCtx.stroke();
+    }
+  }
+  function drawSakuraBlossom(blossom,scale,time,alpha=1){
+    if(scale<=0)return;sakuraCtx.save();sakuraCtx.translate(blossom.x,blossom.y);sakuraCtx.rotate(Math.sin(time*.00042+blossom.phase)*.075);sakuraCtx.scale(scale,scale);
+    const colors=['rgba(205,143,153,','rgba(228,180,184,','rgba(239,207,204,'];sakuraCtx.fillStyle=`${colors[blossom.tone]}${.74*alpha})`;
+    for(let i=0;i<5;i++){sakuraCtx.save();sakuraCtx.rotate(i*Math.PI*2/5);sakuraCtx.beginPath();sakuraCtx.ellipse(0,-blossom.size*.62,blossom.size*.42,blossom.size*.7,0,0,Math.PI*2);sakuraCtx.fill();sakuraCtx.restore()}
+    sakuraCtx.beginPath();sakuraCtx.arc(0,0,blossom.size*.17,0,Math.PI*2);sakuraCtx.fillStyle=`rgba(166,116,108,${.55*alpha})`;sakuraCtx.fill();sakuraCtx.restore();
+  }
+  function drawSakuraVotive(votive,time,elapsed){
+    const reveal=clamp((elapsed-votive.delay)/620,0,1);if(reveal<=0)return;
+    const sway=reduceMotion.matches?0:Math.sin(time*.00115+votive.phase)*.075;
+    const red=votive.tone?'rgba(132,47,52,.82)':'rgba(161,57,59,.86)';
+    sakuraCtx.save();sakuraCtx.translate(votive.x,votive.y);sakuraCtx.rotate(sway*reveal);sakuraCtx.globalAlpha=reveal;
+    sakuraCtx.strokeStyle='rgba(128,54,55,.58)';sakuraCtx.lineWidth=.75;sakuraCtx.beginPath();sakuraCtx.moveTo(0,-1);sakuraCtx.quadraticCurveTo(sway*18,4,0,8);sakuraCtx.stroke();
+    if(votive.type==='tag'){
+      const width=votive.size,height=votive.length;sakuraCtx.fillStyle='rgba(151,54,57,.88)';sakuraCtx.fillRect(-width*.5,7,width,height);
+      sakuraCtx.strokeStyle='rgba(102,43,45,.42)';sakuraCtx.lineWidth=.55;sakuraCtx.strokeRect(-width*.5,7,width,height);
+      sakuraCtx.fillStyle='rgba(241,219,199,.72)';sakuraCtx.fillRect(-.6,11,1.2,height*.48);
+    }else{
+      sakuraCtx.fillStyle=red;sakuraCtx.beginPath();sakuraCtx.arc(0,8,2.35,0,Math.PI*2);sakuraCtx.fill();
+      sakuraCtx.beginPath();sakuraCtx.moveTo(-1.2,9);sakuraCtx.bezierCurveTo(-4,14,-4.8,votive.length*.72,-3,votive.length+8);sakuraCtx.lineTo(.2,votive.length+4);sakuraCtx.bezierCurveTo(-.8,votive.length*.66,1.2,14,1.1,9);sakuraCtx.closePath();sakuraCtx.fill();
+      sakuraCtx.beginPath();sakuraCtx.moveTo(1.1,9);sakuraCtx.bezierCurveTo(4.8,14,5.2,votive.length*.7,3.4,votive.length+6);sakuraCtx.lineTo(.4,votive.length+3);sakuraCtx.bezierCurveTo(1.6,votive.length*.6,-.5,14,-1,9);sakuraCtx.closePath();sakuraCtx.globalAlpha=reveal*.76;sakuraCtx.fill();
+    }
+    sakuraCtx.restore();
+  }
+  function addSakuraPetal(source,chosen=false){
+    if(!source)return;sakuraFalling.push({x:source.x,y:source.y,vx:(Math.random()-.4)*(chosen?.34:.18),vy:.15+Math.random()*(chosen?.22:.13),angle:Math.random()*Math.PI*2,turn:(Math.random()-.5)*.014,size:(chosen?6.2:3.8)+Math.random()*2.8,phase:Math.random()*Math.PI*2,tone:source.tone,chosen,age:chosen?-(Math.random()*720):0,flutter:.018+Math.random()*.018,depth:.65+Math.random()*.7});
+    if(sakuraFalling.length>96)sakuraFalling.splice(0,sakuraFalling.length-96);
+  }
+  function drawSakuraPetal(petal,time,delta){
+    petal.age+=delta;if(petal.age<0)return;
+    const breeze=Math.sin(petal.age*petal.flutter+petal.phase)*.18+Math.sin(time*.00022+petal.phase)*.07;petal.x+=(petal.vx+breeze)*delta*petal.depth;petal.y+=petal.vy*delta*petal.depth;petal.vy=Math.min(.46,petal.vy+.00016*delta);petal.angle+=petal.turn*delta+Math.sin(petal.age*.026+petal.phase)*.003;
+    if(sakuraPointer.active){const dx=petal.x-sakuraPointer.x,dy=petal.y-sakuraPointer.y,dist=Math.hypot(dx,dy)||1;if(dist<165)petal.vx+=dx/dist*(1-dist/165)*.018*delta}
+    sakuraCtx.save();sakuraCtx.globalAlpha=.5+petal.depth*.32;sakuraCtx.translate(petal.x,petal.y);sakuraCtx.rotate(petal.angle);sakuraCtx.scale(1,.42+Math.abs(Math.sin(petal.age*.021+petal.phase))*.48);sakuraCtx.beginPath();sakuraCtx.moveTo(0,petal.size);sakuraCtx.bezierCurveTo(-petal.size*.9,petal.size*.38,-petal.size*.72,-petal.size*.7,0,-petal.size);sakuraCtx.bezierCurveTo(petal.size*.72,-petal.size*.7,petal.size*.9,petal.size*.38,0,petal.size);sakuraCtx.closePath();
+    const colors=['rgba(202,137,149,.72)','rgba(226,175,181,.75)','rgba(238,202,201,.78)'];sakuraCtx.fillStyle=colors[petal.tone]||colors[0];sakuraCtx.fill();sakuraCtx.restore();
+  }
+  function animateSakuraFortune(blossom){
+    const stage=$('sakuraStage'),result=$('sakuraResult');if(!stage||!result||!blossom)return;
+    let flight=$('sakuraFlight');if(!flight){flight=document.createElement('i');flight.id='sakuraFlight';flight.className='sakura-fortune-flight';flight.setAttribute('aria-hidden','true');stage.appendChild(flight)}
+    sakuraFlightAnimation?.cancel();flight.hidden=false;
+    const startX=blossom.x-6,startY=blossom.y-13,endX=result.offsetLeft+result.offsetWidth*.5-6,endY=result.offsetTop-result.offsetHeight*.5+18,dx=endX-startX,dy=endY-startY;
+    sakuraFlightAnimation=flight.animate([
+      {offset:0,opacity:0,transform:`translate3d(${startX}px,${startY}px,0) rotate(-14deg) scale(.28)`},
+      {offset:.09,opacity:1,transform:`translate3d(${startX+dx*.05}px,${startY+dy*.02-7}px,0) rotate(-7deg) scale(.5)`},
+      {offset:.32,opacity:1,transform:`translate3d(${startX+dx*.27}px,${startY+dy*.2+18}px,0) rotate(10deg) scale(.72)`},
+      {offset:.62,opacity:1,transform:`translate3d(${startX+dx*.62}px,${startY+dy*.58-13}px,0) rotate(-7deg) scale(.9)`},
+      {offset:.86,opacity:1,transform:`translate3d(${startX+dx*.9}px,${startY+dy*.9+7}px,0) rotate(3deg) scale(1)`},
+      {offset:1,opacity:0,transform:`translate3d(${endX}px,${endY}px,0) rotate(0) scale(1.02)`}
+    ],{duration:1380,easing:'cubic-bezier(.3,.02,.16,1)',fill:'forwards'});
+    sakuraFlightAnimation.onfinish=()=>{flight.hidden=true};
+  }
+  function drawSakuraScene(time,delta){
+    if(!sakuraCtx)return;const elapsed=reduceMotion.matches?100000:Math.max(0,time-sakuraStarted);sakuraCtx.clearRect(0,0,sakuraWidth,sakuraHeight);
+    sakuraCtx.save();sakuraCtx.fillStyle='rgba(112,117,101,.12)';sakuraCtx.beginPath();sakuraCtx.ellipse(sakuraWidth*.31,sakuraHeight*.955,sakuraWidth*.22,sakuraHeight*.025,0,0,Math.PI*2);sakuraCtx.fill();sakuraCtx.restore();
+    const smoothGrowth=value=>{const amount=clamp(value,0,1);return amount*amount*(3-2*amount)},shakeElapsed=time-sakuraShakeStarted,shakeDecay=clamp(1-shakeElapsed/980,0,1),shakeAngle=root.dataset.sakuraPhase==='choosing'&&!reduceMotion.matches?Math.sin(shakeElapsed*.044)*.023*shakeDecay:0,baseX=sakuraWidth*.31,baseY=sakuraHeight*.95;
+    sakuraCtx.save();sakuraCtx.translate(baseX,baseY);sakuraCtx.rotate(shakeAngle);sakuraCtx.translate(-baseX,-baseY);
+    [...sakuraBranches].sort((a,b)=>b.depth-a.depth).forEach(branch=>drawSakuraBranch(branch,1));
+    sakuraBlooms.forEach(blossom=>drawSakuraBlossom(blossom,smoothGrowth((elapsed-blossom.delay)/920),time));
+    sakuraVotives.forEach(votive=>drawSakuraVotive(votive,time,elapsed));
+    sakuraCtx.restore();
+    if(elapsed>3000&&time-sakuraDropAt>(root.dataset.sakuraPhase==='choosing'?115:720+Math.random()*390)){sakuraDropAt=time;const bloom=sakuraBlooms[Math.floor(Math.random()*sakuraBlooms.length)];addSakuraPetal(bloom,root.dataset.sakuraPhase==='choosing')}
+    sakuraFalling=sakuraFalling.filter(petal=>{drawSakuraPetal(petal,time,delta);return petal.y<sakuraHeight+24&&petal.x>-30&&petal.x<sakuraWidth+30});
+  }
+  function updateIdle(time,delta){
+    slips.forEach((slip,index)=>{
+      const airX=Math.sin(time*.00019+slip.seed)*.00045,airY=Math.cos(time*.00016+slip.seed)*.00032;
+      slip.vx+=airX*delta;slip.vy+=airY*delta;
+      if(pointer.active){
+        const dx=slip.x-pointer.x,dy=slip.y-pointer.y,dist=Math.hypot(dx,dy)||1;
+        if(dist<170){const force=(1-dist/170)*.0045*delta;slip.vx+=dx/dist*force;slip.vy+=dy/dist*force;slip.angle+=dx/dist*.00018*delta}
+      }
+      slip.vx*=Math.pow(.994,delta);slip.vy*=Math.pow(.994,delta);slip.x+=slip.vx*delta;slip.y+=slip.vy*delta;
+      const margin=slip.h*.28;if(slip.x<margin||slip.x>width-margin)slip.vx*=-.8;if(slip.y<margin||slip.y>height-margin)slip.vy*=-.8;
+      slip.x=clamp(slip.x,margin,width-margin);slip.y=clamp(slip.y,margin,height-margin);
+      slip.angle+=Math.sin(time*.0005+index)*.00005*delta;
+      drawSlip(slip,time);
+    });
+  }
+  function updateGather(time){
+    const progress=clamp((time-phaseStarted)/1650,0,1),pull=ease(progress),cx=width/2,cy=height/2;
+    slips.forEach((slip,index)=>{
+      const stagger=clamp(progress*1.25-index*.025,0,1),amount=ease(stagger),orbit=(1-amount)*32;
+      const chosen=index===3?ease((progress-.64)/.36):0;
+      const targetX=cx+Math.cos(progress*Math.PI*3*slip.spin+index)*orbit,targetY=cy+Math.sin(progress*Math.PI*2+index)*orbit*.45-chosen*92;
+      slip.x+=(targetX-slip.x)*(.035+amount*.09);slip.y+=(targetY-slip.y)*(.035+amount*.09);slip.angle+=slip.spin*(.025+.08*pull);
+      if(chosen)slip.angle+=(0-slip.angle)*chosen*.16;
+      drawSlip(slip,time,index===3?1:1-progress*.82);
+    });
+    if(progress>=1)revealResult();
+  }
+  function frame(time){
+    animationFrame=requestAnimationFrame(frame);
+    if(document.hidden||!root.closest('.product-view')?.classList.contains('active')){lastFrame=time;return}
+    const delta=Math.min(2.2,(time-lastFrame)/16.667||1);lastFrame=time;
+    if(root.dataset.view==='sakura'){drawSakuraScene(time,delta);return}
+    if(!ctx||root.dataset.view!=='ritual')return;
+    ctx.clearRect(0,0,width,height);drawWater(time);drawPetals(time,delta);
+    if(root.dataset.phase==='drawing')updateGather(time);else if(root.dataset.phase!=='result')updateIdle(time,delta);
+  }
+  function populateResult(){
+    if(!dailyResult)return;
+    setText('omikujiName',dailyResult.name);setText('omikujiWork',dailyResult.workTitle);setText('omikujiGrade',dailyResult.grade);setText('omikujiMessage',dailyResult.message);setText('omikujiAttribution',dailyResult.attribution);
+    setText('omikujiNumber',String((hash(`${localDate().key}|number`)%49)+1).padStart(2,'0'));
+    const portrait=$('omikujiPortrait');portrait.innerHTML=dailyResult.image?`<img src="${esc(dailyResult.image)}" alt="${esc(dailyResult.name)}" loading="lazy" referrerpolicy="no-referrer">`:esc(dailyResult.name.trim().slice(0,1)||'縁');
+  }
+  function revealResult(){
+    if(root.dataset.phase==='result')return;
+    root.dataset.phase='result';setText('omikujiDrawStatus','今日の縁が結ばれました');
+    const paper=$('omikujiPaper');paper.hidden=false;populateResult();requestAnimationFrame(()=>paper.classList.add('is-visible'));
+  }
+  function startDraw(){
+    if(!dailyResult||root.dataset.phase==='drawing')return;
+    localStorage.setItem(openedKey(),'1');clearTimeout(drawTimer);setText('omikujiDrawStatus','水面が、静かに応えています');
+    if(reduceMotion.matches){revealResult();return}
+    root.dataset.phase='drawing';phaseStarted=performance.now();addRipple(width/2,height/2,1.6);
+  }
+  function returnToWater(){
+    const paper=$('omikujiPaper');paper.classList.remove('is-visible');setText('omikujiDrawStatus','');
+    drawTimer=setTimeout(()=>{paper.hidden=true;root.dataset.phase='idle';buildSlips();buildPetals()},360);
+  }
+  const placeNames={sakura:'縁結花樹・人物みくじ',bell:'鈴音回廊・声優みくじ',ink:'言霊井・脚本みくじ',water:'水占池・今日の御籤',ema:'絵馬殿・制作みくじ',torii:'千本鳥居・作品みくじ'};
+  function voiceActorPool(){
+    const actors=new Map(),games=read(GAME_KEY),gameMap=new Map(games.map(game=>[String(game.id),game]));
+    const parts=value=>String(value||'').split(/\s*(?:\/|／|、|,|，|\|)\s*/).map(name=>name.trim()).filter(Boolean);
+    const add=(value,work='',character='')=>parts(value).forEach(name=>{const key=name.toLocaleLowerCase(),entry=actors.get(key)||{name,works:new Set(),characters:new Set()};if(work)entry.works.add(work);if(character)entry.characters.add(character);actors.set(key,entry)});
+    read(CHAR_KEY).forEach(character=>{const game=gameMap.get(String(character.gameId||''));add(character.cv||character.voiceActor||character.actor,titleOf(game)||character.workTitle||'',characterName(character))});
+    (window.amoristBangumiDiscovery?.getList?.()||[]).forEach(game=>(Array.isArray(game.chars)?game.chars:[]).forEach(character=>{const names=Array.isArray(character.actors)?character.actors.map(actor=>actor?.name||actor):[];add(names.join('/'),titleOf(game),characterName(character))}));
+    (window.amoristBangumiDiscovery?.getOptions?.('cv')||[]).forEach(option=>add(option?.value||option?.label||option?.name||option));
+    return [...actors.values()].map(entry=>({name:entry.name,works:[...entry.works],characters:[...entry.characters]})).sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  }
+  function pickVoiceActor(){const all=voiceActorPool();if(!all.length)return null;let options=all.filter(actor=>actor.name!==bellLastName);if(!options.length)options=all;const actor=options[Math.floor(Math.random()*options.length)];bellLastName=actor.name;return actor}
+  function populateBellResult(){
+    const actor=bellActor,name=actor?.name||'まだ知らない声',roles=actor?.characters?.length||0,works=actor?.works||[];
+    setText('bellName',name);setText('bellMeta',roles?`${roles}人の人物に声を宿す`:works.length?`${works.length}つの作品に宿る声`:'記録を待っている声');setText('bellWorks',works.slice(0,3).join('　／　')||'作品の記録は、これから。');
+    const open=$('bellOpen');if(open)open.disabled=!actor?.name;
+  }
+  function revealBellResult(){const result=$('bellResult');if(!result)return;root.dataset.bellPhase='result';result.hidden=false;requestAnimationFrame(()=>result.classList.add('is-visible'));setText('bellStatus',`${bellActor?.name||'声'}との縁が響きました`)}
+  function startBellDraw(){
+    if(root.dataset.bellPhase==='ringing')return;clearTimeout(bellRevealTimer);const result=$('bellResult');result?.classList.remove('is-visible');if(result)result.hidden=true;
+    bellActor=pickVoiceActor();populateBellResult();root.dataset.bellPhase='ringing';setText('bellStatus','鈴音が回廊を渡っています');
+    if(reduceMotion.matches){revealBellResult();return}bellRevealTimer=setTimeout(revealBellResult,1650);
+  }
+  function workPool(){
+    const normalize=(game,source)=>{const name=titleOf(game)||game?.title||'',id=game?.id||game?.bangumiId||game?.subjectId||'',cover=game?.cover||game?.image||game?.images?.large||game?.images?.common||game?.images?.medium||'',year=game?.year||String(game?.date||game?.releaseDate||'').slice(0,4),maker=Array.isArray(game?.developer)?game.developer.join(' / '):(game?.developer||game?.maker||game?.publisher||''),rawWriters=game?.writers||game?.writer||game?.scenarioWriters||game?.scenarioWriter||game?.scenario||[],writers=Array.isArray(rawWriters)?rawWriters.join(' / '):String(rawWriters||''),desc=game?.desc||game?.summary||game?.note||'';return name?{key:`${source}|${id||name}`,id:String(id||''),name,cover,year:String(year||''),maker:String(maker||''),writers,desc:String(desc||''),source}:null};
+    const bangumi=(window.amoristBangumiDiscovery?.getList?.()||[]).map(game=>normalize(game,'bangumi')),local=read(GAME_KEY).map(game=>normalize(game,'local'));
+    return [...new Map([...bangumi,...local].filter(Boolean).map(game=>[game.name,game])).values()];
+  }
+  function pickToriiWork(){const all=workPool();if(!all.length)return null;let options=all.filter(work=>work.key!==toriiLastKey);if(!options.length)options=all;const work=options[Math.floor(Math.random()*options.length)];toriiLastKey=work.key;return work}
+  function populateToriiResult(){
+    const work=toriiWork,name=work?.name||'まだ見ぬ物語',meta=[work?.year,work?.maker].filter(Boolean).join('　／　')||'作品の記録を待っています';
+    setText('toriiName',name);setText('toriiMeta',meta);setText('toriiDesc',work?.desc||'鳥居の向こうで、まだ知らない物語があなたを待っている。');
+    const cover=$('toriiCover');if(cover)cover.innerHTML=work?.cover?`<img src="${esc(work.cover)}" alt="${esc(name)}" loading="lazy" referrerpolicy="no-referrer">`:esc(name.trim().slice(0,1)||'物');
+    const open=$('toriiOpen');if(open)open.disabled=!work?.id;
+  }
+  function revealToriiResult(){const result=$('toriiResult');if(!result)return;root.dataset.toriiPhase='result';result.hidden=false;requestAnimationFrame(()=>result.classList.add('is-visible'));setText('toriiStatus',`${toriiWork?.name||'物語'}へ続く参道が開きました`)}
+  function startToriiPass(){
+    if(root.dataset.toriiPhase==='passing')return;clearTimeout(toriiRevealTimer);const result=$('toriiResult');result?.classList.remove('is-visible');if(result)result.hidden=true;
+    toriiWork=pickToriiWork();populateToriiResult();root.dataset.toriiPhase='passing';window.amoristToriiP5?.pass?.();setText('toriiStatus','鳥居の奥へ進んでいます');
+    if(reduceMotion.matches){revealToriiResult();return}toriiRevealTimer=setTimeout(revealToriiResult,2050);
+  }
+  function makerPool(){
+    const makers=new Map(),parts=value=>String(value||'').split(/\s*(?:\/|／|、|,|，|\||＆|&|×)\s*/).map(name=>name.trim()).filter(Boolean);
+    workPool().forEach(work=>parts(work.maker).forEach(name=>{const key=name.toLocaleLowerCase(),entry=makers.get(key)||{name,works:new Map()};entry.works.set(work.name,work);makers.set(key,entry)}));
+    return [...makers.values()].map(entry=>({name:entry.name,works:[...entry.works.values()]})).sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  }
+  function pickEmaMaker(){const all=makerPool();if(!all.length)return null;let options=all.filter(maker=>maker.name!==emaLastName);if(!options.length)options=all;const maker=options[Math.floor(Math.random()*options.length)];emaLastName=maker.name;return maker}
+  function populateEmaResult(){
+    const maker=emaMaker,name=maker?.name||'まだ記されていない作り手',works=maker?.works||[];
+    setText('emaMaker',name);setText('emaMeta',works.length?`${works.length}作の物語を奉納`:'作品の記録を待っています');setText('emaWorks',works.slice(0,4).map(work=>`『${work.name}』`).join('　／　')||'新しい物語との縁は、これから。');
+    const open=$('emaOpen');if(open)open.disabled=!maker?.name;
+  }
+  function revealEmaResult(){const result=$('emaResult'),emaStage=$('emaStage');if(!result||!emaStage)return;root.dataset.emaPhase='result';emaStage.dataset.emaPhase='result';result.classList.add('is-visible');setText('emaStatus',`${emaMaker?.name||'作り手'}の絵馬が結ばれました`)}
+  function startEmaDraw(event){
+    if(root.dataset.emaPhase==='choosing')return;clearTimeout(emaRevealTimer);const result=$('emaResult'),emaStage=$('emaStage'),tiles=[...document.querySelectorAll('.ema-tile')];
+    result?.classList.remove('is-drawing','is-visible');tiles.forEach(tile=>tile.classList.remove('is-picked'));const picked=event?.currentTarget?.classList?.contains('ema-tile')?event.currentTarget:tiles[Math.floor(Math.random()*tiles.length)];picked?.classList.add('is-picked');
+    emaMaker=pickEmaMaker();populateEmaResult();root.dataset.emaPhase='choosing';if(emaStage)emaStage.dataset.emaPhase='choosing';if(result)result.hidden=false;setText('emaStatus','一枚の絵馬をほどいています');
+    if(reduceMotion.matches){result?.classList.add('is-drawing');revealEmaResult();return}requestAnimationFrame(()=>result?.classList.add('is-drawing'));emaRevealTimer=setTimeout(revealEmaResult,1080);
+  }
+  function writerPool(){
+    const writers=new Map(),parts=value=>String(value||'').split(/\s*(?:\/|／|、|,|，|\||＆|&|×)\s*/).map(name=>name.trim()).filter(Boolean);
+    workPool().forEach(work=>parts(work.writers).forEach(name=>{const key=name.toLocaleLowerCase(),entry=writers.get(key)||{name,works:new Map()};entry.works.set(work.name,work);writers.set(key,entry)}));
+    (window.amoristBangumiDiscovery?.getOptions?.('writer')||[]).forEach(option=>{const name=String(option?.value||option?.label||option?.name||'').trim();if(!name)return;const key=name.toLocaleLowerCase();if(!writers.has(key))writers.set(key,{name,works:new Map()})});
+    return [...writers.values()].map(entry=>({name:entry.name,works:[...entry.works.values()]})).sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  }
+  function pickKotodamaWriter(){const all=writerPool();if(!all.length)return null;let options=all.filter(writer=>writer.name!==kotodamaLastName);if(!options.length)options=all;const writer=options[Math.floor(Math.random()*options.length)];kotodamaLastName=writer.name;return writer}
+  function populateKotodamaResult(){
+    const writer=kotodamaWriter,name=writer?.name||'まだ記されていない書き手',works=writer?.works||[];
+    setText('kotodamaWriter',name);setText('kotodamaMeta',works.length?`${works.length}作の言葉を綴る`:'作品の記憶を待っている');setText('kotodamaWorks',works.slice(0,4).map(work=>`『${work.name}』`).join('　/　')||'新しい物語との縁は、これから。');
+    const open=$('kotodamaOpen');if(open)open.disabled=!writer?.name;
+  }
+  function revealKotodamaResult(){const result=$('kotodamaResult');if(!result)return;root.dataset.kotodamaPhase='result';result.hidden=false;requestAnimationFrame(()=>result.classList.add('is-visible'));setText('kotodamaStatus',`${kotodamaWriter?.name||'書き手'}の名が、水底から浮かびました`)}
+  function startKotodamaDraw(){
+    if(root.dataset.kotodamaPhase==='summoning')return;clearTimeout(kotodamaRevealTimer);const result=$('kotodamaResult');result?.classList.remove('is-visible');if(result)result.hidden=true;
+    kotodamaWriter=pickKotodamaWriter();populateKotodamaResult();root.dataset.kotodamaPhase='summoning';window.amoristKotodamaP5?.summon?.();setText('kotodamaStatus','沈んだ言葉を汲み上げています');
+    if(reduceMotion.matches){revealKotodamaResult();return}kotodamaRevealTimer=setTimeout(revealKotodamaResult,2920);
+  }
+  function pickSakuraCharacter(){
+    const pools=candidates(),all=unique([...pools.user,...pools.bangumi]);if(!all.length)return null;
+    let options=all.filter(row=>row.key!==sakuraLastKey);if(!options.length)options=all;
+    const picked=options[Math.floor(Math.random()*options.length)];sakuraLastKey=picked.key;return picked;
+  }
+  function populateSakuraResult(){
+    const character=sakuraCharacter,name=character?.name||'まだ見ぬ人',work=character?.workTitle||'角色资料尚未准备好';
+    const fortunes=[
+      ['大縁吉',`今日、${name}へ伸びる糸はまっすぐ。心のままに向き合えば、縁は深く結ばれる。`],
+      ['結び吉',`急がず言葉を重ねるほど、${name}との距離は静かに近づいてゆく。`],
+      ['花ひらく',`${name}を想うひとときが、まだ知らない心をひとつ咲かせる。`],
+      ['淡紅の縁',`淡い糸ほど、長く残るもの。今日は${name}の声に耳を澄ませて。`],
+      ['待ち縁',`結び目はまだ小さい。${name}を知る時間が、やがて確かな縁になる。`]
+    ],fortune=fortunes[Math.floor(Math.random()*fortunes.length)];
+    setText('sakuraFortune',fortune[0]);setText('sakuraMessage',fortune[1]);setText('sakuraName',name);setText('sakuraWork',work==='角色资料尚未准备好'?work:`『${work}』より`);
+    const portrait=$('sakuraPortrait');if(portrait)portrait.innerHTML=character?.image?`<img src="${esc(character.image)}" alt="${esc(name)}" loading="lazy" referrerpolicy="no-referrer">`:esc(name.trim().slice(0,1)||'縁');
+    const open=$('sakuraOpen');if(open)open.disabled=!character?.characterId;
+  }
+  function revealSakuraResult(){
+    const result=$('sakuraResult');if(!result)return;root.dataset.sakuraPhase='result';result.classList.remove('is-falling');result.classList.add('is-visible');
+  }
+  function startSakuraDraw(){
+    if(root.dataset.sakuraPhase==='choosing')return;clearTimeout(sakuraRevealTimer);
+    const result=$('sakuraResult');result?.classList.remove('is-visible','is-falling');
+    sakuraCharacter=pickSakuraCharacter();populateSakuraResult();root.dataset.sakuraPhase='choosing';sakuraShakeStarted=performance.now();
+    const chosenBloom=sakuraBlooms[Math.floor(Math.random()*sakuraBlooms.length)],count=reduceMotion.matches?0:36;for(let i=0;i<count;i++){const bloom=sakuraBlooms[Math.floor(Math.random()*sakuraBlooms.length)];addSakuraPetal(bloom,true)}
+    if(result)result.hidden=false;
+    if(reduceMotion.matches){revealSakuraResult();return}
+    animateSakuraFortune(chosenBloom);
+    requestAnimationFrame(()=>result?.classList.add('is-falling'));
+    sakuraRevealTimer=setTimeout(revealSakuraResult,2050);
+  }
+  function openWaterRitual(){
+    const ritual=$('omikujiRitual'),bell=$('bellRitual'),torii=$('toriiRitual'),ema=$('emaRitual'),kotodama=$('kotodamaRitual');$('sakuraRitual').hidden=true;if(bell)bell.hidden=true;if(torii)torii.hidden=true;if(ema)ema.hidden=true;if(kotodama)kotodama.hidden=true;root.dataset.view='ritual';ritual.hidden=false;
+    setText('shrineMapStatus','水占池　本日開所');
+    requestAnimationFrame(()=>{resizeCanvas();ritual.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'})});
+  }
+  function closeWaterRitual(){
+    clearTimeout(drawTimer);const paper=$('omikujiPaper');paper?.classList.remove('is-visible');if(paper)paper.hidden=true;
+    root.dataset.phase='idle';root.dataset.view='map';$('omikujiRitual').hidden=true;setText('omikujiDrawStatus','');buildSlips();buildPetals();
+    requestAnimationFrame(()=>root.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'}));
+  }
+  function openSakuraRitual(){
+    const ritual=$('sakuraRitual'),bell=$('bellRitual'),torii=$('toriiRitual'),ema=$('emaRitual'),kotodama=$('kotodamaRitual');$('omikujiRitual').hidden=true;if(bell)bell.hidden=true;if(torii)torii.hidden=true;if(ema)ema.hidden=true;if(kotodama)kotodama.hidden=true;root.dataset.view='sakura';root.dataset.sakuraPhase='growing';ritual.hidden=false;
+    const result=$('sakuraResult');result?.classList.remove('is-visible','is-falling');if(result)result.hidden=true;sakuraCharacter=null;
+    setText('shrineMapStatus','縁結花樹　本日開所');
+    requestAnimationFrame(()=>{resizeSakuraCanvas();sakuraStarted=performance.now();sakuraDropAt=sakuraStarted;ritual.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'})});
+  }
+  function closeSakuraRitual(){
+    clearTimeout(sakuraRevealTimer);sakuraFlightAnimation?.cancel();const flight=$('sakuraFlight');if(flight)flight.hidden=true;const result=$('sakuraResult');result?.classList.remove('is-visible','is-falling');if(result)result.hidden=true;
+    root.dataset.sakuraPhase='idle';root.dataset.view='map';$('sakuraRitual').hidden=true;sakuraFalling=[];
+    requestAnimationFrame(()=>root.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'}));
+  }
+  function openBellRitual(){
+    const ritual=$('bellRitual');if(!ritual)return;$('omikujiRitual').hidden=true;$('sakuraRitual').hidden=true;const torii=$('toriiRitual'),ema=$('emaRitual'),kotodama=$('kotodamaRitual');if(torii)torii.hidden=true;if(ema)ema.hidden=true;if(kotodama)kotodama.hidden=true;root.dataset.view='bell';root.dataset.bellPhase='idle';ritual.hidden=false;
+    const result=$('bellResult');result?.classList.remove('is-visible');if(result)result.hidden=true;bellActor=null;setText('bellStatus','');setText('shrineMapStatus','鈴音回廊　本日開所');
+    requestAnimationFrame(()=>ritual.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'}));
+  }
+  function closeBellRitual(){
+    clearTimeout(bellRevealTimer);const result=$('bellResult');result?.classList.remove('is-visible');if(result)result.hidden=true;root.dataset.bellPhase='idle';root.dataset.view='map';$('bellRitual').hidden=true;setText('bellStatus','');
+    requestAnimationFrame(()=>root.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'}));
+  }
+  function openToriiRitual(){
+    const ritual=$('toriiRitual');if(!ritual)return;$('omikujiRitual').hidden=true;$('sakuraRitual').hidden=true;const bell=$('bellRitual'),ema=$('emaRitual'),kotodama=$('kotodamaRitual');if(bell)bell.hidden=true;if(ema)ema.hidden=true;if(kotodama)kotodama.hidden=true;root.dataset.view='torii';root.dataset.toriiPhase='idle';ritual.hidden=false;
+    const result=$('toriiResult');result?.classList.remove('is-visible');if(result)result.hidden=true;toriiWork=null;setText('toriiStatus','');setText('shrineMapStatus','千本鳥居　本日開所');requestAnimationFrame(()=>{window.amoristToriiP5?.reset?.();window.amoristToriiP5?.resize?.();ritual.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'})});
+  }
+  function closeToriiRitual(){clearTimeout(toriiRevealTimer);const result=$('toriiResult');result?.classList.remove('is-visible');if(result)result.hidden=true;root.dataset.toriiPhase='idle';root.dataset.view='map';$('toriiRitual').hidden=true;window.amoristToriiP5?.reset?.();setText('toriiStatus','');requestAnimationFrame(()=>root.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'}))}
+  function openEmaRitual(){
+    const ritual=$('emaRitual'),emaStage=$('emaStage');if(!ritual||!emaStage)return;$('omikujiRitual').hidden=true;$('sakuraRitual').hidden=true;const bell=$('bellRitual'),torii=$('toriiRitual'),kotodama=$('kotodamaRitual');if(bell)bell.hidden=true;if(torii)torii.hidden=true;if(kotodama)kotodama.hidden=true;root.dataset.view='ema';root.dataset.emaPhase='idle';emaStage.dataset.emaPhase='idle';ritual.hidden=false;
+    clearTimeout(emaRevealTimer);const result=$('emaResult');result?.classList.remove('is-drawing','is-visible');if(result)result.hidden=true;document.querySelectorAll('.ema-tile').forEach(tile=>tile.classList.remove('is-picked'));emaMaker=null;setText('emaStatus','');setText('shrineMapStatus','絵馬殿　本日開所');requestAnimationFrame(()=>ritual.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'}));
+  }
+  function closeEmaRitual(){clearTimeout(emaRevealTimer);const result=$('emaResult'),emaStage=$('emaStage');result?.classList.remove('is-drawing','is-visible');if(result)result.hidden=true;document.querySelectorAll('.ema-tile').forEach(tile=>tile.classList.remove('is-picked'));root.dataset.emaPhase='idle';root.dataset.view='map';if(emaStage)emaStage.dataset.emaPhase='idle';$('emaRitual').hidden=true;setText('emaStatus','');requestAnimationFrame(()=>root.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'}))}
+  function openKotodamaRitual(){
+    const ritual=$('kotodamaRitual');if(!ritual)return;['omikujiRitual','sakuraRitual','bellRitual','toriiRitual','emaRitual'].forEach(id=>{const node=$(id);if(node)node.hidden=true});clearTimeout(kotodamaRevealTimer);root.dataset.view='ink';root.dataset.kotodamaPhase='idle';ritual.hidden=false;
+    const result=$('kotodamaResult');result?.classList.remove('is-visible');if(result)result.hidden=true;kotodamaWriter=null;setText('kotodamaStatus','');setText('shrineMapStatus','言霊井　本日開所');requestAnimationFrame(()=>{window.amoristKotodamaP5?.reset?.();window.amoristKotodamaP5?.resize?.();ritual.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'})});
+  }
+  function closeKotodamaRitual(){clearTimeout(kotodamaRevealTimer);const result=$('kotodamaResult');result?.classList.remove('is-visible');if(result)result.hidden=true;root.dataset.kotodamaPhase='idle';root.dataset.view='map';$('kotodamaRitual').hidden=true;window.amoristKotodamaP5?.pause?.();setText('kotodamaStatus','');requestAnimationFrame(()=>root.scrollIntoView({block:'start',behavior:reduceMotion.matches?'auto':'smooth'}))}
   function render(){
     const date=localDate();
-    setText('homeOmikujiDate',date.label);
+    setText('omikujiDate',date.label);
+    setText('omikujiRitualDate',date.label);
+    setText('sakuraRitualDate',date.label);
+    setText('bellRitualDate',date.label);
+    setText('toriiRitualDate',date.label);
+    setText('emaRitualDate',date.label);
+    setText('kotodamaRitualDate',date.label);
     dailyResult=readDailyResult(date.key);
     if(!dailyResult){dailyResult=stablePick();saveDailyResult(date.key,dailyResult)}
-    updateView();
+    populateResult();
   }
-  $('homeOmikujiDraw')?.addEventListener('click',()=>{if(!dailyResult)return;localStorage.setItem(openedKey(),'1');isRevealed=true;updateView(true)});
-  $('homeOmikujiCollapse')?.addEventListener('click',()=>{isRevealed=false;updateView(true)});
-  $('homeOmikujiOpen')?.addEventListener('click',()=>{
-    const result=dailyResult;if(!result)return;
-    if(result.source==='角色图鉴'){
-      window.amoristProductNavigate?.('characters',true);
-      setTimeout(()=>{if(result.characterId)window.dispatchEvent(new CustomEvent('amorist-open-character',{detail:result.characterId}))},240);
-    }else{
-      window.amoristProductNavigate?.('bangumi',true);
-      setTimeout(()=>{window.amoristBangumiDiscovery?.show?.(result.workId);setTimeout(()=>{const node=[...document.querySelectorAll('#bangumiDbCharsGrid [data-char-id]')].find(el=>String(el.dataset.charId)===String(result.characterId));if(node){node.classList.add('omikuji-highlight');node.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(()=>node.classList.remove('omikuji-highlight'),1600)}},420)},240);
-    }
+  $('omikujiDraw')?.addEventListener('click',startDraw);
+  $('omikujiReturn')?.addEventListener('click',returnToWater);
+  $('omikujiMapBack')?.addEventListener('click',closeWaterRitual);
+  $('sakuraMapBack')?.addEventListener('click',closeSakuraRitual);
+  $('sakuraDraw')?.addEventListener('click',startSakuraDraw);
+  $('sakuraAgain')?.addEventListener('click',startSakuraDraw);
+  $('bellMapBack')?.addEventListener('click',closeBellRitual);
+  $('bellDraw')?.addEventListener('click',startBellDraw);
+  $('bellAgain')?.addEventListener('click',startBellDraw);
+  $('toriiMapBack')?.addEventListener('click',closeToriiRitual);
+  $('toriiDraw')?.addEventListener('click',startToriiPass);
+  $('toriiAgain')?.addEventListener('click',startToriiPass);
+  $('emaMapBack')?.addEventListener('click',closeEmaRitual);
+  document.querySelectorAll('.ema-tile').forEach(tile=>tile.addEventListener('click',startEmaDraw));
+  $('emaAgain')?.addEventListener('click',startEmaDraw);
+  $('kotodamaMapBack')?.addEventListener('click',closeKotodamaRitual);
+  $('kotodamaDraw')?.addEventListener('click',startKotodamaDraw);
+  $('kotodamaAgain')?.addEventListener('click',startKotodamaDraw);
+  document.querySelectorAll('[data-shrine-place]').forEach(place=>{
+    const key=place.dataset.shrinePlace,label=placeNames[key]||'';
+    const announce=()=>setText('shrineMapStatus',place.hasAttribute('data-coming-soon')?`${label}　準備中`:`${label}　本日開所`);
+    place.addEventListener('mouseenter',announce);place.addEventListener('focus',announce);
+    place.addEventListener('mouseleave',()=>setText('shrineMapStatus','縁結花樹・鈴音回廊・言霊井・水占池・絵馬殿・千本鳥居　本日開所'));
+    place.addEventListener('click',()=>{if(key==='water')openWaterRitual();else if(key==='sakura')openSakuraRitual();else if(key==='bell'&&$('bellRitual'))openBellRitual();else if(key==='torii'&&$('toriiRitual'))openToriiRitual();else if(key==='ema'&&$('emaRitual'))openEmaRitual();else if(key==='ink'&&$('kotodamaRitual'))openKotodamaRitual();else announce()});
   });
+  $('omikujiOpen')?.addEventListener('click',()=>{
+    const result=dailyResult;if(!result)return;
+    if(typeof window.openBangumiCharacterDetail==='function')window.openBangumiCharacterDetail(result.characterId);
+    else window.dispatchEvent(new CustomEvent('amorist-open-character',{detail:result.characterId}));
+  });
+  $('sakuraOpen')?.addEventListener('click',()=>{
+    const result=sakuraCharacter;if(!result?.characterId)return;
+    if(typeof window.openBangumiCharacterDetail==='function')window.openBangumiCharacterDetail(result.characterId);
+    else window.dispatchEvent(new CustomEvent('amorist-open-character',{detail:result.characterId}));
+  });
+  $('bellOpen')?.addEventListener('click',()=>{if(bellActor?.name)window.amoristBangumiDiscovery?.apply?.('cv',bellActor.name)});
+  $('toriiOpen')?.addEventListener('click',()=>{if(!toriiWork?.id)return;if(toriiWork.source==='bangumi')window.amoristBangumiDiscovery?.show?.(toriiWork.id);else window.amoristProductNavigate?.('game',true)});
+  $('emaOpen')?.addEventListener('click',()=>{if(emaMaker?.name)window.amoristBangumiDiscovery?.apply?.('maker',emaMaker.name)});
+  $('kotodamaOpen')?.addEventListener('click',()=>{if(kotodamaWriter?.name)window.amoristBangumiDiscovery?.apply?.('writer',kotodamaWriter.name)});
+  stage?.addEventListener('pointermove',event=>{
+    if(root.dataset.phase!=='idle')return;const rect=stage.getBoundingClientRect();pointer.x=event.clientX-rect.left;pointer.y=event.clientY-rect.top;pointer.active=true;
+    const now=performance.now();if(now-pointer.lastRipple>90){addRipple(pointer.x,pointer.y,.72);pointer.lastRipple=now}
+  },{passive:true});
+  stage?.addEventListener('pointerleave',()=>{pointer.active=false});
+  stage?.addEventListener('pointerdown',event=>{if(root.dataset.phase==='idle'){const rect=stage.getBoundingClientRect();addRipple(event.clientX-rect.left,event.clientY-rect.top,1.1)}},{passive:true});
+  sakuraStage?.addEventListener('pointermove',event=>{const rect=sakuraStage.getBoundingClientRect();sakuraPointer.x=event.clientX-rect.left;sakuraPointer.y=event.clientY-rect.top;sakuraPointer.active=true},{passive:true});
+  sakuraStage?.addEventListener('pointerleave',()=>{sakuraPointer.active=false});
+  window.addEventListener('resize',resizeCanvas,{passive:true});
+  window.addEventListener('resize',resizeSakuraCanvas,{passive:true});
+  if(window.ResizeObserver&&stage)new ResizeObserver(entries=>{if(entries[0]?.contentRect.width>0)resizeCanvas()}).observe(stage);
+  if(window.ResizeObserver&&sakuraStage)new ResizeObserver(entries=>{if(entries[0]?.contentRect.width>0)resizeSakuraCanvas()}).observe(sakuraStage);
   window.addEventListener('amorist-bangumi-cache-ready',render);
   window.addEventListener('amorist-data-changed',render);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
-  render();
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){lastFrame=performance.now();render()}});
+  render();resizeCanvas();resizeSakuraCanvas();animationFrame=requestAnimationFrame(frame);
 })();
 ;
 
@@ -2646,7 +3102,7 @@
       const escapeProductHtml = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
       const dataModel=window.AmoristDataModel;
 
-      const productViews = new Set(['home','library','studio','profile','forms','characters','bangumi','timeline','oshi']);
+      const productViews = new Set(['home','omikuji','library','studio','profile','forms','characters','bangumi','timeline','oshi']);
       const hashView = () => {
         const view=decodeURIComponent(location.hash.replace(/^#\/?/,'').split('/')[0]||'');
         return productViews.has(view)?view:'';
@@ -3042,6 +3498,8 @@
         let hash = 0;
         for (const char of `${dateKey}:${period}`) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
         greeting.textContent = candidates[hash % candidates.length];
+        const dateNote = $p('#homeDateNote');
+        if (dateNote) dateNote.innerHTML = `${now.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase()}<br>${String(now.getDate()).padStart(2,'0')} ${now.toLocaleDateString('en-US',{month:'short'}).toUpperCase()} ${now.getFullYear()}`;
       }
       function renderProfile(syncInputs=true) {
         const p = readProfile();
@@ -3161,7 +3619,39 @@
       $p('#clearFormAnswers').addEventListener('click',()=>{ if(!activeFormId||!confirm('清空这份表格的全部回答？'))return; const all=loadFormAnswers(); delete all[activeFormId]; localStorage.setItem(FORMS_KEY,JSON.stringify(all)); openFormTemplate(activeFormId); productToast('回答已清空'); });
       $p('#backToTemplates').addEventListener('click',()=>{ activeFormId=''; $p('#formTemplates').style.display='grid'; $p('#formWorkspace').classList.remove('active'); $p('#backToTemplates').hidden=true; });
 
+      function arrangeHomeReferenceLayout() {
+        const home = $p('.product-view[data-product-view="home"]');
+        const discovery = home?.querySelector('.home-resource-discovery');
+        const hero = discovery?.querySelector('.resource-discovery-hero');
+        const content = home?.querySelector('.home-content-grid');
+        const copy = hero?.querySelector('.resource-discovery-copy');
+        const feature = hero?.querySelector('.resource-feature-card');
+        const recent = content?.querySelector('.home-recent-section');
+        const character = content?.querySelector('.home-character-section');
+        if (!home || !discovery || !hero || !copy || !feature || !recent || !character) return;
+        let main = hero.querySelector('.home-discovery-main');
+        if (!main) {
+          main = document.createElement('div');
+          main.className = 'home-discovery-main';
+          hero.insertBefore(main, copy);
+          main.append(copy, feature);
+        }
+        if (!copy.querySelector('.resource-discovery-intro')) {
+          const intro = document.createElement('p');
+          intro.className = 'resource-discovery-intro';
+          intro.textContent = '从资料库里，遇见一些没有计划过的作品。';
+          copy.append(intro);
+        }
+        const actions = copy.querySelector('.resource-hero-actions');
+        const featureCopy = feature.querySelector('.discovery-feature-copy');
+        if (actions && featureCopy && actions.parentElement !== featureCopy) featureCopy.append(actions);
+        if (character.parentElement !== hero) hero.append(character);
+        if (recent.parentElement !== discovery) discovery.append(recent);
+        content.hidden = true;
+      }
+
       function renderDashboard() {
+        arrangeHomeReferenceLayout();
         const games=loadGames();
         const playingCandidates=games.filter(game=>game.status==='进行中');
         const selectedId=selectedDashboardPlayingId();
@@ -3184,7 +3674,7 @@
             ? `<img src="${escapeProductHtml(playing.cover)}" alt="${escapeProductHtml(playing.name)}" referrerpolicy="no-referrer"><span>NOW PLAYING</span>`
             : `<span>${playing?escapeProductHtml(initials(playing.name)):'AMORIST'}</span>`;
         }
-        const recent=[...games].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,3);
+        const recent=[...games].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,4);
         $p('#dashboardRecentGames').innerHTML=recent.length ? recent.map(game=>`<div class="recent-item"><div class="recent-cover">${game.cover?`<img src="${escapeProductHtml(game.cover)}" alt="${escapeProductHtml(game.name)}" loading="lazy" referrerpolicy="no-referrer">`:escapeProductHtml(initials(game.name))}</div><div class="recent-info"><strong>${escapeProductHtml(game.name)}</strong><span>${escapeProductHtml(game.status||'尚未分类')} · ${Number(game.progress)||0}%</span></div></div>`).join('') : '<div class="empty-library"><strong>暂无游戏记录</strong></div>';
         let characters=[];
         try{const saved=JSON.parse(localStorage.getItem('amorist-character-book-v1')||'[]');characters=window.AmoristCharacterBookVisibility.filter(Array.isArray(saved)?saved:[],games)}catch{}
@@ -5746,6 +6236,7 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
     const charGrid=$('#bangumiDbCharsGrid');
     if(charGrid)charGrid.addEventListener('click',e=>{const link=e.target.closest('[data-bangumi-filter]');if(link){e.stopPropagation();window.amoristBangumiDiscovery?.apply(link.dataset.bangumiFilter,link.dataset.bangumiValue);return;}const card=e.target.closest('[data-char-id]');if(card)showCharacterDetail(card.dataset.charId);});
     const charModal=$('#bangumiCharModal'),charClose=$('#bangumiCharClose');
+    if(charModal && charModal.parentElement !== document.body) document.body.appendChild(charModal);
     function closeCharacterDetail(){if(charModal)charModal.hidden=true;}
     if(charClose)charClose.addEventListener('click',closeCharacterDetail);
     if(charModal)charModal.addEventListener('click',e=>{if(e.target===charModal)closeCharacterDetail();});
@@ -6037,10 +6528,13 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
     const title = game.nameCn || game.name || `#${game.id}`;
     const year = Number(game.year) || parseInt(String(game.date || ''), 10) || '';
     const meta = [year ? `${year}年` : '', game.developer || '', Array.isArray(game.chars) && game.chars.length ? `${game.chars.length} 位角色` : ''].filter(Boolean).join(' · ');
+    const actions = document.querySelector('.resource-hero-actions') || host.querySelector('.resource-hero-actions');
     host.innerHTML = `<div class="discovery-feature-content" data-open-feature="${esc(game.id)}">
       <div class="discovery-feature-copy"><span>TODAY'S PICK</span><h3>${esc(title)}</h3>${meta?`<p>${esc(meta)}</p>`:''}<button type="button">查看作品 →</button></div>
       <div class="discovery-feature-cover">${game.cover ? `<img src="${esc(game.cover)}" alt="${esc(title)}" loading="lazy" referrerpolicy="no-referrer">` : esc(title).slice(0,1)}</div>
     </div>`;
+    const featureCopy = host.querySelector('.discovery-feature-copy');
+    if (actions && featureCopy) featureCopy.append(actions);
   }
 
   function renderDiscovery(list) {
@@ -6054,6 +6548,9 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
     const retained = featureId && discoveryList.find(game => String(game.id) === featureId);
     if (retained) renderFeature(retained);
     else renderFeature(discoveryList.length ? discoveryList[Math.floor(Math.random() * discoveryList.length)] : null);
+    const actions = document.querySelector('.resource-hero-actions');
+    const featureCopy = document.querySelector('#bangumiDiscoveryFeature .discovery-feature-copy');
+    if (actions && featureCopy) featureCopy.append(actions);
   }
 
   function scheduleDiscovery(list) {
@@ -6078,14 +6575,20 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
   });
 
   $('#bangumiDiscoveryFeature')?.addEventListener('click', event => {
-    const feature = event.target.closest('[data-open-feature]');
-    if (feature) window.amoristBangumiDiscovery?.show(feature.dataset.openFeature);
+    if (event.target.closest('[data-resource-action]')) return;
+    const viewButton = event.target.closest('.discovery-feature-copy > button');
+    if (!viewButton) return;
+    const feature = viewButton.closest('[data-open-feature]');
+    if (!feature) return;
+    event.preventDefault();
+    event.stopPropagation();
+    window.amoristBangumiDiscovery?.show(feature.dataset.openFeature);
   });
 
   function chooseFeature(mode = 'any', open = false) {
     const game = window.amoristBangumiDiscovery?.random(mode, open);
     if (game && !open) renderFeature(game);
-    if (!game) $('#bangumiDbManage')?.click();
+    if (!game) return;
   }
   $$('[data-resource-action="random"]').forEach(button => button.addEventListener('click', () => runWhenBangumiReady(() => chooseFeature('any', false))));
   $$('[data-resource-action="old"]').forEach(button => button.addEventListener('click', () => runWhenBangumiReady(() => chooseFeature('old', false))));

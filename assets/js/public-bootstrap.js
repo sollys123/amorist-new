@@ -58,7 +58,8 @@
     } catch {
       storage['amorist-timeline-events-v1']='{"version":2,"events":[]}';
     }
-    storage['amorist-product-view-v1'] = decodeURIComponent(location.hash.replace(/^#\/?/,'').split('/')[0]||'') === 'timeline' ? 'timeline' : 'home';
+    const requestedView=decodeURIComponent(location.hash.replace(/^#\/?/,'').split('/')[0]||'');
+    storage['amorist-product-view-v1'] = ['timeline','omikuji'].includes(requestedView) ? requestedView : 'home';
     return {
       type: 'amorist-public-data',
       schemaVersion: Number(payload.schemaVersion) || 1,
@@ -171,7 +172,7 @@
     .then(async payload => {
       window.__AMORIST_PUBLIC_DATA__ = payload;
       installVirtualStorage(payload);
-      await loadScript('./assets/js/amorist-app.js?v=timeline-calendar-20260801-9');
+      await loadScript('./assets/js/amorist-app.js?v=kotodama-ritual-20260802-2');
       await loadScript('./assets/js/oshi-hub.js?v=timeline-ui-20260731');
       await loadScript('./assets/js/public-mode.js?v=library-interactions-20260801-8');
     });

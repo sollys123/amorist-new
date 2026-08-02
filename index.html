@@ -29,7 +29,7 @@
 
   <link rel="stylesheet" href="./assets/css/amorist.css?v=oshi-shell-20260801-7">
   <link rel="stylesheet" href="./assets/css/site-modes.css?v=pure-otome-20260728">
-  <link rel="stylesheet" href="./assets/css/polish.css?v=timeline-calendar-20260801-16">
+<link rel="stylesheet" href="./assets/css/polish.css?v=kotodama-ritual-20260802-2">
   <style>
     .product-view[data-product-view="oshi"] .oshi-canvas-shell{filter:none!important}
     .product-view[data-product-view="oshi"] .oshi-canvas{background:#fbf8f2!important;border:0!important;border-radius:0!important;box-shadow:none!important}
@@ -47,6 +47,7 @@
       <nav class="product-nav product-nav-discover">
         <button class="product-nav-btn active" type="button" data-product-target="home"><span class="product-nav-icon">⌂</span><span><b>首页</b><small>今日与最近记录</small></span></button>
         <button class="product-nav-btn" type="button" data-product-target="bangumi"><span class="product-nav-icon">✦</span><span><b>作品索引</b><small>按声优与制作阵容探索</small></span></button>
+        <button class="product-nav-btn" type="button" data-product-target="omikuji"><span class="product-nav-icon">籤</span><span><b>御签所</b><small>水面上的今日缘分</small></span></button>
       </nav>
       <div class="product-nav-label">MY ARCHIVE</div>
       <nav class="product-nav">
@@ -76,6 +77,7 @@
           <div>
             <div class="page-eyebrow">OTOME ARCHIVE</div>
             <h1 id="homeGreeting" aria-live="polite"></h1>
+            <div class="home-date-note" id="homeDateNote"></div>
             <p>好きなものだけ。</p>
           </div>
         </div>
@@ -94,29 +96,6 @@
               </div>
             </div>
           </section>
-          <section class="home-omikuji-card" id="homeOmikujiCard">
-            <header class="home-omikuji-head">
-              <div><span>今日の御籤</span></div>
-              <div class="home-omikuji-head-actions"><time id="homeOmikujiDate"></time><button type="button" id="homeOmikujiCollapse" aria-label="收起御签" hidden>⌃</button></div>
-            </header>
-            <div class="home-omikuji-sealed" id="homeOmikujiSealed">
-              <div class="home-omikuji-seal">縁</div>
-              <button type="button" id="homeOmikujiDraw">引く</button>
-              <small>一日一籤</small>
-            </div>
-            <div class="home-omikuji-result" id="homeOmikujiResult" hidden>
-              <div class="home-omikuji-portrait" id="homeOmikujiPortrait"></div>
-              <div class="home-omikuji-copy">
-                <h2 id="homeOmikujiName"></h2>
-                <p class="home-omikuji-work" id="homeOmikujiWork"></p>
-                <div class="home-omikuji-grade-row"><strong id="homeOmikujiGrade"></strong><i aria-hidden="true">縁</i></div>
-                <p class="home-omikuji-message" id="homeOmikujiMessage"></p>
-                <p class="home-omikuji-attribution" id="homeOmikujiAttribution"></p>
-                <button type="button" id="homeOmikujiOpen">查看角色 →</button>
-              </div>
-            </div>
-          </section>
-
         </div>
 
         <section class="home-metrics-strip">
@@ -172,6 +151,119 @@
           </section>
         </section>
 
+      </section>
+
+      <section class="product-view" data-product-view="omikuji">
+        <div class="omikuji-sanctuary" id="omikujiSanctuary" data-phase="idle" data-view="map">
+          <header class="omikuji-map-head">
+            <div><div class="omikuji-kicker">縁結神社 · ENMUSUBI JINJA</div><h1>御签所</h1><p>循着水声与铃音，在境内遇见今日的缘分。</p></div>
+            <div class="omikuji-map-head-meta"><span>境内案内</span><time id="omikujiDate"></time></div>
+          </header>
+
+          <div class="shrine-map-layout" id="shrineMapView">
+            <div class="shrine-map" id="shrineMap" aria-label="缘结神社境内地图">
+              <svg class="shrine-map-art" viewBox="0 0 1200 760" role="img" aria-label="绘有花树、水池、回廊、绘马殿与千本鸟居的神社地图">
+                <defs>
+                  <linearGradient id="mapGround" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eee8dc"/><stop offset=".55" stop-color="#e8e0d2"/><stop offset="1" stop-color="#ddd4c5"/></linearGradient>
+                  <linearGradient id="mapWater" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#aaa5ad"/><stop offset=".6" stop-color="#8f8a96"/><stop offset="1" stop-color="#797481"/></linearGradient>
+                  <filter id="mapShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="9" stdDeviation="11" flood-color="#665b54" flood-opacity=".15"/></filter>
+                  <pattern id="mapGrain" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r=".6" fill="#766b62" opacity=".12"/><circle cx="13" cy="11" r=".45" fill="#766b62" opacity=".1"/></pattern>
+                </defs>
+                <rect width="1200" height="760" rx="2" fill="url(#mapGround)"/><rect width="1200" height="760" fill="url(#mapGrain)"/>
+                <path class="map-contour" d="M70 142C214 78 321 93 420 138S650 168 766 108s250-47 366 7M38 620c166-91 310-79 438-24s267 44 383-29 214-78 323-46"/>
+                <path class="map-stream" d="M0 388c145-24 192 57 333 32 104-19 171-97 281-71 92 22 123 98 232 86 111-12 181-92 354-67" fill="none"/>
+                <g class="map-main-hall" filter="url(#mapShadow)"><path d="M470 66h260l52 48H418z" fill="#584d54"/><path d="M443 115h314l-25 22H468z" fill="#9a5151"/><rect x="462" y="136" width="276" height="86" fill="#d7c6ae"/><rect x="488" y="151" width="52" height="71" fill="#6a5b57"/><rect x="574" y="151" width="52" height="71" fill="#6a5b57"/><rect x="660" y="151" width="52" height="71" fill="#6a5b57"/><path d="M447 222h306l-26 17H474z" fill="#b7a58f"/></g>
+                <g class="map-sakura" filter="url(#mapShadow)"><path d="M246 260c22-54 23-115 15-172M257 188c-38-23-54-48-63-77M257 163c36-20 55-43 70-74M246 215c-34 3-59 17-79 39" fill="none" stroke="#78695f" stroke-width="12" stroke-linecap="round"/><g fill="#c9a6ac"><circle cx="187" cy="105" r="43"/><circle cx="240" cy="77" r="52"/><circle cx="298" cy="103" r="45"/><circle cx="172" cy="157" r="38"/><circle cx="228" cy="137" r="51"/><circle cx="286" cy="153" r="48"/><circle cx="328" cy="129" r="32"/></g><g fill="#ead5d4" opacity=".72"><circle cx="214" cy="87" r="27"/><circle cx="277" cy="117" r="31"/><circle cx="205" cy="150" r="26"/></g><path d="M168 270c52 14 113 13 166-4" fill="none" stroke="#c7b9a5" stroke-width="14" stroke-linecap="round"/></g>
+                <g class="map-bell-hall" filter="url(#mapShadow)"><path d="M884 105h188l39 35H846z" fill="#5c5255"/><path d="M860 140h236l-20 16H878z" fill="#a15b59"/><rect x="881" y="157" width="194" height="102" fill="#d4c2aa"/><path d="M905 157v102m48-102v102m48-102v102m49-102v102" stroke="#72645c" stroke-width="7"/><path d="M918 176c13 22 13 45 0 67m71-67c13 22 13 45 0 67m63-67c13 22 13 45 0 67" fill="none" stroke="#9a8a79" stroke-width="3"/><circle cx="918" cy="207" r="10" fill="#8b6f4f"/><circle cx="989" cy="207" r="10" fill="#8b6f4f"/><circle cx="1052" cy="207" r="10" fill="#8b6f4f"/></g>
+                <g class="map-ink-well" filter="url(#mapShadow)"><ellipse cx="205" cy="434" rx="92" ry="44" fill="#c4b7a6"/><ellipse cx="205" cy="425" rx="73" ry="34" fill="#615962"/><ellipse cx="205" cy="420" rx="57" ry="24" fill="#8e8790"/><path d="M142 451l-30 52h186l-29-52" fill="#b3a48f"/><path d="M180 393c-8-23 4-43 30-58" fill="none" stroke="#9a5151" stroke-width="4"/></g>
+                <g class="map-pond" filter="url(#mapShadow)"><path d="M411 382c48-73 155-90 249-58 80 27 132 95 95 158-40 67-143 99-239 69-104-32-158-91-105-169z" fill="#c9c0b5"/><path d="M432 388c43-57 137-74 217-48 69 22 107 78 76 128-35 55-121 80-203 57-89-25-136-79-90-137z" fill="url(#mapWater)"/><path d="M469 410c64-35 145-27 208 16M478 463c69 28 144 27 207-6" fill="none" stroke="#d7d1d3" stroke-width="3" opacity=".55"/><g fill="#eee7da" stroke="#985052"><rect x="520" y="370" width="17" height="77" rx="2" transform="rotate(-16 528 408)"/><rect x="613" y="411" width="17" height="81" rx="2" transform="rotate(11 621 451)"/><rect x="574" y="455" width="17" height="73" rx="2" transform="rotate(-5 582 491)"/></g></g>
+                <g class="map-ema-hall" filter="url(#mapShadow)"><path d="M901 362h192l35 31H866z" fill="#65585a"/><path d="M881 394h225l-19 15H899z" fill="#9d5956"/><rect x="900" y="409" width="186" height="110" fill="#d5c3aa"/><path d="M922 409v110m47-110v110m47-110v110m48-110v110" stroke="#76665c" stroke-width="6"/><g fill="#eadcc8" stroke="#9d6d62" stroke-width="2"><path d="M925 430h31v29l-15 9-16-9z"/><path d="M975 446h31v29l-15 9-16-9z"/><path d="M1025 425h31v29l-15 9-16-9z"/></g></g>
+                <g class="map-torii-path"><path d="M518 758L568 553h69l51 205z" fill="#d4c8b8"/><path d="M548 758l39-205h31l40 205" fill="#b9ab99" opacity=".7"/><g fill="#9b4f4e" stroke="#844343" stroke-width="2"><path d="M484 715h238v13H484zM502 679h202v10H502zM517 689h12v69h-12zm158 0h12v69h-12z"/><path d="M516 648h178v11H516zM530 622h150v9H530zM541 631h10v58h-10zm116 0h10v58h-10z"/><path d="M542 591h130v9H542zM552 571h110v8H552zM561 579h8v52h-8zm86 0h8v52h-8z"/></g></g>
+                <path class="map-stone-path" d="M603 548C583 513 581 496 584 474" fill="none" stroke="#b8aa97" stroke-width="22" stroke-linecap="round" stroke-dasharray="2 29"/>
+                <g class="map-lanterns" fill="#d8c8b0" stroke="#8f7f70" stroke-width="3"><path d="M381 545h31l-5 22h-21zm7 22h13v38h-13zm-8 38h29v7h-29z"/><path d="M785 535h31l-5 22h-21zm7 22h13v38h-13zm-8 38h29v7h-29z"/></g>
+              </svg>
+              <img class="shrine-map-art shrine-map-image" src="./assets/user-media/enmusubi-shrine-map.png?v=map-20260802-3" alt="縁結花樹、社殿、水占池、言霊井、絵馬殿と鳥居を描いた境内図">
+              <button class="shrine-place place-sakura is-open" type="button" data-shrine-place="sakura"><span>壱</span><b>縁結花樹</b><small>人物みくじ</small></button>
+              <button class="shrine-place place-bell is-open" type="button" data-shrine-place="bell"><span>弐</span><b>鈴音回廊</b><small>声優みくじ</small></button>
+              <button class="shrine-place place-ink is-open" type="button" data-shrine-place="ink"><span>参</span><b>言霊井</b><small>脚本みくじ</small></button>
+              <button class="shrine-place place-water is-open" type="button" data-shrine-place="water"><span>肆</span><b>水占池</b><small>今日の御籤</small></button>
+              <button class="shrine-place place-ema is-open" type="button" data-shrine-place="ema"><span>伍</span><b>絵馬殿</b><small>制作みくじ</small></button>
+              <button class="shrine-place place-torii is-open" type="button" data-shrine-place="torii"><span>陸</span><b>千本鳥居</b><small>作品みくじ</small></button>
+              <div class="shrine-map-status" id="shrineMapStatus" aria-live="polite">縁結花樹・鈴音回廊・言霊井・水占池・絵馬殿・千本鳥居　本日開所</div>
+            </div>
+          </div>
+
+          <section class="omikuji-ritual" id="omikujiRitual" hidden>
+            <header class="omikuji-ritual-head"><button id="omikujiMapBack" type="button"><span>←</span> 境内図へ戻る</button><div><span>肆 · 水占池</span><h2>今日の御籤</h2><p>水面に浮かぶ一枚から、今日の縁を。</p></div><time id="omikujiRitualDate"></time></header>
+            <div class="omikuji-water-stage" id="omikujiWaterStage">
+              <canvas id="omikujiCanvas" aria-hidden="true"></canvas><div class="omikuji-shrine-lines" aria-hidden="true"><i></i><i></i><i></i></div>
+              <div class="omikuji-idle-copy" id="omikujiIdleCopy"><span class="omikuji-vertical-note">心を静めて</span><button class="omikuji-draw-button" id="omikujiDraw" type="button"><b>引く</b><small>一日一籤</small></button><p>签纸会随水与气息轻轻移动</p></div>
+              <article class="omikuji-paper" id="omikujiPaper" hidden aria-live="polite" tabindex="-1"><div class="omikuji-paper-border" aria-hidden="true"></div><header><span>第 <b id="omikujiNumber">一</b> 番</span><i>御神籤</i><span>AMORIST</span></header><div class="omikuji-grade" id="omikujiGrade"></div><div class="omikuji-paper-divider"><span>縁</span></div><div class="omikuji-character"><div class="omikuji-portrait" id="omikujiPortrait"></div><div><span>本日の縁</span><h2 id="omikujiName"></h2><p id="omikujiWork"></p></div></div><blockquote id="omikujiMessage"></blockquote><p class="omikuji-attribution" id="omikujiAttribution"></p><footer><button id="omikujiOpen" type="button">角色の記録を見る</button><button id="omikujiReturn" type="button">水面へ戻る</button></footer></article>
+              <div class="omikuji-draw-status" id="omikujiDrawStatus" aria-live="polite"></div>
+            </div>
+            <footer class="omikuji-page-foot"><span>鼠标划过水面，会留下片刻涟漪。</span><i></i><span>今日抽中的签会为你保留。</span></footer>
+          </section>
+
+          <section class="sakura-ritual" id="sakuraRitual" hidden>
+            <header class="omikuji-ritual-head sakura-ritual-head"><button id="sakuraMapBack" type="button"><span>←</span> 境内図へ戻る</button><div><span>壱 · 縁結花樹</span><h2>花に宿る縁</h2><p>枝先に咲くひとひらから、今日のひとを。</p></div><time id="sakuraRitualDate"></time></header>
+            <div class="sakura-stage" id="sakuraStage">
+              <canvas id="sakuraCanvas" aria-hidden="true"></canvas>
+              <div class="sakura-action" id="sakuraAction"><button id="sakuraDraw" type="button" aria-label="縁結花樹を揺らす"></button></div>
+              <article class="sakura-result" id="sakuraResult" hidden aria-live="polite">
+                <header class="sakura-result-head"><span>縁結御籤</span><strong id="sakuraFortune">結び吉</strong><i aria-hidden="true">縁</i></header>
+                <div class="sakura-result-character"><div class="sakura-result-portrait" id="sakuraPortrait"></div><div class="sakura-result-copy"><small>本日のご縁</small><h3 id="sakuraName"></h3><p id="sakuraWork"></p><div class="sakura-result-oracle"><span>縁のことば</span><p id="sakuraMessage"></p></div></div></div>
+                <footer><button id="sakuraOpen" type="button">人物の記録を見る</button><button id="sakuraAgain" type="button">もう一度</button></footer>
+              </article>
+              <div class="sakura-status" id="sakuraStatus" aria-live="polite"></div>
+            </div>
+          </section>
+          <section class="bell-ritual" id="bellRitual" hidden>
+            <header class="omikuji-ritual-head bell-ritual-head"><button id="bellMapBack" type="button"><span>←</span> 境内図へ戻る</button><div><span>弐 · 鈴音回廊</span><h2>声の余韻</h2><p>ひとつの鈴から、まだ知らない声へ。</p></div><time id="bellRitualDate"></time></header>
+            <div class="bell-stage" id="bellStage">
+              <div class="bell-corridor" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="bell-echoes" aria-hidden="true"><i></i><i></i><i></i></div>
+              <div class="bell-companions" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="bell-action"><button id="bellDraw" type="button" aria-label="中央の鈴を鳴らす"><i class="bell-knot"></i><i class="bell-cord"></i><i class="bell-body"></i><i class="bell-clapper"></i></button></div>
+              <article class="bell-result" id="bellResult" hidden aria-live="polite"><span>声の縁</span><div class="bell-result-seal">聲</div><div class="bell-result-copy"><small>本日の声</small><h3 id="bellName"></h3><p id="bellMeta"></p><em id="bellWorks"></em></div><footer><button id="bellOpen" type="button">作品を巡る</button><button id="bellAgain" type="button">もう一度</button></footer></article>
+              <div class="bell-status" id="bellStatus" aria-live="polite"></div>
+            </div>
+          </section>
+          <section class="torii-ritual" id="toriiRitual" hidden>
+            <header class="omikuji-ritual-head torii-ritual-head"><button id="toriiMapBack" type="button"><span>←</span> 境内図へ戻る</button><div><span>陸 · 千本鳥居</span><h2>参道の彼方</h2><p>鳥居をくぐった先で、ひとつの物語に出会う。</p></div><time id="toriiRitualDate"></time></header>
+            <div class="torii-stage" id="toriiStage">
+              <div class="torii-p5" id="toriiP5" aria-hidden="true"></div>
+              <svg class="torii-svg-texture" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><filter id="toriiPaperNoise"><feTurbulence type="fractalNoise" baseFrequency=".78" numOctaves="3" seed="17"></feTurbulence><feColorMatrix values="0 0 0 0 .28 0 0 0 0 .23 0 0 0 0 .18 0 0 0 .12 0"></feColorMatrix></filter><rect width="100" height="100" filter="url(#toriiPaperNoise)"></rect></svg>
+              <div class="torii-path" aria-hidden="true"></div><div class="torii-mist" aria-hidden="true"></div>
+              <div class="torii-gates" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+              <button class="torii-action" id="toriiDraw" type="button" aria-label="千本鳥居をくぐる"></button>
+              <article class="torii-result" id="toriiResult" hidden aria-live="polite"><figure class="torii-cover" id="toriiCover"></figure><div class="torii-work-copy"><span>参道の先の一作</span><h3 id="toriiName"></h3><p id="toriiMeta"></p><em id="toriiDesc"></em><footer><button id="toriiOpen" type="button">作品の世界へ</button><button id="toriiAgain" type="button">もう一度くぐる</button></footer></div></article>
+              <div class="torii-status" id="toriiStatus" aria-live="polite"></div>
+            </div>
+          </section>
+          <section class="ema-ritual" id="emaRitual" hidden>
+            <header class="omikuji-ritual-head ema-ritual-head"><button id="emaMapBack" type="button"><span>←</span> 境内図へ戻る</button><div><span>伍 · 絵馬殿</span><h2>願いを結ぶ作り手</h2><p>軒下の一枚を選び、物語を生む名に出会う。</p></div><time id="emaRitualDate"></time></header>
+            <div class="ema-stage" id="emaStage">
+              <div class="ema-architecture" aria-hidden="true"><i></i><i></i><i></i></div>
+              <div class="ema-rack" id="emaRack" role="group" aria-label="一枚の絵馬を選ぶ">
+                <button class="ema-tile" type="button" aria-label="一の絵馬"><i></i><span>縁</span></button><button class="ema-tile" type="button" aria-label="二の絵馬"><i></i><span>結</span></button><button class="ema-tile" type="button" aria-label="三の絵馬"><i></i><span>作</span></button><button class="ema-tile" type="button" aria-label="四の絵馬"><i></i><span>語</span></button><button class="ema-tile" type="button" aria-label="五の絵馬"><i></i><span>願</span></button><button class="ema-tile" type="button" aria-label="六の絵馬"><i></i><span>夢</span></button><button class="ema-tile" type="button" aria-label="七の絵馬"><i></i><span>巡</span></button>
+              </div>
+              <article class="ema-result" id="emaResult" hidden aria-live="polite">
+                <i class="ema-result-cord" aria-hidden="true"><span></span></i>
+                <div class="ema-result-inner"><svg class="ema-crest" viewBox="0 0 100 54" aria-hidden="true"><path d="M14 27c10-18 28-18 36 0-8 18-26 18-36 0Zm36 0c10-18 28-18 36 0-8 18-26 18-36 0Z"/><circle cx="50" cy="27" r="5"/></svg><span>制作の縁</span><h3 id="emaMaker"></h3><p id="emaMeta"></p><em id="emaWorks"></em><footer><button id="emaOpen" type="button">この作り手の作品へ</button><button id="emaAgain" type="button">もう一枚</button></footer></div>
+              </article>
+              <div class="ema-status" id="emaStatus" aria-live="polite"></div>
+            </div>
+          </section>
+          <section class="kotodama-ritual" id="kotodamaRitual" hidden>
+            <header class="omikuji-ritual-head kotodama-ritual-head"><button id="kotodamaMapBack" type="button"><span>←</span> 境内図へ戻る</button><div><span>参 · 言霊井</span><h2>水底の書き手</h2><p>言葉の沈む井戸から、物語を綴る名を呼び起こす。</p></div><time id="kotodamaRitualDate"></time></header>
+            <div class="kotodama-stage" id="kotodamaStage">
+              <div class="kotodama-p5" id="kotodamaP5" aria-hidden="true"></div>
+              <button class="kotodama-well" id="kotodamaDraw" type="button" aria-label="言霊井を覗く"><i class="kotodama-roof"></i><i class="kotodama-post left"></i><i class="kotodama-post right"></i><i class="kotodama-rope"></i><span class="kotodama-mouth"><i></i></span><b>言葉を汲む</b></button>
+              <article class="kotodama-result" id="kotodamaResult" hidden aria-live="polite"><div class="kotodama-seal">詞</div><div class="kotodama-copy"><span>本日の書き手</span><h3 id="kotodamaWriter"></h3><p id="kotodamaMeta"></p><em id="kotodamaWorks"></em><footer><button id="kotodamaOpen" type="button">この書き手の作品へ</button><button id="kotodamaAgain" type="button">もう一度汲む</button></footer></div></article>
+              <div class="kotodama-status" id="kotodamaStatus" aria-live="polite"></div>
+            </div>
+          </section>
+        </div>
       </section>
 
       <section class="product-view" data-product-view="oshi">
@@ -714,6 +806,7 @@
     <section role="dialog" aria-modal="true" aria-labelledby="mobileMoreTitle"><div class="mobile-more-head"><div><span>AMORIST</span><strong id="mobileMoreTitle">更多空间</strong></div><button id="mobileMoreClose" type="button" aria-label="关闭更多菜单">×</button></div>
       <div class="mobile-more-grid">
         <button type="button" data-product-target="bangumi"><span>✦</span><b>作品索引</b><small>按声优与制作阵容探索</small></button>
+        <button type="button" data-product-target="omikuji"><span>籤</span><b>御签所</b><small>抽取今日的缘分</small></button>
         <button type="button" data-product-target="oshi"><span>♡</span><b>推角展示</b><small>人物主页与记录</small></button>
         <button type="button" data-product-target="forms"><span>⊞</span><b>图文创作</b><small>九宫格、Tier 与偏好卡</small></button>
         <button type="button" data-product-target="profile"><span>◎</span><b>我的自介</b><small>编辑玩家名片</small></button>
@@ -919,6 +1012,9 @@
   <script>window.AMORIST_MODE = 'public';</script>
   <script src="./assets/js/image-store.js"></script>
   <script src="./assets/js/data-model.js?v=characters-preferences-20260801-1"></script>
-  <script src="./assets/js/public-bootstrap.js?v=timeline-calendar-20260801-5"></script>
+  <script src="./assets/vendor/p5.min.js?v=2.3.1"></script>
+  <script src="./assets/js/torii-p5.js?v=ritual-layout-20260802-20"></script>
+  <script src="./assets/js/kotodama-p5.js?v=kotodama-ritual-20260802-2"></script>
+  <script src="./assets/js/public-bootstrap.js?v=kotodama-ritual-20260802-2"></script>
 </body>
 </html>
