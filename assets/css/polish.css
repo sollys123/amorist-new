@@ -1633,3 +1633,67 @@ html body .product-main .product-view[data-product-view="forms"] .workshop-setti
     padding-bottom:14px!important;
   }
 }
+
+/* Keep FLOW navigation close to the artwork instead of pinning it to the canvas floor. */
+@media(min-width:761px){
+  .product-view[data-product-view="oshi"] .oshi-canvas.oshi-auto-layout:not(.oshi-magazine-layout) .oshi-stage-control{bottom:58px}
+  .product-view[data-product-view="oshi"] .oshi-canvas.oshi-auto-layout:not(.oshi-magazine-layout) .oshi-stage-counter{bottom:70px}
+}
+@media(max-width:760px){
+  .product-view[data-product-view="oshi"] .oshi-canvas.oshi-auto-layout:not(.oshi-magazine-layout) .oshi-stage-control{bottom:28px}
+  .product-view[data-product-view="oshi"] .oshi-canvas.oshi-auto-layout:not(.oshi-magazine-layout) .oshi-stage-counter{bottom:40px}
+}
+
+/* Keep the chart breathable and let every palette carry its own text color. */
+html body .product-view[data-product-view="forms"] .workshop-grid{
+  padding-bottom:18px!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-sheet{
+  padding-bottom:26px!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-main{
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-sheet{
+  width:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-grid{
+  width:100%!important;
+  height:auto!important;
+  max-width:none!important;
+  max-height:none!important;
+  overflow:visible!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-cell{
+  display:grid!important;
+  grid-template-rows:minmax(0,1fr) auto!important;
+  aspect-ratio:auto!important;
+  overflow:hidden!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-cell > :is(.workshop-cell-empty,img){
+  grid-row:1;
+  width:100%;
+  height:100%;
+  min-height:0;
+  flex:none;
+}
+html body .product-view[data-product-view="forms"] .workshop-cell-label{
+  grid-row:2;
+  min-height:0;
+  margin:0!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-sheet.workshop-exporting :is(.workshop-cell-remove,.workshop-cell-crop){
+  display:none!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-sheet :is(.workshop-sheet-head input,.workshop-header-row input,.workshop-cell-label){
+  color:var(--workshop-ink,var(--product-ink))!important;
+  -webkit-text-fill-color:var(--workshop-ink,var(--product-ink))!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-sheet :is(.workshop-sheet-head input,.workshop-header-row input,.workshop-cell-label)::placeholder{
+  color:var(--workshop-muted,var(--product-muted))!important;
+  -webkit-text-fill-color:var(--workshop-muted,var(--product-muted))!important;
+}
