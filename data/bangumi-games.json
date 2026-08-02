@@ -60826,6 +60826,151 @@
     }
   },
   {
+    "id": 257833,
+    "name": "遇见逆水寒",
+    "nameCn": "",
+    "cover": "https://lain.bgm.tv/pic/cover/l/34/23/257833_P0C9Y.jpg",
+    "synced": true,
+    "chars": [
+      {
+        "id": 123205,
+        "name": "鐵手",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/0c/fc/123205_crt_B7bp7.jpg?r=1672800100"
+      },
+      {
+        "id": 123206,
+        "name": "追命",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/c8/c8/123206_crt_XnL1O.jpg?r=1672800409"
+      },
+      {
+        "id": 123207,
+        "name": "冷血",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/6e/1c/123207_crt_rk3M7.jpg?r=1672800858"
+      },
+      {
+        "id": 123208,
+        "name": "顧惜朝",
+        "relation": "主角",
+        "cv": "赵路",
+        "image": "https://lain.bgm.tv/pic/crt/l/a7/6f/123208_crt_28pW3.jpg?r=1672803725"
+      },
+      {
+        "id": 123209,
+        "name": "戚少商",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/76/97/123209_crt_34d3d.jpg?r=1672804908"
+      },
+      {
+        "id": 123371,
+        "name": "息紅淚",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/5d/ab/123371_crt_M0T95.jpg?r=1672952566"
+      },
+      {
+        "id": 166987,
+        "name": "无情",
+        "relation": "主角",
+        "cv": "夏磊",
+        "image": "https://lain.bgm.tv/pic/crt/l/16/e3/166987_crt_U75EX.jpg"
+      },
+      {
+        "id": 166988,
+        "name": "方承意",
+        "relation": "主角",
+        "cv": "柯暮卿",
+        "image": "https://lain.bgm.tv/pic/crt/l/23/5a/166988_crt_hM8f8.jpg"
+      },
+      {
+        "id": 166989,
+        "name": "叶问舟",
+        "relation": "主角",
+        "cv": "刘三木",
+        "image": "https://lain.bgm.tv/pic/crt/l/f3/a5/166989_crt_m7Svk.jpg"
+      },
+      {
+        "id": 182273,
+        "name": "燕无归",
+        "relation": "主角",
+        "cv": "谢添天",
+        "image": "https://lain.bgm.tv/pic/crt/l/ae/55/182273_crt_Qv73k.jpg"
+      },
+      {
+        "id": 182274,
+        "name": "叶雪青",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/e9/65/182274_crt_2WPo7.jpg"
+      },
+      {
+        "id": 182275,
+        "name": "姬蜜儿",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/12/26/182275_crt_hBBzh.jpg"
+      },
+      {
+        "id": 182276,
+        "name": "李师师",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/59/e3/182276_crt_ZP3o4.jpg"
+      },
+      {
+        "id": 182277,
+        "name": "沈浵",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/fe/04/182277_crt_fLfFd.jpg"
+      },
+      {
+        "id": 182278,
+        "name": "花将离",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/35/b2/182278_crt_VKG9Z.jpg"
+      },
+      {
+        "id": 182279,
+        "name": "旅妹",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/78/9c/182279_crt_3duB5.jpg"
+      },
+      {
+        "id": 182280,
+        "name": "旅弟",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/56/8a/182280_crt_z55S6.jpg"
+      }
+    ],
+    "updatedAt": 1784551716556,
+    "date": "2018-08-15",
+    "year": 2018,
+    "developer": "",
+    "writers": [],
+    "desc": "《遇见逆水寒》——逆水寒NPC攻略助手\r\n一场命中注定的相逢，梦回北宋，遇见逆水寒！穿越时空，沉醉江湖，你，一位来自现代的旅人,在《逆水寒》如诗如画的游戏世界中行侠游历，缔结因缘！\r\n无情、顾惜朝、李师师、叶雪青，诸多《逆水寒》人物悉数登场，与你相伴，共游江湖。深入跌宕的唯美剧情、难舍难分的情缘羁绊、重重闯关、因缘收集，诸多玩法更与《逆水寒》端游深度联动！\r\n所有江湖偶遇，都是宿命相逢。遇见逆水寒，遇见你的专属因缘！\r\n\r\n【游戏特色】\r\n一、极致唯美：探索未知浪漫，追寻心动脚步\r\n寻梦江湖，遇见逆水寒！\r\n开启美妙机遇，浪漫旅程没有终点，知己红颜，沉醉江湖！\r\n所有的江湖偶遇都是宿命的重逢，打开全新江湖故事，穿越重重因缘浪漫邂逅《逆水寒》。\r\n《逆水寒》的世界，会呼吸的江湖。行程万里，遍游天下，种种奇特风景，各式江湖奇物俯拾即是。\r\n更有诸位《逆水寒》人物宠爱相随，共知旅程冷暖。浪漫江湖奇遇等你发掘。\r\n\r\n二、动人剧情：逆水寒端游文案班底执笔打造\r\n端游《逆水寒》满分剧情再出江湖，带来最动人的故事，最具柔情的江湖！\r\n触碰画卷，梦回北宋绝美江湖，命中注定的相逢，穿越时空阻绝，遇见《逆水寒》！\r\n夏有凉风，秋有明月，千年画卷，由你描绘。一世之盟，生死之约，宿世因缘，等你书写。\r\n无情、顾惜朝、叶问舟、方应看、燕无归、叶雪青、李师师、花将离、温柔、姬蜜儿，十位《逆水寒》人气角色悉数登场，与你相伴而行。\r\n\r\n三、双端连通：以爱穿梭两重世界\r\n江湖冷暖，唯爱永恒。\r\n在《逆水寒》如诗如画的游戏世界中行侠游历，策马天涯！\r\n结识端游逆水寒玩家，探索大宋风景。科举求助，红尘问答。绘制江湖奇景，定格行程最美时刻，百分之百绝对还原《逆水寒》华丽场景，珍藏每一份江湖游历记忆！多种方式与人气端游《逆水寒》进行深度联动。\r\n《逆水寒》中更有专属剧情，重重好礼，为你开启！\r\n全新互动方式，奇妙双重世界，相遇相逢，相知相伴。\r\n更多朋友，等你遇见！\r\n\r\n四、双性别恋爱：宠爱不止一种形态\r\n甜蜜女线故事，触摸古画，解锁宿世因缘。命中注定的相会，遇见生死相随之人。江湖虽大，有他相伴，便再不孤单。执子之手，与子同行。\r\n深情男线故事，解锁身世秘密，探索未知神秘力量，更有机会与众多豪侠交游，花丛醉饮，独得芳心。\r\n种种江湖奇缘，等你体验。\r\n\r\n五、五倍甜蜜：五条专属语音感情线\r\n五位性格迥异的角色，五种不约而同的关怀。走心的江湖故事，顶级的CV加持，一言一笑都逼真动人，带来更有沉浸感的浓情体验。\r\n茶楼夜话，把盏长谈，探寻各位角色心底的秘密，提升人物好感，解锁专属剧情。种种江湖过往，心底旧事，只讲给你听。",
+    "rank": null,
+    "platforms": [
+      "游戏"
+    ],
+    "addresses": {
+      "bangumiSubjectPage": "https://bgm.tv/subject/257833",
+      "bangumiSubjectApi": "https://api.bgm.tv/v0/subjects/257833",
+      "bangumiCharactersApi": "https://api.bgm.tv/v0/subjects/257833/characters",
+      "cover": "https://lain.bgm.tv/pic/cover/l/34/23/257833_P0C9Y.jpg",
+      "characterImages": []
+    }
+  },
+  {
     "id": 259951,
     "name": "オランピアソワレ",
     "nameCn": "奥林匹亚的晚宴",
@@ -79765,6 +79910,31 @@
     }
   },
   {
+    "images": {
+      "small": "https://lain.bgm.tv/r/200/pic/cover/l/5a/ea/613791_67uj0.jpg",
+      "grid": "https://lain.bgm.tv/r/100/pic/cover/l/5a/ea/613791_67uj0.jpg",
+      "large": "https://lain.bgm.tv/pic/cover/l/5a/ea/613791_67uj0.jpg",
+      "medium": "https://lain.bgm.tv/r/800/pic/cover/l/5a/ea/613791_67uj0.jpg",
+      "common": "https://lain.bgm.tv/r/400/pic/cover/l/5a/ea/613791_67uj0.jpg"
+    },
+    "name": "DYNAMIC CHORD feat.KYOHSO V edition",
+    "name_cn": "",
+    "relation": "不同版本",
+    "type": 4,
+    "id": 613791,
+    "nameCn": "",
+    "cover": "https://lain.bgm.tv/pic/cover/l/5a/ea/613791_67uj0.jpg",
+    "date": "2017-03-30",
+    "year": 2017,
+    "platforms": [
+      "游戏"
+    ],
+    "chars": [],
+    "characterFetchCheckedAt": 1785512851156,
+    "synced": true,
+    "updatedAt": 1785512851156
+  },
+  {
     "id": 613840,
     "name": "DYNAMIC CHORD feat.apple-polisher V",
     "nameCn": "",
@@ -80430,6 +80600,31 @@
       "cover": "https://lain.bgm.tv/pic/cover/l/de/c0/614514_F6f2Z.jpg",
       "characterImages": []
     }
+  },
+  {
+    "images": {
+      "small": "https://lain.bgm.tv/r/200/pic/cover/l/c9/9b/614559_1Nt2l.jpg",
+      "grid": "https://lain.bgm.tv/r/100/pic/cover/l/c9/9b/614559_1Nt2l.jpg",
+      "large": "https://lain.bgm.tv/pic/cover/l/c9/9b/614559_1Nt2l.jpg",
+      "medium": "https://lain.bgm.tv/r/800/pic/cover/l/c9/9b/614559_1Nt2l.jpg",
+      "common": "https://lain.bgm.tv/r/400/pic/cover/l/c9/9b/614559_1Nt2l.jpg"
+    },
+    "name": "AMNESIA V Edition",
+    "name_cn": "",
+    "relation": "不同版本",
+    "type": 4,
+    "id": 614559,
+    "nameCn": "",
+    "cover": "https://lain.bgm.tv/pic/cover/l/c9/9b/614559_1Nt2l.jpg",
+    "date": "2013-12-19",
+    "year": 2013,
+    "platforms": [
+      "游戏"
+    ],
+    "chars": [],
+    "characterFetchCheckedAt": 1784654439383,
+    "synced": true,
+    "updatedAt": 1784654439383
   },
   {
     "id": 614563,
@@ -81105,6 +81300,181 @@
       "cover": "https://lain.bgm.tv/pic/cover/l/e0/05/632918_KCwPW.jpg",
       "characterImages": []
     }
+  },
+  {
+    "images": {
+      "small": "https://lain.bgm.tv/r/200/pic/cover/l/c8/09/633074_5U1nA.jpg",
+      "grid": "https://lain.bgm.tv/r/100/pic/cover/l/c8/09/633074_5U1nA.jpg",
+      "large": "https://lain.bgm.tv/pic/cover/l/c8/09/633074_5U1nA.jpg",
+      "medium": "https://lain.bgm.tv/r/800/pic/cover/l/c8/09/633074_5U1nA.jpg",
+      "common": "https://lain.bgm.tv/r/400/pic/cover/l/c8/09/633074_5U1nA.jpg"
+    },
+    "name": "文字化化",
+    "name_cn": "文字化化",
+    "relation": "不同版本",
+    "type": 4,
+    "id": 633074,
+    "nameCn": "文字化化",
+    "cover": "https://lain.bgm.tv/pic/cover/l/c8/09/633074_5U1nA.jpg",
+    "date": "2026-03-26",
+    "year": 2026,
+    "platforms": [
+      "游戏"
+    ],
+    "chars": [
+      {
+        "id": 167566,
+        "name": "化之あだみ",
+        "relation": "主角",
+        "cv": "",
+        "image": ""
+      },
+      {
+        "id": 167569,
+        "name": "這いばい男",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/9f/17/167569_crt_33th8.jpg"
+      },
+      {
+        "id": 167570,
+        "name": "フードの男",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/91/94/167570_crt_5ZgIo.jpg"
+      },
+      {
+        "id": 167571,
+        "name": "隙間の男",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/10/d2/167571_crt_3K0DI.jpg"
+      },
+      {
+        "id": 167572,
+        "name": "生首",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/a5/38/167572_crt_Cc3Tf.jpg"
+      },
+      {
+        "id": 167573,
+        "name": "銀髪の男",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/ce/4c/167573_crt_o3OE0.jpg"
+      },
+      {
+        "id": 167574,
+        "name": "赤い傘の男",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/5b/06/167574_crt_M6t2e.jpg"
+      },
+      {
+        "id": 167575,
+        "name": "長鉈男",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/da/e9/167575_crt_jy04B.jpg"
+      },
+      {
+        "id": 167576,
+        "name": "大きい顔",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/24/08/167576_crt_R7a7S.jpg"
+      },
+      {
+        "id": 167577,
+        "name": "仮面の男",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/dc/5e/167577_crt_xurA6.jpg"
+      },
+      {
+        "id": 167578,
+        "name": "ツギハギの男",
+        "relation": "主角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/62/82/167578_crt_CyFwj.jpg"
+      },
+      {
+        "id": 167579,
+        "name": "青い服の女",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/87/b8/167579_crt_bhEkB.jpg"
+      },
+      {
+        "id": 167580,
+        "name": "ドレスの女",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/49/18/167580_crt_uEjA1.jpg"
+      },
+      {
+        "id": 167581,
+        "name": "ナース",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/84/af/167581_crt_tTW3r.jpg"
+      },
+      {
+        "id": 167582,
+        "name": "チェーンソー女",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/aa/72/167582_crt_PNV4W.jpg"
+      },
+      {
+        "id": 167583,
+        "name": "謎の黒い生き物",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/3b/da/167583_crt_xPN2i.jpg"
+      },
+      {
+        "id": 167584,
+        "name": "車椅子の男",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/ae/bd/167584_crt_RGa8A.jpg"
+      },
+      {
+        "id": 167585,
+        "name": "美容師",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/e0/d3/167585_crt_haht4.jpg?r=1732949041"
+      },
+      {
+        "id": 167586,
+        "name": "被り物の子",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/19/7d/167586_crt_9eEDH.jpg"
+      },
+      {
+        "id": 167587,
+        "name": "人間の男",
+        "relation": "配角",
+        "cv": "",
+        "image": "https://lain.bgm.tv/pic/crt/l/1b/65/167587_crt_LU3kU.jpg"
+      }
+    ],
+    "characterFetchCheckedAt": 1784824491123,
+    "synced": true,
+    "updatedAt": 1784824491123,
+    "versionIds": [
+      633074,
+      404387
+    ],
+    "versionResolveCheckedAt": 1785167485913,
+    "versionResolveCompleted": true,
+    "characterSourceId": 404387,
+    "characterSourceName": "文字化化",
+    "inheritedCharacters": true
   },
   {
     "id": 635505,

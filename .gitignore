@@ -18,3 +18,15 @@ OSHI_MAGAZINE_REPORT.md
 # Common local artifacts
 node_modules/
 *.log
+
+# Non-runtime visual references and local snapshots
+home-*.png
+assets/references/
+data/amorist-data.json.bak
+data/amorist-media-manifest.json
+data/import-sessions.json
+
+# Local skill/download tooling
+/.redskill-download.zip
+/.redskill-stage/
+/skills/

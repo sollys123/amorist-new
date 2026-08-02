@@ -47,6 +47,7 @@
   const characterPreferenceLabel = value => labelWith(value, preferenceMaps, 'unclassified');
   const normalizeCharacterRoleType = value => normalizeWith(value, roleMaps, 'unset');
   const characterRoleTypeLabel = value => labelWith(value, roleMaps, 'unset');
+  const defaultCharacterPreferenceForRole = roleType => String(roleType ?? '').trim().toLowerCase() === 'sub' ? 'excluded' : 'unclassified';
 
   function roleTypeFromBangumiRelation(value) {
     const relation = String(value ?? '').normalize('NFKC').trim().toLowerCase();
@@ -110,9 +111,12 @@
     if (!character || typeof character !== 'object') return character;
     const legacyPreference = character.preference ?? character.relation ?? character.category;
     const role = inferCharacterRoleType(character, gameRows);
+    const hasPreference = String(legacyPreference ?? '').normalize('NFKC').trim() !== '';
+    const normalizedPreference = hasPreference ? normalizeCharacterPreference(legacyPreference) : defaultCharacterPreferenceForRole(role.roleType);
+    const isUnclassifiedSubDefault = role.roleType === 'sub' && normalizedPreference === 'unclassified' && character.preferenceSource !== 'manual';
     return {
       ...character,
-      preference:normalizeCharacterPreference(legacyPreference),
+      preference:isUnclassifiedSubDefault ? 'excluded' : normalizedPreference,
       roleType:role.roleType,
       roleTypeSource:role.roleTypeSource
     };
@@ -135,6 +139,7 @@
     gameCategoryLabel,
     normalizeCharacterPreference,
     characterPreferenceLabel,
+    defaultCharacterPreferenceForRole,
     normalizeCharacterRoleType,
     characterRoleTypeLabel,
     roleTypeFromBangumiRelation,

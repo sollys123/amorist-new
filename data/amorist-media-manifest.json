@@ -1,7 +1,7 @@
 {
   "type": "amorist-media-manifest",
   "schemaVersion": 1,
-  "generatedAt": "2026-08-02T09:00:30.505Z",
+  "generatedAt": "2026-08-02T12:16:50.557Z",
   "files": {
     "img-63f3f3a3d61332264d1cc369.webp": {
       "sourceHash": "63f3f3a3d61332264d1cc369a3cce530d248e010c35a4e56f67147d2d436ef55",
@@ -12,6 +12,31 @@
       "sourceHash": "e0d809fdf62d3543c5ea25e0724bef6667abb77f68191cf03e6cd3abbb0a7502",
       "mime": "image/webp",
       "bytes": 18966
+    },
+    "img-95e4aec27bccda518ac54125.webp": {
+      "sourceHash": "95e4aec27bccda518ac54125661956e8ead16ca7e8ea0bb42606130cfe580ac2",
+      "mime": "image/webp",
+      "bytes": 938408
+    },
+    "img-2f487cdde9d2f8f2b1059120.webp": {
+      "sourceHash": "2f487cdde9d2f8f2b1059120f631d2ddb062fba9dedeb0be59088925bbf64152",
+      "mime": "image/webp",
+      "bytes": 913180
+    },
+    "img-f9fb146e1db7217558bb6550.webp": {
+      "sourceHash": "f9fb146e1db7217558bb6550e76ede758e2858cae794377bf28d905179b561d2",
+      "mime": "image/webp",
+      "bytes": 175838
+    },
+    "img-a081d66200328d8f6abd6284.webp": {
+      "sourceHash": "a081d66200328d8f6abd62841ec26fb17b2f5e203a15cffa54e3cb61e3447eb7",
+      "mime": "image/webp",
+      "bytes": 178878
+    },
+    "img-1ba4b9403b4c1808654f2800.webp": {
+      "sourceHash": "1ba4b9403b4c1808654f2800eeae7b88b8a5ab2675b0b95e89536c0ae8174310",
+      "mime": "image/webp",
+      "bytes": 197616
     }
   },
   "possiblyUnused": [

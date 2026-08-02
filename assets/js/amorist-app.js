@@ -3497,6 +3497,21 @@
       }
       function renderProfileHome() {
         const profile = readProfile();
+        const libraryGames = loadGames();
+        const archivedStatuses = new Set(['已封盘','已全通','已买未打','进行中']);
+        const completedGames = libraryGames.filter(game => game.status === '已全通').length;
+        const archivedGames = libraryGames.filter(game => archivedStatuses.has(game.status)).length;
+        const completedRoutes = libraryGames.reduce((total, game) => {
+          const routeSource = window.AmoristGameStore?.gameRouteNames?.(game) || game.routes;
+          const routes = Array.isArray(routeSource) ? routeSource.map(route => String(route || '').trim()).filter(Boolean) : [];
+          const done = Array.isArray(game.routeDone) ? game.routeDone.map(route => String(route || '').trim()).filter(Boolean) : [];
+          return total + new Set(done.filter(route => routes.includes(route))).size;
+        }, 0);
+        const startedAt = new Date(2024, 6, 6);
+        const today = new Date();
+        startedAt.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        const playedDays = Math.max(0, Math.floor((today - startedAt) / 86400000) + 1);
         const characterRows = profileCharacterRows();
         const oshiCharacters = profileCharacterNames(characterRows, character => ['favorite','oshi'].includes(character.preference));
         const preferredHeroines = profileCharacterNames(characterRows, character => character.roleType === 'protagonist' && ['like','good'].includes(character.preference));
@@ -3559,6 +3574,10 @@
         setProfileText('#profileXhs', profile.xhs);
         setProfileText('#profileNsId', profile.platformId);
         setProfileText('#profileKkv', profile.contactValue);
+        setProfileText('#profileStatCompleted', completedGames);
+        setProfileText('#profileStatArchived', archivedGames);
+        setProfileText('#profileStatRoutes', completedRoutes);
+        setProfileText('#profileStatDays', playedDays);
 
         const tags = $p('#profileTags');
         if (tags) tags.innerHTML = profileChips(profile.tags);
@@ -3624,6 +3643,13 @@
         setTimeout(() => $p('.profile-edit-field')?.focus(), 30);
       }
       if (window.AMORIST_MODE === 'editor') {
+        $p('#profileExportButton')?.addEventListener('click', () => {
+          const stage = $p('#profileHomeStage');
+          const button = $p('#profileExportButton');
+          if (!stage || !button) return;
+          const profile = readProfile();
+          captureProductElement(stage, `${profileText(profile.name) || '个人简介'}.png`, button);
+        });
         $p('#profileEditButton')?.addEventListener('click', openProfileEditModal);
         $p('#profileAvatarButton')?.addEventListener('click', openProfileEditModal);
         $p('#profileEditClose')?.addEventListener('click', closeProfileEditModal);
@@ -3945,7 +3971,7 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
 
       function saveGamePatch(id,patch){
         const rows=games(),i=rows.findIndex(g=>g.id===id);if(i<0)return;
-        rows[i]={...rows[i],...patch,updatedAt:Date.now()};saveGames(rows);renderGameDetail(id);
+        rows[i]={...rows[i],...patch,updatedAt:Date.now()};saveGames(rows);renderGameDetail(id);window.dispatchEvent(new CustomEvent('amorist-data-changed',{detail:{games:true}}));
       }
 
       function gameLogDateValue(value){
@@ -4061,7 +4087,8 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       async function loadGameSourceInfo(game){
         const host=$('#gameSourceInfo'); if(!host)return;
         try{
-          const rows=await new Promise((resolve,reject)=>{const req=indexedDB.open('amorist-bangumi-db',1);req.onerror=()=>reject(req.error);req.onsuccess=()=>{const db=req.result,tx=db.transaction('games'),q=tx.objectStore('games').getAll();q.onsuccess=()=>resolve(q.result||[]);q.onerror=()=>reject(q.error)}});
+           let rows=[];
+           try{rows=await new Promise((resolve,reject)=>{const req=indexedDB.open('amorist-bangumi-db',1);req.onerror=()=>reject(req.error);req.onsuccess=()=>{try{const db=req.result,tx=db.transaction('games'),q=tx.objectStore('games').getAll();q.onsuccess=()=>resolve(q.result||[]);q.onerror=()=>reject(q.error);}catch(error){reject(error);}}});}catch{}
           const currentSource=rows.find(item=>String(item.id)===String(game.bangumiId));
           if(game.bangumiId&&!game.bangumiVersionCheckedAt&&window.amoristBangumiDiscovery?.resolveById){
             try{
@@ -4072,14 +4099,24 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
               }
             }catch{}
           }
-          const sourceIds=[game.bangumiId,game.bangumiCharacterSourceId].filter(Boolean).map(String);
-          const source=rows.find(item=>sourceIds.includes(String(item.id)))||rows.find(item=>item.name===game.name||item.nameCn===game.name||item.nameAlt===game.name);
-          if(source){const meta=$$('#gameDetailPanel .hero-copy .meta dd'),release=source.date||source.year,developer=source.developer||'';if(meta[0]&&release&&!game.releaseDate&&!game.year)meta[0].textContent=release;if(meta[1]&&developer&&!game.developer)meta[1].textContent=developer;}
-          if(!source){host.innerHTML='<div class="section-head"><h3>作品资料</h3><span class="playing-meta">来自作品资料库</span></div><div class="playing-meta">这部游戏尚未关联作品资料库。可在作品资料库中导入后自动关联。</div>';return;}
-          const infobox=Array.isArray(source.infobox)?source.infobox:[];
+           const sourceIds=[game.bangumiId,game.bangumiCharacterSourceId].filter(Boolean).map(String);
+           const source=rows.find(item=>sourceIds.includes(String(item.id)))||rows.find(item=>item.name===game.name||item.nameCn===game.name||item.nameAlt===game.name);
+           const localRoleRelation=roleType=>({protagonist:'主人公',route:'攻略对象',sub:'配角',unset:'其他角色'})[dataModel.normalizeCharacterRoleType(roleType)]||'其他角色';
+           let localRows=[];
+           try{const raw=JSON.parse(localStorage.getItem('amorist-character-book-v1')||'[]');localRows=Array.isArray(raw)?raw.filter(character=>String(character?.gameId||'')===String(game.id)||((Array.isArray(character?.gameIds)?character.gameIds:[]).map(String).includes(String(game.id)))):[];}catch{}
+           const storedCharacters=Array.isArray(game.sourceCharacters)?game.sourceCharacters:[];
+           const linkedMap=new Map();
+           [...storedCharacters,...localRows.map(character=>({id:character.bangumiCharacterId||`local-char-${character.id}`,localCharacterId:String(character.id||''),bangumiCharacterId:character.bangumiCharacterId||'',name:character.name||character.nameCn||'未命名角色',name_cn:character.nameCn||'',relation:character.relation||character.role||localRoleRelation(character.roleType),cv:character.cv||'',image:character.image||''}))].forEach(character=>{const key=String(character.localCharacterId||character.bangumiCharacterId||character.id||character.name||'');if(key)linkedMap.set(key,{...(linkedMap.get(key)||{}),...character});});
+           const linkedCharacters=[...linkedMap.values()];
+           if(source){const meta=$$('#gameDetailPanel .hero-copy .meta dd'),release=source.date||source.year,developer=source.developer||'';if(meta[0]&&release&&!game.releaseDate&&!game.year)meta[0].textContent=release;if(meta[1]&&developer&&!game.developer)meta[1].textContent=developer;}
+           if(!source&&!linkedCharacters.length){host.innerHTML='<div class="section-head"><h3>作品资料</h3><span class="playing-meta">来自作品资料库</span></div><div class="playing-meta">这部游戏尚未关联作品资料库，也没有已关联的角色。</div>';return;}
+           const displaySource=source||{name:game.name,nameCn:game.name,chars:[],infobox:[]};
+           const infobox=Array.isArray(displaySource.infobox)?displaySource.infobox:[];
           const sourceRows=infobox.map(row=>`<div class="game-source-row"><strong>${safe(row.key||'')}</strong><span>${safe(gameSourceValue(row.value))}</span></div>`).join('');
-          const staff=[source.developer&&`开发/制作：${source.developer}`,...(source.writers||[]).map(w=>`剧本：${w}`)].filter(Boolean);
-          const chars=Array.isArray(source.chars)?source.chars:[];
+           const staff=[displaySource.developer&&`开发/制作：${displaySource.developer}`,...(displaySource.writers||[]).map(w=>`剧本：${w}`)].filter(Boolean);
+           const sourceCharacters=Array.isArray(displaySource.chars)?displaySource.chars:[];
+           const sourceCharacterKeys=new Set(sourceCharacters.flatMap(character=>[character?.id,character?.bangumiCharacterId,character?.name,character?.name_cn].filter(Boolean).map(String)));
+           const chars=[...sourceCharacters,...linkedCharacters.filter(character=>![character?.id,character?.bangumiCharacterId,character?.name,character?.name_cn].filter(Boolean).map(String).some(key=>sourceCharacterKeys.has(key)))];
           const roleGroup=gameCharacterRole;
           const charCard=character=>{
             const image=character.image||character.images?.large||character.images?.medium||character.images?.grid||'';
@@ -4100,9 +4137,9 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
             :groups.main.length||groups.support.length
               ?charBlock('主角',groups.main)+charBlock('配角',groups.support)+charBlock('其他角色',groups.other)
               :charBlock('角色',chars);
-          host.innerHTML='<div class="section-head"><h3>作品资料</h3><span class="playing-meta">来自作品资料库</span></div>'
-            +`<div class="game-source-layout"><div class="game-source-copy"><div class="game-source-meta">${[source.nameCn||source.nameAlt||source.name,source.year?source.year+'年':'',...staff].filter(Boolean).map(x=>`<span>${safe(x)}</span>`).join('')}</div>`
-            +(source.desc?`<p class="game-source-desc">${safe(source.desc)}</p>`:'')
+           host.innerHTML='<div class="section-head"><h3>作品资料</h3><span class="playing-meta">'+(source?'来自作品资料库':'来自已关联角色')+'</span></div>'
+             +`<div class="game-source-layout"><div class="game-source-copy"><div class="game-source-meta">${[displaySource.nameCn||displaySource.nameAlt||displaySource.name,displaySource.year?displaySource.year+'年':'',...staff].filter(Boolean).map(x=>`<span>${safe(x)}</span>`).join('')}</div>`
+             +(displaySource.desc?`<p class="game-source-desc">${safe(displaySource.desc)}</p>`:'')
             +(sourceRows?`<h4>制作与作品信息</h4><div class="game-source-infobox">${sourceRows}</div>`:'')
             +`</div><div class="game-source-characters">${charactersHtml||'<div class="playing-meta">暂无角色数据</div>'}</div></div>`;
         }catch{host.innerHTML='<div class="section-head"><h3>作品资料</h3></div><div class="playing-meta">暂时无法读取作品资料库。</div>';}
@@ -4224,6 +4261,27 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       const chars=()=>{try{const rows=JSON.parse(localStorage.getItem(CHAR_KEY)||'[]');const cleaned=Array.isArray(rows)?rows.filter(character=>character?.gameId||(!character?.animeId&&!Array.isArray(character?.animeIds))):[];if(Array.isArray(rows)&&cleaned.length!==rows.length)localStorage.setItem(CHAR_KEY,JSON.stringify(cleaned));const gameRows=roleGameRows();return cleaned.map(character=>dataModel.normalizeCharacterRecord(character,gameRows))}catch{return[]}};
       const visibleChars=(rows=chars(),gameRows=games())=>window.AmoristCharacterBookVisibility.filter(rows,gameRows);
       const saveChars=v=>localStorage.setItem(CHAR_KEY,JSON.stringify((Array.isArray(v)?v:[]).map(character=>dataModel.normalizeCharacterRecord(character,roleGameRows()))));
+      const characterRoleRelation=roleType=>({protagonist:'主人公',route:'攻略对象',sub:'配角',unset:'其他角色'})[dataModel.normalizeCharacterRoleType(roleType)]||'其他角色';
+      const characterGameSummary=character=>({id:character?.bangumiCharacterId||`local-char-${character?.id||Date.now()}`,localCharacterId:String(character?.id||''),bangumiCharacterId:character?.bangumiCharacterId||'',name:character?.name||character?.nameCn||'未命名角色',name_cn:character?.nameCn||'',relation:character?.relation||character?.role||characterRoleRelation(character?.roleType),cv:character?.cv||'',image:character?.image||''});
+      function syncCharacterGameLink(character,previousGameId=''){
+        const characterId=String(character?.id||''),currentGameId=String(character?.gameId||''),oldGameId=String(previousGameId||'');
+        if(!characterId)return;
+        const rows=games();let changed=false;
+        const next=rows.map(game=>{
+          const gameId=String(game?.id||'');
+          if(gameId!==currentGameId&&gameId!==oldGameId)return game;
+          const source=Array.isArray(game?.sourceCharacters)?game.sourceCharacters:[];
+          const updated=source.filter(item=>String(item?.localCharacterId||item?.characterBookId||'')!==characterId);
+          if(gameId===currentGameId){
+            const summary=characterGameSummary(character);
+            const match=updated.findIndex(item=>character.bangumiCharacterId&&String(item?.bangumiCharacterId||item?.id||'')===String(character.bangumiCharacterId));
+            if(match>=0)updated[match]={...updated[match],...summary};else updated.push(summary);
+          }
+          if(JSON.stringify(source)!==JSON.stringify(updated)){changed=true;return {...game,sourceCharacters:updated,updatedAt:Date.now()};}
+          return game;
+        });
+        if(changed)saveGames(next);
+      }
       const go=view=>document.querySelector(`[data-product-target="${view}"]`)?.click();
       const toast=msg=>{const t=$('#toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2200)};
       const characterHasBirthday=character=>Array.isArray(character?.infobox)&&character.infobox.some(row=>/生日|誕生日|birth/i.test(String(row?.key||''))&&String(row?.value??'').trim()!=='');
@@ -4290,6 +4348,7 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       let activeCharRoleFilter='all';
       let activeCharPreferenceFilter='all';
       let charBatchMode=false;
+      let charPreferenceAutoDefault=false;
       const charSelected=new Set();
       const characterPreferenceOrder=dataModel.CHARACTER_PREFERENCES.map(item=>item.id);
       const characterPreferenceAxisByRole={
@@ -4419,17 +4478,17 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
           const subjects=await v0('/v0/characters/'+encodeURIComponent(c.id)+'/subjects');
           subjectIds.push(...(Array.isArray(subjects)?subjects:[]).filter(subject=>Number(subject?.type)===4).map(subject=>String(subject.id)));
         }catch{}
-        if(bgSelected?.id)subjectIds.push(String(bgSelected.id));
         subjectIds=[...new Set(subjectIds)];
         const gameRows=games();
         const eligibleGames=gameRows.filter(game=>window.AmoristCharacterBookVisibility.visibleStatuses.has(String(game.status||'').trim()));
-        const preferredSubjectId=String(bgSelected?.id||'')&&subjectIds.includes(String(bgSelected.id))?String(bgSelected.id):subjectIds.find(subjectId=>eligibleGames.some(game=>String(game.bangumiId||game.bangumiDisplayId||'')===subjectId))||existing?.bangumiSubjectId||subjectIds[0]||'';
+        const preferredSubjectId=existing?.bangumiSubjectId&&subjectIds.includes(String(existing.bangumiSubjectId))?String(existing.bangumiSubjectId):subjectIds.find(subjectId=>eligibleGames.some(game=>String(game.bangumiId||game.bangumiDisplayId||'')===subjectId))||subjectIds[0]||'';
         const linkedGame=eligibleGames.find(game=>String(game.bangumiId||game.bangumiDisplayId||'')===preferredSubjectId)||eligibleGames.find(game=>subjectIds.includes(String(game.bangumiId||game.bangumiDisplayId||'')));
         if(!linkedGame){toast('请先将所属游戏设为「进行中」或「已全通」');return;}
-        const record=dataModel.normalizeCharacterRecord({...(existing||{}),id:existing?.id||`char-bgm-${c.id}`,name:c.name||'未命名角色',nameCn:c.name_cn||existing?.nameCn||'',aliases:existing?.aliases||[],gameId:linkedGame.id,gameIds:[...new Set([...(Array.isArray(existing?.gameIds)?existing.gameIds:[]),existing?.gameId,linkedGame.id].filter(Boolean))],bangumiCharacterId:c.id,bangumiSubjectId:preferredSubjectId,bangumiSubjectIds:subjectIds,preference:dataModel.normalizeCharacterPreference(existing?.preference??existing?.relation),roleType:existing?.roleType||'unset',roleTypeSource:existing?.roleTypeSource||'bangumi',cv:existing?.cv||cv,image:existing?.image||image,note:existing?.note||'',summary:existing?.summary||'',infobox:existing?.infobox||[],nameSearchSynced:Boolean(c.name_cn||existing?.nameSearchSynced),updatedAt:Date.now()},gameRows);
-        try{await enrichCharacterBirthday(record);}catch{}
-        const i=all.findIndex(x=>x.id===record.id);if(i>=0)all[i]=record;else all.push(record);
-        saveChars(all);closeCharDialog();renderCharacterBook($('#charSearchInput')?.value||'');toast('角色主页已生成');
+         const importedRoleType=existing?.roleType&&existing.roleType!=='unset'?existing.roleType:dataModel.roleTypeFromBangumiRelation(c.relation);
+         const record=dataModel.normalizeCharacterRecord({...(existing||{}),id:existing?.id||`char-bgm-${c.id}`,name:c.name||'未命名角色',nameCn:c.name_cn||existing?.nameCn||'',aliases:existing?.aliases||[],gameId:linkedGame.id,gameIds:[...new Set([...(Array.isArray(existing?.gameIds)?existing.gameIds:[]),existing?.gameId,linkedGame.id].filter(Boolean))],bangumiCharacterId:c.id,bangumiSubjectId:preferredSubjectId,bangumiSubjectIds:subjectIds,preference:existing?.preference??'',preferenceSource:existing?.preferenceSource||'default',roleType:importedRoleType,roleTypeSource:existing?.roleTypeSource||'bangumi',cv:existing?.cv||cv,image:existing?.image||image,note:existing?.note||'',summary:existing?.summary||'',infobox:existing?.infobox||[],nameSearchSynced:Boolean(c.name_cn||existing?.nameSearchSynced),updatedAt:Date.now()},gameRows);
+         try{await enrichCharacterBirthday(record);}catch{}
+         const i=all.findIndex(x=>x.id===record.id);if(i>=0)all[i]=record;else all.push(record);
+         syncCharacterGameLink(record,existing?.gameId);saveChars(all);window.dispatchEvent(new CustomEvent('amorist-data-changed',{detail:{games:true,chars:true}}));closeCharDialog();renderCharacterBook($('#charSearchInput')?.value||'');toast('角色主页已生成');
         setTimeout(()=>window.dispatchEvent(new CustomEvent('amorist-open-character',{detail:c.id})),80);
       }
       function openCharDialog(id=''){
@@ -4443,8 +4502,9 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
         $('#editingCharId').value=char?.id||'';
         $('#charName').value=char?.name||'';
         $('#charGame').value=char?.gameId||'';
-        $('#charRoleType').value=char?.roleType||'unset';
-        $('#charPreference').value=char?.preference||'unclassified';
+         $('#charRoleType').value=char?.roleType||'unset';
+         charPreferenceAutoDefault=!char?.preference;
+         $('#charPreference').value=char?.preference||dataModel.defaultCharacterPreferenceForRole(char?.roleType);
         $('#charRoleTypeSourceHint').textContent=char?(`身份来源：${char.roleTypeSource==='manual'?'手动设置':'Bangumi 映射'}`):'';
         $('#charCV').value=char?.cv||'';
         $('#charImage').value=char?.image||'';
@@ -4456,6 +4516,18 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       }
       function closeCharDialog(){$('#charDialogOverlay').classList.remove('open')}
       $('#addCharButton').addEventListener('click',()=>openCharDialog());
+      $('#charRoleType').addEventListener('change',()=>{
+        const preference=$('#charPreference');
+        if(!preference)return;
+        const roleType=dataModel.normalizeCharacterRoleType($('#charRoleType').value);
+        if(roleType==='sub'&&(charPreferenceAutoDefault||preference.value==='unclassified')){
+          preference.value='excluded';
+          charPreferenceAutoDefault=true;
+        }else if(roleType!=='sub'&&charPreferenceAutoDefault){
+          preference.value='unclassified';
+        }
+      });
+      $('#charPreference').addEventListener('change',()=>{charPreferenceAutoDefault=false});
       $('#closeCharDialog').addEventListener('click',closeCharDialog);
       $('#charDialogOverlay').addEventListener('click',e=>{if(e.target===$('#charDialogOverlay'))closeCharDialog()});
       $('#charUploadButton').onclick=()=>$('#charUploadInput').click();
@@ -4478,11 +4550,11 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
         const previous=all.find(c=>c.id===id)||{};
         const selectedRole=dataModel.normalizeCharacterRoleType($('#charRoleType').value);
         const previousRole=dataModel.normalizeCharacterRoleType(previous.roleType);
-        const roleTypeSource=id?(previous.roleTypeSource==='manual'||selectedRole!==previousRole?'manual':(previous.roleTypeSource||'bangumi')):'manual';
-        const record=dataModel.normalizeCharacterRecord({...previous,id:id||`char-${Date.now()}`,name:$('#charName').value.trim(),gameId:$('#charGame').value,preference:$('#charPreference').value,roleType:selectedRole,roleTypeSource,cv:$('#charCV').value.trim(),image:$('#charImage').value.trim(),note:$('#charNote').value.trim(),updatedAt:Date.now()},games());
-        const i=all.findIndex(c=>String(c.id)===String(id));
-        if(i>=0)all[i]=record;else all.push(record);
-        saveChars(all);closeCharDialog();renderCharacterBook($('#charSearchInput')?.value||'');toast('角色已保存');
+         const roleTypeSource=id?(previous.roleTypeSource==='manual'||selectedRole!==previousRole?'manual':(previous.roleTypeSource||'bangumi')):'manual';
+         const record=dataModel.normalizeCharacterRecord({...previous,id:id||`char-${Date.now()}`,name:$('#charName').value.trim(),gameId:$('#charGame').value,preference:$('#charPreference').value,preferenceSource:'manual',roleType:selectedRole,roleTypeSource,cv:$('#charCV').value.trim(),image:$('#charImage').value.trim(),note:$('#charNote').value.trim(),updatedAt:Date.now()},games());
+         const i=all.findIndex(c=>String(c.id)===String(id));
+         if(i>=0)all[i]=record;else all.push(record);
+         syncCharacterGameLink(record,previous.gameId);saveChars(all);window.dispatchEvent(new CustomEvent('amorist-data-changed',{detail:{games:true,chars:true}}));closeCharDialog();renderCharacterBook($('#charSearchInput')?.value||'');toast('角色已保存');
       });
       $('#charSearchButton').addEventListener('click',searchCharacterOnBangumi);
       $('#charSearchKeyword').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchCharacterOnBangumi();}});
@@ -4493,9 +4565,9 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
         if(selected)createCharacterFromBangumi(selected);
       });
       $('#deleteCharButton').addEventListener('click',()=>{
-        const id=$('#editingCharId').value,char=chars().find(c=>String(c.id)===String(id));
-        if(!char||!confirm(`删除角色「${char.name}」？`))return;
-        saveChars(chars().filter(c=>String(c.id)!==String(id)));closeCharDialog();renderCharacterBook($('#charSearchInput')?.value||'');toast('角色已删除');
+       const id=$('#editingCharId').value,char=chars().find(c=>String(c.id)===String(id));
+       if(!char||!confirm(`删除角色「${char.name}」？`))return;
+       syncCharacterGameLink({...char,gameId:''},char.gameId);saveChars(chars().filter(c=>String(c.id)!==String(id)));window.dispatchEvent(new CustomEvent('amorist-data-changed',{detail:{games:true,chars:true}}));closeCharDialog();renderCharacterBook($('#charSearchInput')?.value||'');toast('角色已删除');
       });
       $('#charSearchInput')?.addEventListener('input',e=>renderCharacterBook(e.target.value));
       $$('#charRoleFilters .filter-pill').forEach(btn=>btn.addEventListener('click',()=>{
@@ -4808,20 +4880,28 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       $('#charBatchApplyPreference')?.addEventListener('click',()=>{
         const preference=$('#charBatchPreference').value;
         if(!preference||!charSelected.size)return toast('请先选择角色和喜好分类');
-        saveChars(chars().map(c=>charSelected.has(String(c.id))?{...c,preference:dataModel.normalizeCharacterPreference(preference),updatedAt:Date.now()}:c));
+        saveChars(chars().map(c=>charSelected.has(String(c.id))?{...c,preference:dataModel.normalizeCharacterPreference(preference),preferenceSource:'manual',updatedAt:Date.now()}:c));
         $('#charBatchPreference').value='';charSelected.clear();renderCharacterBook($('#charSearchInput')?.value||'');updateCharBatchCount();toast('已批量更新角色喜好');
       });
       $('#charBatchApplyRole')?.addEventListener('click',()=>{
         const roleType=$('#charBatchRoleType').value;
         if(!roleType||!charSelected.size)return toast('请先选择角色和身份');
-        saveChars(chars().map(c=>charSelected.has(String(c.id))?{...c,roleType:dataModel.normalizeCharacterRoleType(roleType),roleTypeSource:'manual',updatedAt:Date.now()}:c));
+          const nextRoleType=dataModel.normalizeCharacterRoleType(roleType);
+          const updated=chars().map(c=>{
+            if(!charSelected.has(String(c.id)))return c;
+             const nextPreference=nextRoleType==='sub'&&c.preferenceSource!=='manual'&&(!c.preference||c.preference==='unclassified')?'excluded':c.preference;
+            return {...c,roleType:nextRoleType,preference:nextPreference,roleTypeSource:'manual',updatedAt:Date.now()};
+          });
+          updated.filter(c=>charSelected.has(String(c.id))).forEach(c=>syncCharacterGameLink(c,c.gameId));
+          saveChars(updated);window.dispatchEvent(new CustomEvent('amorist-data-changed',{detail:{games:true,chars:true}}));
         $('#charBatchRoleType').value='';charSelected.clear();renderCharacterBook($('#charSearchInput')?.value||'');updateCharBatchCount();toast('已批量更新角色身份');
       });
       $('#charBatchDelete')?.addEventListener('click',()=>{
         if(!charSelected.size)return toast('请先选择角色');
         const rows=chars(),count=rows.filter(c=>charSelected.has(String(c.id))).length;
         if(!count||!confirm(`删除选中的 ${count} 位角色？`))return;
-        saveChars(rows.filter(c=>!charSelected.has(String(c.id))));charSelected.clear();renderCharacterBook($('#charSearchInput')?.value||'');updateCharBatchCount();toast(`已删除 ${count} 位角色`);
+         rows.filter(c=>charSelected.has(String(c.id))).forEach(c=>syncCharacterGameLink({...c,gameId:''},c.gameId));
+         saveChars(rows.filter(c=>!charSelected.has(String(c.id))));window.dispatchEvent(new CustomEvent('amorist-data-changed',{detail:{games:true,chars:true}}));charSelected.clear();renderCharacterBook($('#charSearchInput')?.value||'');updateCharBatchCount();toast(`已删除 ${count} 位角色`);
       });
       $('#charBatchCancel')?.addEventListener('click',()=>{
         charBatchMode=false;charSelected.clear();$('#charBatchActions').hidden=true;$('#charBatchToggle').textContent='批量管理';
@@ -5799,11 +5879,11 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
             }else if(!Array.isArray(existing.infobox))existing.infobox=[];
             existing.nameSearchSynced=Boolean(c.nameSearchSynced||existing.nameSearchSynced);
             existing.birthdayCheckedAt=c.birthdayCheckedAt||existing.birthdayCheckedAt||'';
-            existing.preference=dataModel.normalizeCharacterPreference(existing.preference??existing.relation);
+             existing.preference=dataModel.normalizeCharacterPreference(existing.preference??existing.relation);
             if(existing.roleTypeSource!=='manual'){existing.roleType=dataModel.roleTypeFromBangumiRelation(c.relation);existing.roleTypeSource='bangumi';}
             existing.updatedAt=Date.now();
           }else{
-            allChars.push({id:'char-bgm-'+g.id+'-'+(c.id||Math.random().toString(36).slice(2,8)),name:c.name,nameCn:c.nameCn||'',aliases:Array.isArray(c.aliases)?c.aliases:[],gameId,bangumiCharacterId:c.id||'',bangumiSubjectId:g.id,preference:'unclassified',roleType:dataModel.roleTypeFromBangumiRelation(c.relation),roleTypeSource:'bangumi',cv:c.cv||'',image:c.image||'',note:'',summary:c.summary||'',infobox:c.infobox||[],nameSearchSynced:Boolean(c.nameSearchSynced),birthdayCheckedAt:c.birthdayCheckedAt||'',updatedAt:Date.now()});
+              allChars.push({id:'char-bgm-'+g.id+'-'+(c.id||Math.random().toString(36).slice(2,8)),name:c.name,nameCn:c.nameCn||'',aliases:Array.isArray(c.aliases)?c.aliases:[],gameId,bangumiCharacterId:c.id||'',bangumiSubjectId:g.id,preference:'',preferenceSource:'default',roleType:dataModel.roleTypeFromBangumiRelation(c.relation),roleTypeSource:'bangumi',cv:c.cv||'',image:c.image||'',note:'',summary:c.summary||'',infobox:c.infobox||[],nameSearchSynced:Boolean(c.nameSearchSynced),birthdayCheckedAt:c.birthdayCheckedAt||'',updatedAt:Date.now()});
             addedChars++;
           }
         });

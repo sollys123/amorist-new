@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
   <meta name="color-scheme" content="light">
   <link id="lxgwFont" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" onerror="this.onerror=null;this.href='https://cdn.bootcdn.net/ajax/libs/lxgw-wenkai-webfont/1.7.0/style.min.css';">
-  <title>Amorist</title>
+  <title>Amorist · HARU</title>
   
 
 
@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="./assets/css/amorist.css?v=oshi-shell-20260801-7">
   <link rel="stylesheet" href="./assets/css/site-modes.css?v=pure-otome-20260728">
 <link rel="stylesheet" href="./assets/css/polish.css?v=kotodama-ritual-20260802-3">
-  <link rel="stylesheet" href="./assets/css/profile-home.css?v=profile-home-v15-20260802-23">
+  <link rel="stylesheet" href="./assets/css/profile-home.css?v=profile-home-v15-20260802-27">
   <style>
     .product-view[data-product-view="oshi"] .oshi-canvas-shell{filter:none!important}
     .product-view[data-product-view="oshi"] .oshi-canvas{background:#fbf8f2!important;border:0!important;border-radius:0!important;box-shadow:none!important}
@@ -76,15 +76,26 @@
                 <article class="profile-boundary-card" data-profile-section="boundaries"><div class="profile-panel-label">BOUNDARIES</div><h3>雷点</h3><p id="profileBoundaries"></p><div class="profile-choices"><div data-profile-section="sameFan"><small>SAME FAN</small><b id="profileSameFanPlay"></b></div></div></article>
               </div>
             </section>
+            <section class="profile-library-stats" aria-label="游戏档案统计">
+              <div class="profile-library-stats-head"><span>GAME ARCHIVE</span><strong>PLAY RECORD</strong></div>
+              <div class="profile-library-stat-list">
+                <div class="profile-library-stat"><strong id="profileStatCompleted">0</strong><span>全通作品</span></div>
+                <div class="profile-library-stat"><strong id="profileStatArchived">0</strong><span>入库作品</span></div>
+                <div class="profile-library-stat"><strong id="profileStatRoutes">0</strong><span>已通关线路</span></div>
+                <div class="profile-library-stat"><strong id="profileStatDays">0</strong><span>已入坑天数</span></div>
+              </div>
+            </section>
             <div class="profile-panel-wrap" data-profile-group="taste">
               <section class="profile-taste-section">
                 <div class="profile-taste-grid">
+                  <div class="profile-taste-top">
                   <article data-profile-section="artist"><div class="profile-panel-label">ARTIST</div><h3>偏好的画师</h3><p id="profileArtist"></p></article>
                   <article data-profile-section="writer"><div class="profile-panel-label">WRITER</div><h3>偏好的剧本娘</h3><p id="profileWriter"></p></article>
                   <article data-profile-section="works"><div class="profile-panel-label">WORKS</div><h3>偏好的作品类型</h3><p id="profileWorks"></p></article>
                   <article data-profile-section="worldview"><div class="profile-panel-label">WORLDVIEW</div><h3>偏好的世界观</h3><p id="profileWorldview"></p></article>
                   <article data-profile-section="character"><div class="profile-panel-label">HEROINE TYPE</div><h3>偏好的女主角类型</h3><p id="profileCharacter"></p></article>
                   <article data-profile-section="voiceActors"><div class="profile-panel-label">VOICE ACTOR</div><h3>偏好的声优</h3><p id="profileVoiceActors"></p></article>
+                  </div>
                   <div class="profile-taste-cards">
                     <article class="profile-xp-card" data-profile-group="lovetype"><div class="profile-love-type-main" data-profile-section="type"><p id="profileType"></p></div><div class="profile-love-type-section" data-profile-section="tags"><div class="profile-panel-label">XP TAGS</div><div class="profile-tagline profile-love-type-tags" id="profileTags"></div></div><div class="profile-love-type-section" data-profile-section="relationship"><div class="profile-panel-label">RELATIONSHIP</div><p id="profileRelationship"></p></div></article>
                     <article class="profile-motif-card" data-profile-group="characters"><div class="profile-character-section" data-profile-section="oshiCharacters"><div class="profile-panel-label">MY OSHIS</div><p id="profileOshiCharacters"></p></div><div class="profile-character-section" data-profile-section="heroineCharacters"><div class="profile-panel-label">FAVOURITE HEROINES</div><p id="profileHeroineCharacters"></p></div></article>
@@ -820,7 +831,7 @@
 
   <script>window.AMORIST_MODE = 'public';</script>
   <script src="./assets/js/image-store.js"></script>
-  <script src="./assets/js/data-model.js?v=characters-preferences-20260801-1"></script>
+  <script src="./assets/js/data-model.js?v=characters-preferences-20260802-3"></script>
   <script src="./assets/vendor/p5.min.js?v=2.3.1"></script>
   <script src="./assets/js/torii-p5.js?v=ritual-layout-20260802-20"></script>
   <script src="./assets/js/kotodama-p5.js?v=kotodama-ritual-20260802-2"></script>
