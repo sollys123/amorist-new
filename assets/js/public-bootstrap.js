@@ -172,7 +172,7 @@
     .then(async payload => {
       window.__AMORIST_PUBLIC_DATA__ = payload;
       installVirtualStorage(payload);
-      await loadScript('./assets/js/amorist-app.js?v=kotodama-ritual-20260802-12');
+      await loadScript('./assets/js/amorist-app.js?v=timeline-calendar-picker-20260803-1');
       await loadScript('./assets/js/oshi-hub.js?v=timeline-ui-20260731');
       await loadScript('./assets/js/public-mode.js?v=library-interactions-20260801-8');
     });

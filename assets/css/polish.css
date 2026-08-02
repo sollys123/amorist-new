@@ -1025,7 +1025,7 @@ body.theme-dialog-open {overflow:hidden!important}
 /* Timeline calendar: fixed editorial cells, compact covers, quiet metadata. */
 .product-view[data-product-view="timeline"] {
   min-height:calc(100vh - 70px);
-  padding:24px clamp(28px,5vw,74px) 78px!important;
+  padding:8px clamp(28px,5vw,74px) 78px!important;
   background:#fbf8f2!important;
   color:#4d4958;
 }
@@ -1077,7 +1077,7 @@ body.theme-dialog-open {overflow:hidden!important}
 .timeline-toolbar .product-select:focus {border-bottom-color:#705681}
 .timeline-toolbar .timeline-check {display:flex;align-items:center;gap:6px;color:#8e8790;font:400 10px Georgia,"Songti SC",serif;white-space:nowrap}
 .timeline-toolbar .timeline-check input {accent-color:#705681}
-.timeline-calendar {display:grid;grid-template-columns:125px minmax(0,1000px);gap:30px;margin:0;padding:20px 0 0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.timeline-calendar {display:grid;grid-template-columns:125px minmax(0,1000px);gap:30px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
 .timeline-calendar-aside {padding:30px 0 0 12px;color:#4d4958}
 .timeline-calendar-month-number {display:block;color:#76628b;font:400 66px/.82 Georgia,serif;letter-spacing:-.08em}
 .timeline-calendar-aside strong {display:block;margin-top:18px;color:#332d39;font:400 21px/1 Georgia,serif;letter-spacing:.14em}
@@ -1091,7 +1091,7 @@ body.theme-dialog-open {overflow:hidden!important}
 .timeline-calendar-main {min-width:0}
 .timeline-calendar-head {display:flex;align-items:end;justify-content:flex-end;min-height:24px;margin:0;padding:0 0 4px;border:0;background:transparent}
 .timeline-calendar-month-title {display:none}
-.timeline-calendar-actions {display:flex;gap:16px}.timeline-calendar-nav {width:22px;height:22px;border:0;border-radius:0;background:transparent;color:#76628b;font:400 18px/1 Georgia,serif;cursor:pointer}
+.timeline-calendar-actions {display:flex;align-items:center;gap:12px}.timeline-calendar-picker {width:112px;height:22px;padding:2px 0 4px;border:0;border-bottom:1px solid #d6d0d2;border-radius:0;background:transparent;color:#4d4958;font:400 10px Georgia,"Songti SC",serif;letter-spacing:.06em;outline:0;color-scheme:light}.timeline-calendar-picker:focus {border-bottom-color:#705681}.timeline-calendar-nav {width:22px;height:22px;border:0;border-radius:0;background:transparent;color:#76628b;font:400 18px/1 Georgia,serif;cursor:pointer}
 .timeline-calendar-weekdays,.timeline-calendar-grid {display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
 .timeline-calendar-weekdays {color:#8e8790;font:700 8px/1 Georgia,serif;letter-spacing:.16em;text-align:center}
 .timeline-calendar-weekdays span {padding:10px 0}
@@ -1121,7 +1121,7 @@ body.theme-dialog-open {overflow:hidden!important}
   .timeline-head-actions {justify-content:flex-start}
   .timeline-toolbar {flex-wrap:wrap;gap:10px;padding:10px 0}
   .timeline-toolbar .timeline-view-switch {order:0;margin-left:auto}
-  .timeline-calendar {grid-template-columns:1fr;gap:16px;padding-top:14px}.timeline-calendar-aside {display:grid;grid-template-columns:auto auto auto 1fr;align-items:end;gap:10px;padding:0}.timeline-calendar-month-number {font-size:48px}.timeline-calendar-aside strong{margin:0}.timeline-calendar-aside small{margin:0}.timeline-calendar-aside i,.timeline-calendar-aside p,.timeline-calendar-aside dl{display:none}
+  .timeline-calendar {grid-template-columns:1fr;gap:16px;padding-top:0}.timeline-calendar-aside {display:grid;grid-template-columns:auto auto auto 1fr;align-items:end;gap:10px;padding:0}.timeline-calendar-month-number {font-size:48px}.timeline-calendar-aside strong{margin:0}.timeline-calendar-aside small{margin:0}.timeline-calendar-aside i,.timeline-calendar-aside p,.timeline-calendar-aside dl{display:none}
   .timeline-calendar-grid {grid-auto-rows:82px}.timeline-calendar-event {width:42px;height:50px}
 }
 @media(max-width:560px){
@@ -1515,4 +1515,121 @@ html body .product-view[data-product-view="forms"] .form-side{
 html body .product-view[data-product-view="forms"] :is(.product-button,.workshop-new,.workshop-tools button,.workshop-size-presets button,.workshop-color-row button,.workshop-palette-card,.workshop-picker-tabs button,.workshop-search button,.workshop-preset,.workshop-list-delete){
   border-radius:0!important;
   box-shadow:none!important;
+}
+
+/* ===== pageHeadingAlignment ===== */
+/* Keep every archive heading at the REPO / visual-creation scale. */
+html body .product-view[data-product-view] :is(.product-page-head,.resource-page-head,.library-reference-head,.char-reference-head,.timeline-page-head,.oshi-page-head) h1{
+  font-size:29px!important;
+  line-height:1.08!important;
+}
+html body .product-view[data-product-view] :is(.product-page-head,.resource-page-head,.library-reference-head,.char-reference-head,.timeline-page-head,.oshi-page-head){
+  margin-bottom:18px!important;
+}
+
+/* The divination map uses a custom header, so give it the same frame as the archives. */
+html body .product-view[data-product-view="omikuji"] .omikuji-map-head{
+  width:100%!important;
+  max-width:1180px!important;
+  min-height:72px!important;
+  margin:0 auto 18px!important;
+  gap:30px!important;
+  padding:0 0 18px!important;
+  border-bottom:0!important;
+}
+html body .product-view[data-product-view="omikuji"] .omikuji-map-head h1{
+  margin:9px 0 7px!important;
+  font-size:29px!important;
+  line-height:1.08!important;
+}
+html body .product-view[data-product-view="omikuji"] .omikuji-map-head p{
+  margin:0!important;
+  font-size:9px!important;
+  line-height:1.7!important;
+}
+
+/* Keep every top-level heading on the same vertical coordinate when switching views. */
+html body .product-main .product-view[data-product-view="studio"],
+html body .product-main .product-view[data-product-view="forms"],
+html body .product-main .product-view[data-product-view="library"],
+html body .product-main .product-view[data-product-view="characters"],
+html body .product-main .product-view[data-product-view="bangumi"],
+html body .product-main .product-view[data-product-view="timeline"],
+html body .product-main .product-view[data-product-view="oshi"]{
+  padding-top:24px!important;
+}
+html body .product-view[data-product-view="omikuji"] .omikuji-sanctuary{
+  padding-top:24px!important;
+}
+html body .product-view[data-product-view] > :is(.product-page-head,.resource-page-head) > div:first-child{
+  align-self:flex-start!important;
+}
+html body .product-view[data-product-view="omikuji"] .omikuji-map-head{
+  align-items:flex-start!important;
+}
+html body .product-view[data-product-view="omikuji"] .omikuji-map-head h1{
+  margin-top:8px!important;
+}
+html body .product-main .product-view[data-product-view="characters"] .char-reference-head>div:first-child::before{
+  white-space:nowrap;
+}
+@media(min-width:721px){
+  html body .product-main .product-view[data-product-view="omikuji"] .omikuji-sanctuary{
+    padding-left:30px!important;
+    padding-right:30px!important;
+  }
+  html body .product-view[data-product-view="omikuji"] .omikuji-map-head{
+    min-height:96px!important;
+  }
+}
+
+/* Add the missing editorial kicker without changing the existing header DOM. */
+html body .product-view[data-product-view="studio"] .repo-product-head>div:first-child::before,
+html body .product-view[data-product-view="forms"] :is(.product-page-head,.workshop-page-head)>div:first-child::before{
+  display:block;
+  margin-bottom:9px;
+  color:#76628b;
+  font:700 9px/1 Georgia,serif;
+  letter-spacing:.22em;
+}
+html body .product-view[data-product-view="studio"] .repo-product-head>div:first-child::before{content:"OTOME GAME REPO"}
+html body .product-view[data-product-view="forms"] :is(.product-page-head,.workshop-page-head)>div:first-child::before{content:"VISUAL CREATION"}
+
+/* Keep the compact workshop settings readable: one control per row. */
+html body .product-main .product-view[data-product-view="forms"] .workshop-settings{
+  grid-template-columns:1fr!important;
+  gap:6px!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+}
+html body .product-main .product-view[data-product-view="forms"] .workshop-settings label,
+html body .product-main .product-view[data-product-view="forms"] .workshop-settings .workshop-header-setting,
+html body .product-main .product-view[data-product-view="forms"] .workshop-settings .workshop-header-setting label{
+  min-height:30px!important;
+  font-size:12px!important;
+  line-height:1.35!important;
+  white-space:nowrap;
+}
+html body .product-main .product-view[data-product-view="forms"] .workshop-settings label{
+  justify-content:space-between!important;
+}
+html body .product-main .product-view[data-product-view="forms"] .workshop-settings label:has(input[type="checkbox"]),
+html body .product-main .product-view[data-product-view="forms"] .workshop-settings .workshop-header-setting label{
+  justify-content:flex-start!important;
+  gap:8px!important;
+}
+html body .product-main .product-view[data-product-view="forms"] .workshop-settings input[type="number"]{
+  font-size:12px!important;
+}
+
+@media(max-width:720px){
+  html body .product-view[data-product-view] :is(.product-page-head,.resource-page-head,.library-reference-head,.char-reference-head,.timeline-page-head,.oshi-page-head) h1,
+  html body .product-view[data-product-view="omikuji"] .omikuji-map-head h1{
+    font-size:30px!important;
+  }
+  html body .product-view[data-product-view="omikuji"] .omikuji-map-head{
+    min-height:0!important;
+    margin-bottom:18px!important;
+    padding-bottom:14px!important;
+  }
 }
