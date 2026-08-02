@@ -28,7 +28,6 @@
 
   function lockPublicViews() {
     document.querySelectorAll([
-      '[data-product-view="profile"] input','[data-product-view="profile"] textarea','[data-product-view="profile"] select',
       '#gameDialogForm input','#gameDialogForm textarea','#gameDialogForm select',
       '#charDialogForm input','#charDialogForm textarea','#charDialogForm select'
     ].join(',')).forEach(lockField);
@@ -56,7 +55,7 @@
   }, true);
 
   document.addEventListener('input', event => {
-    if (event.target.closest('[data-product-view="profile"],#gameDialogForm,#charDialogForm')) {
+    if (event.target.closest('#gameDialogForm,#charDialogForm')) {
       if (!event.target.matches('#charSearchInput,#bangumiDbSearch,#bangumiDbMaker,#bangumiDbCv,#bangumiDbWriter')) {
         event.preventDefault();
         event.stopImmediatePropagation();

@@ -6,7 +6,7 @@
 
   const DATA_URL = './data/amorist-data.json';
   const PREVIEW_KEY = 'amorist-public-preview-v1';
-  const MANAGED_PREFIXES = ['amorist-', 'amorist.', 'otomeRepoMaker.'];
+  const MANAGED_PREFIXES = ['amorist-', 'amorist.', 'amoristUi.', 'otomeRepoMaker.'];
   const PUBLIC_TOOL_STORAGE_PREFIX = 'amorist-public-tool:';
   const PUBLIC_TOOL_KEYS = new Set([
     'amorist-game-repos-v1',
@@ -113,14 +113,15 @@
     const nativeSet = Storage.prototype.setItem;
     const nativeRemove = Storage.prototype.removeItem;
     const nativeClear = Storage.prototype.clear;
+    const publicToolOverlays = Object.create(null);
     const isLocal = instance => {
       try { return instance === window.localStorage; } catch { return false; }
     };
 
     Storage.prototype.getItem = function(key) {
       if (isLocal(this) && isPublicToolKey(key)) {
-        const overlay=nativeGet.call(this,publicToolStorageKey(key));
-        if(overlay!==null)return overlay;
+        const overlayKey = publicToolStorageKey(key);
+        if (Object.prototype.hasOwnProperty.call(publicToolOverlays, overlayKey)) return publicToolOverlays[overlayKey];
       }
       if (isLocal(this) && isManagedKey(key)) {
         return Object.prototype.hasOwnProperty.call(virtual, key) ? virtual[key] : null;
@@ -128,15 +129,14 @@
       return nativeGet.call(this, key);
     };
     Storage.prototype.setItem = function(key, value) {
-      if (isLocal(this) && isPublicToolKey(key)) return nativeSet.call(this, publicToolStorageKey(key), value);
-      // Keep migrations and derived public-page state alive for this page load.
-      // The source JSON remains immutable.
-      if (isLocal(this) && isManagedKey(key)) { virtual[key]=String(value); return; }
+      if (isLocal(this) && isPublicToolKey(key)) { publicToolOverlays[publicToolStorageKey(key)] = String(value); return; }
+      // Public pages are read-only. Initialization writes stay in memory only.
+      if (isLocal(this) && isManagedKey(key)) return;
       return nativeSet.call(this, key, value);
     };
     Storage.prototype.removeItem = function(key) {
-      if (isLocal(this) && isPublicToolKey(key)) return nativeRemove.call(this, publicToolStorageKey(key));
-      if (isLocal(this) && isManagedKey(key)) { delete virtual[key]; return; }
+      if (isLocal(this) && isPublicToolKey(key)) { delete publicToolOverlays[publicToolStorageKey(key)]; return; }
+      if (isLocal(this) && isManagedKey(key)) return;
       return nativeRemove.call(this, key);
     };
     Storage.prototype.clear = function() {
@@ -172,7 +172,7 @@
     .then(async payload => {
       window.__AMORIST_PUBLIC_DATA__ = payload;
       installVirtualStorage(payload);
-      await loadScript('./assets/js/amorist-app.js?v=kotodama-ritual-20260802-2');
+      await loadScript('./assets/js/amorist-app.js?v=kotodama-ritual-20260802-5');
       await loadScript('./assets/js/oshi-hub.js?v=timeline-ui-20260731');
       await loadScript('./assets/js/public-mode.js?v=library-interactions-20260801-8');
     });

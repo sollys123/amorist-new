@@ -8,7 +8,6 @@
 .public-load-banner span {opacity:.8}
 
 body.public-mode #libraryBatchToggle,
-body.public-mode #dashboardPlayingSwitchWrap,
 body.public-mode #libraryBatchActions,
 body.public-mode #addCharButton,
 body.public-mode #charBatchToggle,
@@ -19,16 +18,12 @@ body.public-mode #bangumiDbImport,
 body.public-mode #bangumiDbManage,
 body.public-mode #libraryCoverUploadButton,
 body.public-mode #charManualActions,
-body.public-mode .profile-editor,
-body.public-mode .mobile-profile-switch,
 body.public-mode .batch-select,
 body.public-mode .library-delete,
 body.public-mode .workshop-edit-controls,
 body.public-mode #workshopSave,
 body.public-mode #workshopSaveTemplate {display:none !important}
 body.public-mode [data-detail-action="edit-routes"] {display:none !important}
-body.public-mode .profile-layout {grid-template-columns:minmax(0,1fr) !important;max-width:1000px;margin-inline:auto}
-body.public-mode .profile-canvas-wrap {width:100%}
 body.public-mode input[aria-readonly="true"],
 body.public-mode textarea[aria-readonly="true"],
 body.public-mode select[data-public-locked="true"] {cursor:default}
@@ -71,7 +66,6 @@ body.site-data-modal-open {overflow:hidden}
   .site-data-check-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
   .site-data-actions .product-button {flex:1 1 150px}
   .public-load-banner {align-items:flex-start;flex-direction:column;gap:3px}
-  body.public-mode .profile-layout[data-mobile-pane] .profile-canvas-wrap {display:block !important}
 }
 @media (max-width:420px) {
   .site-data-check-grid {grid-template-columns:1fr}

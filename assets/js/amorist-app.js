@@ -36,35 +36,9 @@
     root.classList.toggle('amorist-mobile', mobileQuery.matches);
   };
 
-  const ensureProfileSwitcher = () => {
-    const layout = document.querySelector('.profile-layout');
-    if (!layout || document.querySelector('.mobile-profile-switch')) return;
-    const switcher = document.createElement('div');
-    switcher.className = 'mobile-profile-switch';
-    switcher.setAttribute('role', 'tablist');
-    switcher.setAttribute('aria-label', '自介页面移动端视图');
-    switcher.innerHTML = `
-      <button type="button" class="active" data-profile-mobile-pane="preview" role="tab" aria-selected="true">预览名片</button>
-      <button type="button" data-profile-mobile-pane="edit" role="tab" aria-selected="false">编辑资料</button>`;
-    layout.before(switcher);
-    layout.dataset.mobilePane = 'preview';
-    switcher.addEventListener('click', event => {
-      const button = event.target.closest('[data-profile-mobile-pane]');
-      if (!button) return;
-      const pane = button.dataset.profileMobilePane;
-      layout.dataset.mobilePane = pane;
-      switcher.querySelectorAll('button').forEach(item => {
-        const active = item === button;
-        item.classList.toggle('active', active);
-        item.setAttribute('aria-selected', active ? 'true' : 'false');
-      });
-      if (mobileQuery.matches) switcher.scrollIntoView({block:'start', behavior:'smooth'});
-    });
-  };
-
   document.addEventListener('click', event => {
     if (!mobileQuery.matches) return;
-    const chip = event.target.closest('.filter-pill,.profile-tab,.profile-page-btn');
+    const chip = event.target.closest('.filter-pill');
     if (chip) requestAnimationFrame(() => chip.scrollIntoView({block:'nearest', inline:'center', behavior:'smooth'}));
   });
 
@@ -74,10 +48,9 @@
   else mobileQuery.addListener(syncViewport);
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => { syncViewport(); ensureProfileSwitcher(); }, {once:true});
+    document.addEventListener('DOMContentLoaded', () => { syncViewport(); }, {once:true});
   } else {
     syncViewport();
-    ensureProfileSwitcher();
   }
 })();
 ;
@@ -3094,7 +3067,6 @@
       const LIBRARY_ROUTE_KEY = 'amoristUi.libraryRoute.v1';
       let libraryBrowseScrollY = 0;
       const GAME_LIBRARY_KEY = 'amorist-game-library-v1';
-      const DASHBOARD_PLAYING_KEY = 'amorist-dashboard-playing-v1';
       const PROFILE_KEY = 'amorist-profile-v1';
       const FORMS_KEY = 'amorist-form-answers-v1';
       const $p = selector => document.querySelector(selector);
@@ -3102,9 +3074,10 @@
       const escapeProductHtml = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
       const dataModel=window.AmoristDataModel;
 
-      const productViews = new Set(['home','omikuji','library','studio','profile','forms','characters','bangumi','timeline','oshi']);
+      const productViews = new Set(['home','omikuji','library','studio','forms','characters','bangumi','timeline','oshi']);
       const hashView = () => {
-        const view=decodeURIComponent(location.hash.replace(/^#\/?/,'').split('/')[0]||'');
+        const requested=decodeURIComponent(location.hash.replace(/^#\/?/,'').split('/')[0]||'');
+        const view=requested === 'profile' ? 'home' : requested;
         return productViews.has(view)?view:'';
       };
       const writeViewHash = view => {
@@ -3121,6 +3094,7 @@
       }
 
       function switchProductView(view, persist=true, sourceButton=null) {
+        if (view === 'profile') view = 'home';
         if (!productViews.has(view)) view = 'home';
         if(view==='studio' && sourceButton?.closest('.product-sidebar,.mobile-nav,.mobile-more-sheet')){
           window.amoristRepoManager?.enterEditor?.();
@@ -3136,7 +3110,7 @@
             localStorage.removeItem(LIBRARY_ROUTE_KEY);
             if ($p('#gameDetailPanel')) showLibraryBrowse();
           }
-          if (view === 'home') renderDashboard();
+          if (view === 'home') renderProfileHome();
           if (view === 'oshi') window.renderOshiHub?.();
           if (view === 'characters') window.renderCharacterBook?.();
           if (view === 'timeline') window.renderTimeline?.();
@@ -3153,7 +3127,7 @@
         document.body.classList.toggle('bangumi-active', view === 'bangumi');
         if (persist) { localStorage.setItem(PRODUCT_VIEW_KEY, view); localStorage.setItem(PRODUCT_UI_VIEW_KEY, view); }
         if (view === 'studio') setTimeout(() => window.dispatchEvent(new Event('resize')), 40);
-        if (view === 'home') renderDashboard();
+        if (view === 'home') renderProfileHome();
         if (view === 'oshi') {
           if (persist) {
             localStorage.setItem('amoristUi.oshiRoute.v1', JSON.stringify({screen:'hub',id:''}));
@@ -3201,17 +3175,6 @@
       function saveGames(games) {
         const normalized=games.map(normalizeLibraryGame),raw=JSON.stringify(normalized);
         localStorage.setItem(GAME_LIBRARY_KEY,raw);gameLibraryRawCache=raw;gameLibraryValueCache=normalized;
-      }
-      function selectedDashboardPlayingId() { return String(localStorage.getItem(DASHBOARD_PLAYING_KEY) || ''); }
-      function renderDashboardPlayingSwitch(games, playing) {
-        const wrap = $p('#dashboardPlayingSwitchWrap'), select = $p('#dashboardPlayingSelect');
-        if (!wrap || !select) return;
-        const candidates = games.filter(game => game.status === '进行中');
-        wrap.hidden = window.AMORIST_MODE !== 'editor' || candidates.length < 2;
-        select.innerHTML = '<option value="">自动选择</option>' + candidates.map(game => `<option value="${escapeProductHtml(game.id)}">${escapeProductHtml(game.name || '未命名游戏')}</option>`).join('');
-        const selected = selectedDashboardPlayingId();
-        select.value = candidates.some(game => String(game.id) === selected) ? selected : '';
-        select.title = playing ? `当前：${playing.name || '未命名游戏'}` : '暂无进行中的游戏';
       }
       let activeLibraryFilter = '全部';
       let libraryBatchMode = false;
@@ -3418,13 +3381,13 @@
         const record = { ...previous, id:id || `game-${Date.now()}`, name:$p('#libraryGameName').value.trim(), status:$p('#libraryGameStatus').value, category:dataModel.normalizeGameCategory($p('#libraryGameCategory').value), progress:Math.max(0,Math.min(100,Number($p('#libraryGameProgress').value)||0)), cover:$p('#libraryGameCover').value.trim(), note:$p('#libraryGameNote').value.trim(), platform:$p('#libraryGamePlatform').value.trim(), hours:Number($p('#libraryGameHours').value)||0, rating:Number($p('#libraryGameRating [aria-checked="true"]')?.dataset.ratingValue)||0, routes, startedAt:$p('#libraryGameStartDate')?.value||'', completedAt:$p('#libraryGameCompleteDate')?.value||'', routeSelectionCustomized:true, routeDone:Array.isArray(previous?.routeDone)?previous.routeDone:[], logs:previous?.logs||[], updatedAt:Date.now() };
         const index = games.findIndex(item => String(item.id) === String(id));
         if (index >= 0) games[index] = record; else games.push(record);
-        saveGames(games); closeGameDialog(); renderGameLibrary(); renderDashboard(); productToast('游戏记录已保存');
+        saveGames(games); closeGameDialog(); renderGameLibrary(); renderProfileHome(); productToast('游戏记录已保存');
       });
       $p('#deleteGameButton').addEventListener('click', () => {
         const id = $p('#editingGameId').value;
         const game = loadGames().find(item => String(item.id) === String(id));
         if (!game || !confirm(`从游戏档案删除「${game.name}」？`)) return;
-        saveGames(loadGames().filter(item => String(item.id) !== String(id))); closeGameDialog(); renderGameLibrary(); renderDashboard(); productToast('已从游戏档案移除');
+        saveGames(loadGames().filter(item => String(item.id) !== String(id))); closeGameDialog(); renderGameLibrary(); renderProfileHome(); productToast('已从游戏档案移除');
       });
       $$p('[data-library-filter]').forEach(button => button.addEventListener('click', () => {
         activeLibraryFilter = button.dataset.libraryFilter;
@@ -3459,136 +3422,258 @@
         });
         saveGames(rows);librarySelected.clear();
         $p('#libraryBatchStatus').value='';$p('#libraryBatchCategory').value='';
-        renderGameLibrary();renderDashboard();updateLibraryBatchCount();
+        renderGameLibrary();renderProfileHome();updateLibraryBatchCount();
         productToast(category&&!categoryCount?'状态已更新':'已批量更新作品');
       });
       $p('#libraryBatchDelete')?.addEventListener('click', () => {
         if (!librarySelected.size) return productToast('请先选择作品');
         const rows = loadGames(), targets = rows.filter(game => librarySelected.has(String(game.id)));
         if (!targets.length || !confirm(`删除选中的 ${targets.length} 部作品？`)) return;
-        saveGames(rows.filter(game => !librarySelected.has(String(game.id)))); librarySelected.clear(); renderGameLibrary(); renderDashboard(); updateLibraryBatchCount(); productToast(`已删除 ${targets.length} 部作品`);
+        saveGames(rows.filter(game => !librarySelected.has(String(game.id)))); librarySelected.clear(); renderGameLibrary(); renderProfileHome(); updateLibraryBatchCount(); productToast(`已删除 ${targets.length} 部作品`);
       });
       $p('#libraryBatchCancel')?.addEventListener('click', () => { libraryBatchMode=false; librarySelected.clear(); $p('#libraryBatchStatus').value=''; $p('#libraryBatchCategory').value=''; $p('#libraryBatchActions').hidden=true; $p('#libraryBatchToggle').textContent='批量管理'; renderGameLibrary(); updateLibraryBatchCount(); });
       window.addEventListener('amorist-data-changed', event => {
-        if (!event.detail || event.detail.games) {
+        if (!event.detail || event.detail.games || event.detail.chars) {
           renderGameLibrary();
-          renderDashboard();
+          renderProfileHome();
         }
       });
 
+      const PROFILE_FIELDS = [
+        'name','handle','bio','years','type','favorite','tags','age','platformId','sameFan',
+        'platforms','languages','oshiChars','playstyle','playPace','voiceActors','xp','worldview','scriptWriters',
+        'likedWorks','attribute','habit','mood','artist','writer','works',
+        'character','relationship','boundaries','account','note','xhs',
+        'contactValue','avatar'
+      ];
+      const emptyProfile = () => PROFILE_FIELDS.reduce((profile,key) => { profile[key] = ''; return profile; }, {});
       function readProfile() {
-        const fallback = {name:'HARU',handle:'@yourname',bio:'喜欢故事里无法被替代的相遇。\n慢慢玩，认真写，也允许自己反复心动。',years:'2020',type:'强剧情 · 成长型角色',favorite:'等待填写',tags:'乙女游戏,剧情党,长评选手',age:'',platformId:'',sameFan:'',platforms:'',languages:'',oshiChars:'',playstyle:'',voiceActors:'',xp:'',worldview:'',scriptWriters:'',likedWorks:'',wishlist:''};
-        try { return {...fallback,...JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}')}; } catch { return fallback; }
-      }
-      function profileChips(str) { return String(str||'').split(/[，,]/).map(s=>s.trim()).filter(Boolean).map(s=>`<span>${escapeProductHtml(s)}</span>`).join(''); }
-      function profileList(str) { return String(str||'').split(/\n/).map(s=>s.trim()).filter(Boolean).map(s=>`<span>${escapeProductHtml(s)}</span>`).join(''); }
-      function profileText(str) { return escapeProductHtml(String(str||'').replace(/\n/g,'<br>')); }
-      function renderHomeGreeting() {
-        const greeting = $p('#homeGreeting');
-        if (!greeting) return;
-        const now = new Date();
-        const hour = now.getHours();
-        const period = hour < 5 ? 'evening' : hour < 11 ? 'morning' : hour < 18 ? 'day' : 'evening';
-        const candidates = {
-          morning: ['おはよう', 'Bonjour', 'Good morning', 'Buongiorno', 'Buenos días', 'Guten Morgen', 'Bom dia'],
-          day: ['こんにちは', 'Bonjour', 'Hello', 'Ciao', 'Hola', 'Salut', '안녕하세요'],
-          evening: ['こんばんは', 'Bonsoir', 'Good evening', 'Buonasera', 'Buenas noches', 'Guten Abend', 'Boa noite']
-        }[period];
-        const dateKey = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
-        let hash = 0;
-        for (const char of `${dateKey}:${period}`) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-        greeting.textContent = candidates[hash % candidates.length];
-        const dateNote = $p('#homeDateNote');
-        if (dateNote) dateNote.innerHTML = `${now.toLocaleDateString('en-US',{weekday:'long'}).toUpperCase()}<br>${String(now.getDate()).padStart(2,'0')} ${now.toLocaleDateString('en-US',{month:'short'}).toUpperCase()} ${now.getFullYear()}`;
-      }
-      function renderProfile(syncInputs=true) {
-        const p = readProfile();
-        if (syncInputs) $$p('.profile-field').forEach(field => { if (field.dataset.profileKey) field.value = p[field.dataset.profileKey] || ''; });
-        /* Page 1 */
-        $p('#profileDisplayName').textContent = p.name || '未命名玩家';
-        $p('#profileDisplayHandle').textContent = p.handle || '@yourname';
-        $p('#profileDisplayBio').textContent = p.bio || '';
-        $p('#profileDisplayYears').textContent = p.years || '—';
-        $p('#profileDisplayAge').textContent = p.age || '—';
-        $p('#profileDisplayPlatformId').textContent = p.platformId || '—';
-        $p('#profileDisplaySameFan').textContent = p.sameFan || '—';
-        $p('#profileDisplayPlatforms').innerHTML = profileChips(p.platforms);
-        $p('#profileDisplayLanguages').innerHTML = profileChips(p.languages);
-        $p('#profileDisplayOshi').innerHTML = profileList(p.oshiChars);
-        $p('#profileDisplayType').textContent = p.type || '—';
-        $p('#profileDisplayPlaystyle').textContent = p.playstyle || '—';
-        $p('#profileDisplayTags').innerHTML = profileChips(p.tags);
-        /* Page 2 */
-        $p('#profileDisplayName2').textContent = p.name || '未命名玩家';
-        $p('#profileDisplayVA').innerHTML = profileText(p.voiceActors);
-        $p('#profileDisplayXP').innerHTML = profileText(p.xp);
-        $p('#profileDisplayWorld').innerHTML = profileText(p.worldview);
-        $p('#profileDisplayScript').innerHTML = profileText(p.scriptWriters);
-        $p('#profileDisplayFavorite').textContent = p.favorite || '—';
-        $p('#profileDisplayLiked').innerHTML = profileList(p.likedWorks);
-        $p('#profileDisplayWishlist').innerHTML = profileList(p.wishlist);
-        /* Game library sync */
-        renderProfileGames();
-        /* Sidebar & home */
-        const sidebarName = $p('#sidebarName');
-        const sidebarAvatar = $p('#sidebarAvatar');
-        if (sidebarName) sidebarName.textContent = p.name || '玩家';
-        if (sidebarAvatar) sidebarAvatar.textContent = initials(p.name);
-        renderHomeGreeting();
-      }
-      function renderProfileGames() {
+        let raw = {};
         try {
-          const games = JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]');
-          const list = Array.isArray(games) ? games : [];
-          const playing = list.filter(g=>g.status==='进行中');
-          const finished = list.filter(g=>g.status==='已全通');
-          const elPlaying = $p('#profileDisplayPlaying');
-          const elFinished = $p('#profileDisplayFinished');
-          const elArchive = $p('#profileArchiveStats');
-          if (elPlaying) elPlaying.innerHTML = playing.length ? playing.map(g=>`<span>${escapeProductHtml(g.name)}</span>`).join('') : '<span style="opacity:.5">暂无</span>';
-          if (elFinished) elFinished.innerHTML = finished.length ? finished.map(g=>`<span>${escapeProductHtml(g.name)}</span>`).join('') : '<span style="opacity:.5">暂无</span>';
-          if (elArchive) elArchive.textContent = `游戏档案 ${list.length} · 全通 ${finished.length}`;
+          const parsed = JSON.parse(localStorage.getItem(PROFILE_KEY) || '{}');
+          if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) raw = parsed;
         } catch {}
-      }
-      /* Profile editor tabs */
-      $$p('.profile-tab').forEach(tab => tab.addEventListener('click', () => {
-        $$p('.profile-tab').forEach(t => t.classList.toggle('active', t === tab));
-        $$p('.profile-editor-section').forEach(s => s.classList.toggle('active', s.dataset.profileSection === tab.dataset.profileTab));
-      }));
-      /* Profile page switching */
-      let activeProfilePage = 1;
-      function switchProfilePage(page) {
-        activeProfilePage = Number(page);
-        $$p('.profile-page-btn').forEach(b => b.classList.toggle('active', b.dataset.profilePage == page));
-        $$p('.profile-canvas-dot').forEach(b => b.classList.toggle('active', b.dataset.profilePage == page));
-        $$p('.profile-canvas').forEach(c => {
-          const match = c.dataset.profileCard == page;
-          c.classList.toggle('active', match);
-          c.style.display = match ? '' : 'none';
+        const {nowText: _legacyNow, nextText: _legacyNext, statement: _legacyStatement, heroine: _legacyHeroine, heroineDetail: _legacyHeroineDetail, ...storedProfile} = raw;
+        const profile = {...emptyProfile(), ...storedProfile};
+        const migrations = [
+          ['writer','scriptWriters'],
+          ['works','likedWorks'],
+          ['character','oshiChars'],
+          ['relationship','oshiChars']
+        ];
+        let changed = false;
+        migrations.forEach(([target, sourceKey]) => {
+          if (!String(profile[target] || '').trim() && String(profile[sourceKey] || '').trim()) {
+            profile[target] = profile[sourceKey];
+            changed = true;
+          }
         });
-        /* Page 1: show basic tab only; Page 2: show prefs + works simultaneously */
-        if (page == 1) {
-          $$p('.profile-tab').forEach(t => t.classList.toggle('active', t.dataset.profileTab === 'basic'));
-          $$p('.profile-editor-section').forEach(s => s.classList.toggle('active', s.dataset.profileSection === 'basic'));
-        } else {
-          $$p('.profile-tab').forEach(t => t.classList.toggle('active', t.dataset.profileTab !== 'basic'));
-          $$p('.profile-editor-section').forEach(s => s.classList.toggle('active', s.dataset.profileSection !== 'basic'));
+        if (window.AMORIST_MODE === 'editor' && changed) {
+          try { localStorage.setItem(PROFILE_KEY, JSON.stringify({...raw, ...profile})); } catch {}
+        }
+        return profile;
+      }
+      const profileText = value => String(value ?? '').trim();
+      const profileChips = value => profileText(value).split(/[，,\n]/).map(item => item.trim()).filter(Boolean).map(item => '<span>' + escapeProductHtml(item) + '</span>').join('');
+      const profileCharacterRows = () => {
+        try {
+          const parsed = JSON.parse(localStorage.getItem('amorist-character-book-v1') || '[]');
+          if (!Array.isArray(parsed)) return [];
+          const gameRows = loadGames();
+          const normalized = parsed.map(character => dataModel.normalizeCharacterRecord(character, gameRows));
+          return window.AmoristCharacterBookVisibility?.filter
+            ? window.AmoristCharacterBookVisibility.filter(normalized, gameRows)
+            : normalized;
+        } catch { return []; }
+      };
+      const profileCharacterName = character => profileText(character?.nameCn || character?.name_cn || character?.cnName || character?.chineseName || character?.name);
+      const profileCharacterNames = (rows, predicate) => {
+        const preferenceOrder = {favorite:0, oshi:1, like:0, good:1};
+        return [...new Set(rows.filter(predicate).sort((a, b) => (preferenceOrder[a.preference] ?? 9) - (preferenceOrder[b.preference] ?? 9)).map(profileCharacterName).filter(Boolean))].join('、');
+      };
+      function setProfileText(selector, value) {
+        const element = $p(selector);
+        if (element) element.textContent = String(value ?? '');
+      }
+      function renderProfileHome() {
+        const profile = readProfile();
+        const characterRows = profileCharacterRows();
+        const oshiCharacters = profileCharacterNames(characterRows, character => ['favorite','oshi'].includes(character.preference));
+        const preferredHeroines = profileCharacterNames(characterRows, character => character.roleType === 'protagonist' && ['like','good'].includes(character.preference));
+        const fieldValues = {
+          name: profile.name,
+          handle: profile.handle,
+          bio: profile.bio,
+          age: profile.age,
+          years: profile.years,
+          attribute: profile.attribute,
+          languages: profile.languages,
+          platformId: profile.platformId,
+          platforms: profile.platforms,
+          sameFan: profile.sameFan,
+          habit: profile.habit,
+          voiceActors: profile.voiceActors,
+          artist: profile.artist,
+          writer: profile.writer,
+          works: profile.works,
+          character: profile.character,
+          relationship: profile.relationship,
+          worldview: profile.worldview,
+          tags: profile.tags,
+          type: profile.type,
+          oshiCharacters,
+          heroineCharacters: preferredHeroines,
+          playstyle: profile.playstyle,
+          playPace: profile.playPace,
+          boundaries: profile.boundaries || profile.sameFan,
+          account: profile.account,
+          note: profile.note,
+          xhs: profile.xhs,
+          contactValue: profile.contactValue
+        };
+        setProfileText('#profileName', profile.name);
+        setProfileText('#profileHandle', profile.handle);
+        setProfileText('#profileBio', profile.bio);
+        setProfileText('#profileAge', profile.age);
+        setProfileText('#profileYears', profile.years);
+        setProfileText('#profileArtist', profile.artist);
+        setProfileText('#profileWriter', profile.writer);
+        setProfileText('#profileWorks', profile.works);
+        setProfileText('#profileCharacter', profile.character);
+        setProfileText('#profileRelationship', profile.relationship);
+        setProfileText('#profileVoiceActors', profile.voiceActors);
+        setProfileText('#profileWorldview', profile.worldview);
+        setProfileText('#profileType', profile.type);
+        setProfileText('#profileOshiCharacters', oshiCharacters);
+        setProfileText('#profileHeroineCharacters', preferredHeroines);
+        setProfileText('#profilePlayHabit', profile.habit);
+        setProfileText('#profilePlayPlatforms', profile.platforms);
+        setProfileText('#profilePlayLanguages', profile.languages);
+        setProfileText('#profilePlayAttribute', profile.attribute);
+        setProfileText('#profilePlayStyle', profile.playstyle);
+        setProfileText('#profilePlayPace', profile.playPace);
+        setProfileText('#profileBoundaries', profile.boundaries);
+        setProfileText('#profileSameFanPlay', profile.sameFan);
+        setProfileText('#profileAccount', profile.account);
+        setProfileText('#profileNote', profile.note);
+        setProfileText('#profileXhs', profile.xhs);
+        setProfileText('#profileNsId', profile.platformId);
+        setProfileText('#profileKkv', profile.contactValue);
+
+        const tags = $p('#profileTags');
+        if (tags) tags.innerHTML = profileChips(profile.tags);
+        const avatar = $p('#profileAvatar');
+        const avatarImage = $p('#profileAvatarImage');
+        const avatarInitial = $p('#profileAvatarInitial');
+        if (avatar) avatar.classList.toggle('has-image', Boolean(profileText(profile.avatar)));
+        if (avatarImage) {
+          avatarImage.src = profile.avatar || '';
+          avatarImage.alt = profile.name ? profile.name + ' 的头像' : '';
+        }
+        if (avatarInitial) avatarInitial.textContent = initials(profile.name);
+        $$p('[data-profile-section]').forEach(section => {
+          const key = section.dataset.profileSection;
+          section.hidden = !profileText(fieldValues[key]);
+        });
+        const groups = {
+          identity: ['name','handle','bio','age','years','languages'],
+          play: ['playstyle','playPace','habit','platforms','languages','attribute','boundaries','sameFan'],
+          taste: ['artist','writer','works','worldview','character','voiceActors','type','tags','relationship','oshiCharacters','heroineCharacters'],
+          lovetype: ['type','tags','relationship'],
+          characters: ['oshiCharacters','heroineCharacters'],
+          social: ['account','note','xhs','platformId','contactValue'],
+          contact: ['xhs','platformId','contactValue'],
+        };
+        Object.entries(groups).forEach(([group, keys]) => {
+          $$p('[data-profile-group="' + group + '"]').forEach(element => {
+            element.hidden = !keys.some(key => profileText(fieldValues[key]));
+          });
+        });
+      }
+
+      let pendingProfileAvatar = '';
+      let profileAvatarDirty = false;
+      function setProfileEditForm(profile) {
+        $$p('.profile-edit-field').forEach(field => {
+          const key = field.dataset.profileKey;
+          if (key) field.value = profile[key] || '';
+        });
+        pendingProfileAvatar = profile.avatar || '';
+        profileAvatarDirty = false;
+        const preview = $p('#profileEditAvatarPreview');
+        if (preview) {
+          preview.classList.toggle('has-image', Boolean(pendingProfileAvatar));
+          const image = preview.querySelector('img');
+          const initial = preview.querySelector('span');
+          if (image) image.src = pendingProfileAvatar;
+          if (initial) initial.textContent = initials(profile.name);
         }
       }
-      $$p('.profile-page-btn').forEach(b => b.addEventListener('click', () => switchProfilePage(b.dataset.profilePage)));
-      $$p('.profile-canvas-dot').forEach(b => b.addEventListener('click', () => switchProfilePage(b.dataset.profilePage)));
-      /* Input listeners */
-      $$p('.profile-field').forEach(field => field.addEventListener('input', () => {
-        if (!field.dataset.profileKey) return;
-        const profile = readProfile(); profile[field.dataset.profileKey] = field.value;
-        localStorage.setItem(PROFILE_KEY,JSON.stringify(profile)); renderProfile(false);
-      }));
-      /* Capture active page */
-      $p('#profileCaptureButton').onclick = () => {
-        const card = activeProfilePage === 1 ? $p('#profileCanvas1') : $p('#profileCanvas2');
-        const name = `${readProfile().name||'我的'}-自介${activeProfilePage===1?'属性':'偏好'}.png`;
-        captureProductElement(card, name, $p('#profileCaptureButton'));
-      };
+      function closeProfileEditModal() {
+        const modal = $p('#profileEditModal');
+        if (!modal) return;
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+      function openProfileEditModal() {
+        const modal = $p('#profileEditModal');
+        if (!modal || window.AMORIST_MODE !== 'editor') return;
+        setProfileEditForm(readProfile());
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        setTimeout(() => $p('.profile-edit-field')?.focus(), 30);
+      }
+      if (window.AMORIST_MODE === 'editor') {
+        $p('#profileEditButton')?.addEventListener('click', openProfileEditModal);
+        $p('#profileAvatarButton')?.addEventListener('click', openProfileEditModal);
+        $p('#profileEditClose')?.addEventListener('click', closeProfileEditModal);
+        $p('#profileEditCancel')?.addEventListener('click', closeProfileEditModal);
+        $p('#profileEditModal')?.addEventListener('click', event => {
+          if (event.target.id === 'profileEditModal') closeProfileEditModal();
+        });
+        $p('#profileAvatarUpload')?.addEventListener('change', event => {
+          const file = event.target.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            pendingProfileAvatar = String(reader.result || '');
+            profileAvatarDirty = true;
+            setProfileEditForm({...readProfile(), avatar: pendingProfileAvatar});
+            profileAvatarDirty = true;
+          };
+          reader.readAsDataURL(file);
+          event.target.value = '';
+        });
+        $p('#profileAvatarRemove')?.addEventListener('click', () => {
+          pendingProfileAvatar = '';
+          profileAvatarDirty = true;
+          const preview = $p('#profileEditAvatarPreview');
+          preview?.classList.remove('has-image');
+          if (preview?.querySelector('img')) preview.querySelector('img').removeAttribute('src');
+        });
+        $p('#profileEditForm')?.addEventListener('submit', event => {
+          event.preventDefault();
+          const next = {...readProfile()};
+          $$p('.profile-edit-field').forEach(field => {
+            const key = field.dataset.profileKey;
+            if (key) next[key] = field.value.trim();
+          });
+          if (profileAvatarDirty) next.avatar = pendingProfileAvatar;
+          try {
+            localStorage.setItem(PROFILE_KEY, JSON.stringify(next));
+            window.dispatchEvent(new CustomEvent('amorist-profile-changed', {detail: next}));
+            renderProfileHome();
+            closeProfileEditModal();
+            productToast('个人资料已保存');
+          } catch {
+            productToast('个人资料保存失败');
+          }
+        });
+        document.addEventListener('keydown', event => {
+          if (event.key === 'Escape') closeProfileEditModal();
+        });
+      }
+      window.addEventListener('amorist-profile-changed', renderProfileHome);
 
       const formTemplates = {
         monthly:{title:'本月游戏手账',subtitle:'MONTHLY OTOME NOTES',questions:['这个月玩了哪些作品？','本月最喜欢的一部作品是？','最让你心动的角色是谁？','印象最深的一幕是什么？','有没有意外的雷点或惊喜？','下个月最想开启哪一部？']},
@@ -3619,171 +3704,6 @@
       $p('#clearFormAnswers').addEventListener('click',()=>{ if(!activeFormId||!confirm('清空这份表格的全部回答？'))return; const all=loadFormAnswers(); delete all[activeFormId]; localStorage.setItem(FORMS_KEY,JSON.stringify(all)); openFormTemplate(activeFormId); productToast('回答已清空'); });
       $p('#backToTemplates').addEventListener('click',()=>{ activeFormId=''; $p('#formTemplates').style.display='grid'; $p('#formWorkspace').classList.remove('active'); $p('#backToTemplates').hidden=true; });
 
-      function arrangeHomeReferenceLayout() {
-        const home = $p('.product-view[data-product-view="home"]');
-        const discovery = home?.querySelector('.home-resource-discovery');
-        const hero = discovery?.querySelector('.resource-discovery-hero');
-        const content = home?.querySelector('.home-content-grid');
-        const copy = hero?.querySelector('.resource-discovery-copy');
-        const feature = hero?.querySelector('.resource-feature-card');
-        const recent = content?.querySelector('.home-recent-section');
-        const character = content?.querySelector('.home-character-section');
-        if (!home || !discovery || !hero || !copy || !feature || !recent || !character) return;
-        let main = hero.querySelector('.home-discovery-main');
-        if (!main) {
-          main = document.createElement('div');
-          main.className = 'home-discovery-main';
-          hero.insertBefore(main, copy);
-          main.append(copy, feature);
-        }
-        if (!copy.querySelector('.resource-discovery-intro')) {
-          const intro = document.createElement('p');
-          intro.className = 'resource-discovery-intro';
-          intro.textContent = '从资料库里，遇见一些没有计划过的作品。';
-          copy.append(intro);
-        }
-        const actions = copy.querySelector('.resource-hero-actions');
-        const featureCopy = feature.querySelector('.discovery-feature-copy');
-        if (actions && featureCopy && actions.parentElement !== featureCopy) featureCopy.append(actions);
-        if (character.parentElement !== hero) hero.append(character);
-        if (recent.parentElement !== discovery) discovery.append(recent);
-        content.hidden = true;
-      }
-
-      function renderDashboard() {
-        arrangeHomeReferenceLayout();
-        const games=loadGames();
-        const playingCandidates=games.filter(game=>game.status==='进行中');
-        const selectedId=selectedDashboardPlayingId();
-        const playing=playingCandidates.find(game=>String(game.id)===selectedId) || playingCandidates[0];
-        renderDashboardPlayingSwitch(games, playing);
-        $p('#metricGames').textContent=games.length;
-        $p('#metricFinished').textContent=games.filter(game=>game.status==='已全通').length;
-        const archiveCounter=$p('#archiveCount');
-        $p('#metricCreated').textContent=archiveCounter?.textContent?.trim() || '0';
-        const totalHours=games.reduce((sum,game)=>sum+(Number(game.hours)||0),0);
-        if($p('#metricHours'))$p('#metricHours').textContent=`${Math.round(totalHours*10)/10}h`;
-        $p('#dashboardPlayingTitle').textContent=playing?.name || '暂无进行中的游戏';
-        $p('#dashboardPlayingMeta').textContent=playing ? (playing.note || playing.status || '进行中') : '在游戏档案中将状态设为「进行中」';
-        const progress=Math.max(0,Math.min(100,Number(playing?.progress)||0));
-        $p('#dashboardProgressBar').style.width=`${progress}%`;
-        $p('#dashboardProgressText').textContent=`${progress}%`;
-        const cover=$p('#dashboardPlayingCover');
-        if(cover){
-          cover.innerHTML=playing?.cover
-            ? `<img src="${escapeProductHtml(playing.cover)}" alt="${escapeProductHtml(playing.name)}" referrerpolicy="no-referrer"><span>NOW PLAYING</span>`
-            : `<span>${playing?escapeProductHtml(initials(playing.name)):'AMORIST'}</span>`;
-        }
-        const recent=[...games].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,4);
-        $p('#dashboardRecentGames').innerHTML=recent.length ? recent.map(game=>`<div class="recent-item"><div class="recent-cover">${game.cover?`<img src="${escapeProductHtml(game.cover)}" alt="${escapeProductHtml(game.name)}" loading="lazy" referrerpolicy="no-referrer">`:escapeProductHtml(initials(game.name))}</div><div class="recent-info"><strong>${escapeProductHtml(game.name)}</strong><span>${escapeProductHtml(game.status||'尚未分类')} · ${Number(game.progress)||0}%</span></div></div>`).join('') : '<div class="empty-library"><strong>暂无游戏记录</strong></div>';
-        let characters=[];
-        try{const saved=JSON.parse(localStorage.getItem('amorist-character-book-v1')||'[]');characters=window.AmoristCharacterBookVisibility.filter(Array.isArray(saved)?saved:[],games)}catch{}
-        const character=[...characters].sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0))[0];
-        const spotlight=$p('#homeCharacterSpotlight');
-        if(spotlight){
-          const characterGame=games.find(game=>String(game.id)===String(character?.gameId||''));
-          const characterGameName=character?.gameName||character?.sourceGame||character?.workTitle||characterGame?.name||'未知作品';
-          spotlight.innerHTML=character?`<div class="home-character-card"><div class="spotlight-avatar">${character.image?`<img src="${escapeProductHtml(character.image)}" alt="${escapeProductHtml(character.name||'角色')}" loading="lazy" referrerpolicy="no-referrer">`:escapeProductHtml(initials(character.name))}</div><div><h3>${escapeProductHtml(character.nameCn||character.name||'未命名角色')}</h3><p>来自“${escapeProductHtml(characterGameName)}”</p></div></div>`:'<div class="spotlight-empty">暂无角色记录</div>';
-        }
-      }
-
-      let dashboardCharacter=null;
-      let dashboardCharacterId='';
-      let dashboardBangumiGames=[];
-      function dashboardCharacterGameName(character){
-        const gameRows=loadGames();
-        const characterGameId=String(character?.gameId||'');
-        const subjectIds=[character?.bangumiSubjectId,...(Array.isArray(character?.bangumiSubjectIds)?character.bangumiSubjectIds:[])].filter(Boolean).map(String);
-        const linkedGame=gameRows.find(game=>String(game.id)===characterGameId)
-          ||gameRows.find(game=>subjectIds.includes(String(game.bangumiId||game.bangumiDisplayId||'')))
-          ||dashboardBangumiGames.find(game=>subjectIds.includes(String(game.id||game.bangumiId||'')));
-        return String(character?.gameName||character?.sourceGame||character?.workTitle||linkedGame?.nameCn||linkedGame?.name||'').trim();
-      }
-      function dashboardCharacters(){
-        try{
-          const gameRows=loadGames();
-          const value=JSON.parse(localStorage.getItem('amorist-character-book-v1')||'[]');
-          const saved=window.AmoristCharacterBookVisibility.filter(Array.isArray(value)?value.filter(Boolean):[],gameRows);
-          const indexed=gameRows.filter(game=>window.AmoristCharacterBookVisibility.visibleStatuses.has(String(game.status||'').trim())).flatMap(game=>(Array.isArray(game.sourceCharacters)?game.sourceCharacters:[]).map(character=>({...character,gameId:character.gameId||game.id,bangumiSubjectId:character.bangumiSubjectId||game.bangumiId||game.bangumiDisplayId||'',gameName:game.name,sourceGame:game.name})));
-          const merged=[...saved,...indexed],seen=new Set();
-          return merged.filter(character=>{const key=String(character.bangumiCharacterId||character.id||character.name||'');if(!key||seen.has(key)||!dashboardCharacterGameName(character))return false;seen.add(key);return true;});
-        }catch{return[]}
-      }
-      function renderDashboardRandomCharacter(force=false){
-        const spotlight=$p('#homeCharacterSpotlight');
-        if(!spotlight)return;
-        const rows=dashboardCharacters();
-        if(!rows.length){spotlight.innerHTML='<div class="spotlight-empty">暂无角色记录</div>';dashboardCharacter=null;dashboardCharacterId='';return;}
-        const sectionHeading=spotlight.closest('.home-character-section')?.querySelector('.section-head h2');
-        if(sectionHeading)sectionHeading.textContent='随机角色';
-        const available=rows.filter(row=>String(row.bangumiCharacterId||row.id||'')!==String(dashboardCharacterId));
-        if(force||!dashboardCharacter||!rows.includes(dashboardCharacter))dashboardCharacter=(available.length?available:rows)[Math.floor(Math.random()*(available.length?available:rows).length)];
-        dashboardCharacterId=String(dashboardCharacter.bangumiCharacterId||dashboardCharacter.id||'');
-        const name=dashboardCharacter.nameCn||dashboardCharacter.name||'未命名角色';
-        const image=dashboardCharacter.image||dashboardCharacter.cover||'';
-        const gameName=dashboardCharacterGameName(dashboardCharacter);
-        const detailButton=spotlight.closest('.home-character-section')?.querySelector('.section-head .text-button');
-        if(detailButton){
-          detailButton.textContent='查看角色 →';
-          detailButton.removeAttribute('data-product-target');
-          detailButton.id='dashboardCharacterDetailButton';
-          if(!detailButton.dataset.dashboardBound){
-            detailButton.dataset.dashboardBound='1';
-            detailButton.addEventListener('click',event=>{event.preventDefault();event.stopImmediatePropagation();if(dashboardCharacterId)window.dispatchEvent(new CustomEvent('amorist-open-character',{detail:dashboardCharacterId}));},true);
-          }
-        }
-        spotlight.innerHTML=`<div class="home-character-card"><button class="spotlight-avatar" id="dashboardCharacterAvatar" type="button" aria-label="查看${escapeProductHtml(name)}大图">${image?`<img src="${escapeProductHtml(image)}" alt="${escapeProductHtml(name)}" loading="lazy" referrerpolicy="no-referrer">`:escapeProductHtml(initials(name))}</button><div class="spotlight-copy"><h3>${escapeProductHtml(name)}</h3><p>来自“${escapeProductHtml(gameName)}”</p><button class="text-button spotlight-random-button" id="dashboardCharacterRandomButton" type="button">换一位 →</button></div></div>`;
-      }
-      window.addEventListener('amorist-bangumi-cache-ready',event=>{
-        dashboardBangumiGames=Array.isArray(event.detail?.list)?event.detail.list:[];
-        renderDashboardRandomCharacter(true);
-      });
-      function bindDashboardRecentGames(){
-        const rows=loadGames();
-        $p('#dashboardRecentGames')?.querySelectorAll('.recent-item').forEach(item=>{
-          const name=item.querySelector('.recent-info strong')?.textContent?.trim();
-          const game=rows.find(row=>row.name===name);
-          if(game)item.dataset.dashboardGameId=String(game.id);
-        });
-      }
-      const renderDashboardBase=renderDashboard;
-      renderDashboard=()=>{renderDashboardBase();renderDashboardRandomCharacter();bindDashboardRecentGames();};
-      document.addEventListener('click',event=>{
-        const recentGame=event.target.closest('#dashboardRecentGames .recent-item[data-dashboard-game-id]');
-        if(recentGame){
-          event.preventDefault();
-          const id=recentGame.dataset.dashboardGameId;
-          window.amoristProductNavigate?.('library');
-          setTimeout(()=>{const card=[...document.querySelectorAll('#gameLibraryGrid .game-card')].find(node=>String(node.dataset.gameId)===String(id));card?.click();},0);
-          return;
-        }
-        if(event.target.closest('#dashboardCharacterRandomButton')){event.preventDefault();event.stopPropagation();renderDashboardRandomCharacter(true);return;}
-        if(event.target.closest('#dashboardCharacterAvatar')&&dashboardCharacter){
-          event.preventDefault();
-          let modal=document.querySelector('#dashboardCharacterLightbox');
-          if(!modal){modal=document.createElement('div');modal.id='dashboardCharacterLightbox';modal.className='dashboard-character-lightbox';modal.innerHTML='<button type="button" aria-label="关闭大图">×</button><img alt="">';document.body.appendChild(modal);modal.addEventListener('click',e=>{if(e.target===modal||e.target.tagName==='BUTTON')modal.hidden=true;});}
-          const image=dashboardCharacter.image||dashboardCharacter.cover;
-          if(image){modal.querySelector('img').src=image;modal.querySelector('img').alt=dashboardCharacter.nameCn||dashboardCharacter.name||'';modal.hidden=false;}
-        }
-      });
-      document.addEventListener('click',event=>{
-        const image=event.target.closest('img');
-        if(!image||image.closest('#dashboardCharacterLightbox'))return;
-        const interactive=image.closest('button,a,[role="button"],[data-product-target],[data-action],[data-game-id],[data-char-id],[data-bangumi-id],[data-asset-game],.game-card,.char-card,.recent-item,.library-card,.bangumi-db-card,.bangumi-db-char,.game-source-char,.oshi-figure,.oshi-gallery-item,.asset-pick,.theme-card');
-        if(interactive||image.closest('[data-no-image-preview]'))return;
-        const source=image.currentSrc||image.src;
-        if(!source)return;
-        let modal=document.querySelector('#dashboardCharacterLightbox');
-        if(!modal){modal=document.createElement('div');modal.id='dashboardCharacterLightbox';modal.className='dashboard-character-lightbox';modal.innerHTML='<button type="button" aria-label="关闭大图">×</button><img alt="">';document.body.appendChild(modal);modal.addEventListener('click',e=>{if(e.target===modal||e.target.tagName==='BUTTON')modal.hidden=true;});}
-        event.preventDefault();
-        event.stopPropagation();
-        image.dataset.imagePreview='';
-        modal.querySelector('img').src=source;
-        modal.querySelector('img').alt=image.alt||'图片预览';
-        modal.hidden=false;
-      });
-      document.addEventListener('keydown',event=>{ if(event.key==='Escape'){closeGameDialog();const modal=$p('#dashboardCharacterLightbox');if(modal)modal.hidden=true;} });
-
       async function captureProductElement(element,filename,button) {
         const original=button.textContent; button.disabled=true; button.textContent='正在生成…';
         try {
@@ -3795,13 +3715,7 @@
       }
       $p('#captureFormAnswers').addEventListener('click',()=>{ if(!activeFormId)return; saveActiveForm(true); captureProductElement($p('.answer-sheet'),`${formTemplates[activeFormId].title}.png`,$p('#captureFormAnswers')); });
 
-      renderProfile(); renderGameLibrary(); renderDashboard();
-      $p('#dashboardPlayingSelect')?.addEventListener('change', event => {
-        const id = event.target.value;
-        if (id) localStorage.setItem(DASHBOARD_PLAYING_KEY, id);
-        else localStorage.removeItem(DASHBOARD_PLAYING_KEY);
-        renderDashboard();
-      });
+      renderProfileHome(); renderGameLibrary();
       let hasProductSession=false;
       try { hasProductSession=sessionStorage.getItem(PRODUCT_SESSION_KEY)==='1'; sessionStorage.setItem(PRODUCT_SESSION_KEY,'1'); } catch {}
       const restoredProductView=hashView()||(hasProductSession
@@ -3809,7 +3723,7 @@
         : 'home');
       switchProductView(restoredProductView,false);
       document.body.classList.add('product-routing-ready');
-      setTimeout(renderDashboard,500);
+      setTimeout(renderProfileHome,500);
     })();
 ;
 
@@ -3868,26 +3782,6 @@
       const toast=message=>{const t=$('#toast');if(!t)return;t.textContent=message;t.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2000)};
       const initial=name=>String(name||'A').trim().slice(0,1).toUpperCase();
 
-      function updateProfileArchiveStats(){
-        const rows=games(), el=$('#profileArchiveStats');
-        if(el) el.textContent=`游戏档案 ${rows.length} · 全通 ${rows.filter(g=>g.status==='已全通').length}`;
-        const safe=v=>String(v??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-        const playing=rows.filter(g=>g.status==='进行中'), finished=rows.filter(g=>g.status==='已全通');
-        const elP=$('#profileDisplayPlaying'), elF=$('#profileDisplayFinished');
-        if(elP) elP.innerHTML=playing.length?playing.map(g=>`<span>${safe(g.name)}</span>`).join(''):'<span style="opacity:.5">暂无</span>';
-        if(elF) elF.innerHTML=finished.length?finished.map(g=>`<span>${safe(g.name)}</span>`).join(''):'<span style="opacity:.5">暂无</span>';
-        updateConnectedDashboard();
-      }
-      function updateConnectedDashboard(){
-        const rows=games(),hours=rows.reduce((sum,g)=>sum+(Number(g.hours)||0),0);
-        if($('#metricGames'))$('#metricGames').textContent=rows.length;
-        if($('#metricFinished'))$('#metricFinished').textContent=rows.filter(g=>g.status==='已全通').length;
-        if($('#metricHours'))$('#metricHours').textContent=`${Math.round(hours*10)/10}h`;
-      }
-      window.addEventListener('amorist-data-changed',event=>{
-        if(!event.detail||event.detail.timeline)updateConnectedDashboard();
-      });
-
       function openEnhancedGameDialog(game=null){
         $('#gameDialogTitle').textContent=game?'编辑游戏档案':'添加到游戏档案';
         $('#editingGameId').value=game?.id||'';
@@ -3926,31 +3820,9 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
         saveGames(rows);
         const syncGameTimeline=(type,date)=>{const next=readTimelineEvents().filter(event=>!(String(event?.gameId||'')===String(id)&&event.type===type));if(date)next.push(normalizeTimelineEvent({id:timelineGameEventId(id,type),gameId:id,type,occurredAt:date,datePrecision:'day',title:timelineTypeLabel(type),source:'game-edit'}));writeTimelineEvents(next)};
         try{syncGameTimeline('started',$('#libraryGameStartDate')?.value||'');syncGameTimeline('completed',$('#libraryGameCompleteDate')?.value||'')}catch(error){console.warn('游玩时间同步失败',error)}
-        updateProfileArchiveStats(); if(!$('#gameDetailPanel').hidden)renderGameDetail(id);
+        if(!$('#gameDetailPanel').hidden)renderGameDetail(id);
       });
-      $('#deleteGameButton').addEventListener('click',()=>setTimeout(updateProfileArchiveStats,0));
       $$('[data-product-target="library"]').forEach(button=>button.addEventListener('click',()=>{localStorage.removeItem('amoristUi.libraryRoute.v1');window.AmoristLibraryUI?.showBrowse?.()},true));
-      $$('[data-open-dashboard-game]').forEach(button=>button.addEventListener('click',event=>{
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        const candidates=games().filter(game=>game.status==='霑幄｡御ｸｭ');
-        const selectedId=localStorage.getItem('amorist-dashboard-playing-v1')||candidates[0]?.id;
-        const playing=candidates.find(game=>String(game.id)===String(selectedId))||candidates[0];
-        if(!playing){window.amoristProductNavigate?.('library');return;}
-        window.amoristProductNavigate?.('library');
-        setTimeout(()=>renderGameDetail(playing.id),0);
-      },true));
-      $$('[data-open-dashboard-game-direct]').forEach(button=>button.addEventListener('click',event=>{
-        event.preventDefault();
-        event.stopImmediatePropagation();
-        const rows=games();
-        const selectedId=localStorage.getItem('amorist-dashboard-playing-v1');
-        const dashboardName=$('#dashboardPlayingTitle')?.textContent?.trim();
-        const playing=rows.find(game=>String(game.id)===String(selectedId))||rows.find(game=>game.name===dashboardName)||rows[0];
-        if(!playing){window.amoristProductNavigate?.('library');return;}
-        window.amoristProductNavigate?.('library');
-        setTimeout(()=>renderGameDetail(playing.id),0);
-      },true));
 
       const GAME_REPO_KEY='amorist-game-repos-v1';
       let activeRepoGameId='';
@@ -4073,7 +3945,7 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
 
       function saveGamePatch(id,patch){
         const rows=games(),i=rows.findIndex(g=>g.id===id);if(i<0)return;
-        rows[i]={...rows[i],...patch,updatedAt:Date.now()};saveGames(rows);updateProfileArchiveStats();renderGameDetail(id);
+        rows[i]={...rows[i],...patch,updatedAt:Date.now()};saveGames(rows);renderGameDetail(id);
       }
 
       function gameLogDateValue(value){
@@ -4278,7 +4150,7 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       function openVisualTemplate(id,seedGameId=''){
         if(!visualTemplates[id])return;activeVisual=id;
         $('#formTemplates').style.display='none';$('#formWorkspace').classList.add('active');$('#backToTemplates').hidden=false;
-        const profile=(()=>{try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}')}catch{return{}}})();$('#visualSheetOwner').textContent=profile.name||'HARU';
+        const profile=(()=>{try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}')}catch{return{}}})();$('#visualSheetOwner').textContent=profile.name||'';
         if(seedGameId){const state=visualState(),game=games().find(g=>g.id===seedGameId);if(game&&!state.slots[0]){state.slots[0]={gameId:game.id,name:game.name,cover:game.cover||'',label:game.name};saveVisual(state)}}
         renderVisual();
       }
@@ -4316,7 +4188,6 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       } catch {}
       window.AmoristTimelineStore={read:readTimelineEvents,write:writeTimelineEvents,migrate:migrateTimelineData,normalize:normalizeTimelineEvent,name:timelineGameName,sort:eventSortValue,dateLabel:timelineDateLabel,typeLabel:timelineTypeLabel,dateValue:timelineDateValue,id:timelineId,routeId:timelineRouteEventId,sameRoute:isSameRouteEvent,canonicalize:canonicalizeTimelineEvents};
       window.AmoristGameStore={games,saveGames,gameRouteNames,gameRouteProgress,renderGameDetail};
-      updateProfileArchiveStats();
     })();
 ;
 
@@ -4806,7 +4677,7 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
         const state=newVisualState(),slots=state.slots||[],canvas=$('#visualCanvas');
         $('#activeFormTitle').value=state.title;
         const profile=(()=>{try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||'{}')}catch{return{}}})();
-        $('#visualSheetOwner').textContent=profile.name||'HARU';
+        $('#visualSheetOwner').textContent=profile.name||'';
 
         function slotHtml(item,index,cssClass=''){
           const cls=cssClass||({char9:'char-nine-slot',pref:'pref-table-slot',custom:'custom-table-cell',attr:'visual-slot'}[id]||'visual-slot');
@@ -4959,7 +4830,6 @@ const routes=$('#libraryGameRoutes').value.split(/[，,]/).map(x=>x.trim()).filt
       window.addEventListener('amorist-data-changed',event=>{
         if(!event.detail||event.detail.chars||event.detail.games)renderCharacterBook($('#charSearchInput')?.value||'');
         if((!event.detail||event.detail.games)&&typeof populateGameSelect==='function')populateGameSelect();
-        if(typeof updateProfileArchiveStats==='function')updateProfileArchiveStats();
       });
       window.addEventListener('amorist-bangumi-cache-ready',event=>{
         bangumiRoleRows=Array.isArray(event.detail?.list)?event.detail.list:[];

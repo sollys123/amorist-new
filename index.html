@@ -29,7 +29,8 @@
 
   <link rel="stylesheet" href="./assets/css/amorist.css?v=oshi-shell-20260801-7">
   <link rel="stylesheet" href="./assets/css/site-modes.css?v=pure-otome-20260728">
-<link rel="stylesheet" href="./assets/css/polish.css?v=kotodama-ritual-20260802-2">
+<link rel="stylesheet" href="./assets/css/polish.css?v=kotodama-ritual-20260802-3">
+  <link rel="stylesheet" href="./assets/css/profile-home.css?v=profile-home-v15-20260802-23">
   <style>
     .product-view[data-product-view="oshi"] .oshi-canvas-shell{filter:none!important}
     .product-view[data-product-view="oshi"] .oshi-canvas{background:#fbf8f2!important;border:0!important;border-radius:0!important;box-shadow:none!important}
@@ -45,7 +46,7 @@
       </div>
       <div class="product-nav-label">EXPLORE</div>
       <nav class="product-nav product-nav-discover">
-        <button class="product-nav-btn active" type="button" data-product-target="home"><span class="product-nav-icon">⌂</span><span><b>首页</b><small>今日与最近记录</small></span></button>
+        <button class="product-nav-btn active" type="button" data-product-target="home"><span class="product-nav-icon">⌂</span><span><b>个人主页</b><small>个人资料与偏好</small></span></button>
         <button class="product-nav-btn" type="button" data-product-target="bangumi"><span class="product-nav-icon">✦</span><span><b>作品索引</b><small>按声优与制作阵容探索</small></span></button>
         <button class="product-nav-btn" type="button" data-product-target="omikuji"><span class="product-nav-icon">籤</span><span><b>御签所</b><small>水面上的今日缘分</small></span></button>
       </nav>
@@ -61,96 +62,39 @@
         <button class="product-nav-btn" type="button" data-product-target="studio"><span class="product-nav-icon">✎</span><span><b>游戏 REPO</b><small>短评、长评与截图</small></span></button>
         <button class="product-nav-btn" type="button" data-product-target="forms"><span class="product-nav-icon">⊞</span><span><b>图文创作</b><small>九宫格、Tier 与偏好卡</small></span></button>
       </nav>
-      <div class="product-nav-label">PERSONAL</div>
-      <div class="product-sidebar-foot">
-        <button class="sidebar-profile-button" type="button" data-product-target="profile">
-          <span class="product-avatar" id="sidebarAvatar">A</span>
-          <span><strong id="sidebarName">玩家</strong><small>查看与编辑我的自介</small></span>
-          <i>›</i>
-        </button>
-      </div>
     </aside>
 
     <div class="product-main" id="main-content" tabindex="-1">
       <section class="product-view active" data-product-view="home">
-        <div class="home-page-head">
-          <div>
-            <div class="page-eyebrow">OTOME ARCHIVE</div>
-            <h1 id="homeGreeting" aria-live="polite"></h1>
-            <div class="home-date-note" id="homeDateNote"></div>
-            <p>好きなものだけ。</p>
-          </div>
-        </div>
-
-        <div class="home-feature-grid">
-          <section class="home-journey-card">
-            <div class="journey-cover" id="dashboardPlayingCover"><span>AMORIST</span></div>
-            <div class="journey-copy">
-              <div class="journey-heading"><div class="card-eyebrow">NOW PLAYING</div><label class="dashboard-playing-switch" id="dashboardPlayingSwitchWrap" hidden><span>切换展示</span><select id="dashboardPlayingSelect" aria-label="切换首页正在游玩的游戏"><option value="">自动选择</option></select></label></div>
-              <h2 id="dashboardPlayingTitle">暂无进行中的游戏</h2>
-              <p id="dashboardPlayingMeta">在游戏档案中将状态设为「进行中」</p>
-              <div class="journey-progress-line"><span>进度</span><strong id="dashboardProgressText">0%</strong></div>
-              <div class="progress-track"><i id="dashboardProgressBar"></i></div>
-              <div class="journey-actions">
-                <button class="text-action" type="button" data-product-target="library" data-open-dashboard-game-direct>游戏档案 <span>→</span></button>
+        <div class="profile-home profile-home-public">
+          <div class="profile-home-stage-wrap"><section class="profile-home-stage">
+            <header class="profile-masthead"><span>PRIVATE / SELF INTRODUCTION</span><h1>OTOME PROFILE</h1><small id="profileIssueNumber"></small></header>
+            <section class="profile-hero">
+              <div class="profile-identity"><figure class="profile-portrait"><div class="profile-avatar" id="profileAvatar"><img id="profileAvatarImage" alt=""><span id="profileAvatarInitial"></span></div></figure><div class="profile-name-block" data-profile-group="identity"><span class="profile-field-label">PROFILE / ABOUT ME</span><h2 id="profileName"></h2><div class="profile-handle" id="profileHandle" data-profile-section="handle"></div><p class="profile-bio" id="profileBio" data-profile-section="bio"></p><div class="profile-meta"><span data-profile-section="age"><small>AGE</small><b id="profileAge"></b></span><span data-profile-section="years"><small>SINCE</small><b id="profileYears"></b></span></div></div></div>
+              <div class="profile-merged-preferences" data-profile-group="play">
+                <article class="profile-play-main" data-profile-group="play"><div class="profile-panel-label">PLAY STYLE</div><div class="profile-choices"><div data-profile-section="habit"><small>HABIT / 收集习惯</small><b id="profilePlayHabit"></b></div><div data-profile-section="platforms"><small>DEVICE / 游玩平台</small><b id="profilePlayPlatforms"></b></div><div data-profile-section="languages"><small>LANGUAGE / 可玩语言</small><b id="profilePlayLanguages"></b></div><div data-profile-section="attribute"><small>ATTRIBUTE / 属性</small><b id="profilePlayAttribute"></b></div><div data-profile-section="playstyle"><small>PLAY STYLE / 玩法</small><b id="profilePlayStyle"></b></div><div data-profile-section="playPace"><small>PLAY PACE / 游玩节奏</small><b id="profilePlayPace"></b></div></div></article>
+                <article class="profile-boundary-card" data-profile-section="boundaries"><div class="profile-panel-label">BOUNDARIES</div><h3>雷点</h3><p id="profileBoundaries"></p><div class="profile-choices"><div data-profile-section="sameFan"><small>SAME FAN</small><b id="profileSameFanPlay"></b></div></div></article>
               </div>
+            </section>
+            <div class="profile-panel-wrap" data-profile-group="taste">
+              <section class="profile-taste-section">
+                <div class="profile-taste-grid">
+                  <article data-profile-section="artist"><div class="profile-panel-label">ARTIST</div><h3>偏好的画师</h3><p id="profileArtist"></p></article>
+                  <article data-profile-section="writer"><div class="profile-panel-label">WRITER</div><h3>偏好的剧本娘</h3><p id="profileWriter"></p></article>
+                  <article data-profile-section="works"><div class="profile-panel-label">WORKS</div><h3>偏好的作品类型</h3><p id="profileWorks"></p></article>
+                  <article data-profile-section="worldview"><div class="profile-panel-label">WORLDVIEW</div><h3>偏好的世界观</h3><p id="profileWorldview"></p></article>
+                  <article data-profile-section="character"><div class="profile-panel-label">HEROINE TYPE</div><h3>偏好的女主角类型</h3><p id="profileCharacter"></p></article>
+                  <article data-profile-section="voiceActors"><div class="profile-panel-label">VOICE ACTOR</div><h3>偏好的声优</h3><p id="profileVoiceActors"></p></article>
+                  <div class="profile-taste-cards">
+                    <article class="profile-xp-card" data-profile-group="lovetype"><div class="profile-love-type-main" data-profile-section="type"><p id="profileType"></p></div><div class="profile-love-type-section" data-profile-section="tags"><div class="profile-panel-label">XP TAGS</div><div class="profile-tagline profile-love-type-tags" id="profileTags"></div></div><div class="profile-love-type-section" data-profile-section="relationship"><div class="profile-panel-label">RELATIONSHIP</div><p id="profileRelationship"></p></div></article>
+                    <article class="profile-motif-card" data-profile-group="characters"><div class="profile-character-section" data-profile-section="oshiCharacters"><div class="profile-panel-label">MY OSHIS</div><p id="profileOshiCharacters"></p></div><div class="profile-character-section" data-profile-section="heroineCharacters"><div class="profile-panel-label">FAVOURITE HEROINES</div><p id="profileHeroineCharacters"></p></div></article>
+                  </div>
+                </div>
+              </section>
             </div>
-          </section>
+            <section class="profile-bottom-social" data-profile-group="social"><article data-profile-section="account"><div class="profile-panel-label">ACCOUNT CONTENT</div><h3>账号内容</h3><p id="profileAccount"></p></article><article data-profile-section="note"><div class="profile-panel-label">NOTE</div><h3>相处说明</h3><p id="profileNote"></p></article><article class="profile-contact-card" data-profile-group="contact"><div class="profile-panel-label">FIND ME ELSEWHERE</div><div class="profile-contact-list"><div data-profile-section="xhs"><span>REDNOTE</span><b id="profileXhs"></b></div><div data-profile-section="platformId"><span>NS ID</span><b id="profileNsId"></b></div><div data-profile-section="contactValue"><span>KKV</span><b id="profileKkv"></b></div></div></article></section>
+          </section></div>
         </div>
-
-        <section class="home-metrics-strip">
-          <div><span>GAMES</span><strong id="metricGames">0</strong><small>游戏</small></div>
-          <i></i>
-          <div><span>FINISHED</span><strong id="metricFinished">0</strong><small>全通</small></div>
-          <i></i>
-          <div><span>REPO</span><strong id="metricCreated">0</strong><small>存档</small></div>
-          <i></i>
-          <div><span>PLAY TIME</span><strong id="metricHours">0h</strong><small>时长</small></div>
-        </section>
-
-        <div class="home-content-grid">
-          <section class="product-card home-section-card home-recent-section">
-            <div class="section-head"><div><span class="section-kicker">RECENT</span><h2>最近游戏</h2></div><button class="text-button" type="button" data-product-target="library">游戏档案 <span>→</span></button></div>
-            <div class="recent-list" id="dashboardRecentGames"></div>
-          </section>
-          <section class="product-card home-section-card home-character-section">
-            <div class="section-head"><div><span class="section-kicker">CHARACTERS</span><h2>最近角色</h2></div><button class="text-button" type="button" data-product-target="characters">角色图鉴 <span>→</span></button></div>
-            <div id="homeCharacterSpotlight" class="home-character-spotlight"><div class="spotlight-empty">暂无角色记录</div></div>
-          </section>
-        </div>
-
-        <section class="home-resource-discovery">
-          <section class="resource-discovery-hero">
-            <div class="resource-discovery-copy">
-              <span class="section-kicker light">DISCOVER</span>
-              <h2>どこまでも行くんです。</h2>
-              <div class="resource-hero-actions">
-                <button class="resource-primary-action" type="button" data-resource-action="random">随机一部</button>
-                <button class="resource-secondary-action" type="button" data-resource-action="old">旧作漫游</button>
-                <button class="resource-secondary-action" type="button" data-home-open-search>精确检索 →</button>
-              </div>
-            </div>
-            <div class="resource-feature-card" id="bangumiDiscoveryFeature">
-              <div class="feature-placeholder"><span>✦</span><strong>等待一次发现</strong><small>资料加载后，这里会出现一部随机作品。</small></div>
-            </div>
-          </section>
-          <section class="resource-explore-rails" id="bangumiDiscoveryRails">
-            <div class="resource-rail">
-              <div class="resource-rail-head"><span>01 / VOICE ACTOR</span><div class="resource-rail-title"><b>随机声优</b><button class="resource-cycle-button" type="button" data-resource-cycle="cv" aria-label="随机换一批声优" title="随机换一批">↻</button></div></div>
-              <div class="resource-chip-list" id="bangumiCvChips"><span class="resource-chip-skeleton"></span><span class="resource-chip-skeleton"></span><span class="resource-chip-skeleton"></span></div>
-            </div>
-            <div class="resource-rail">
-              <div class="resource-rail-head"><span>02 / SCENARIO</span><div class="resource-rail-title"><b>随机剧本娘</b><button class="resource-cycle-button" type="button" data-resource-cycle="writer" aria-label="随机换一批剧本娘" title="随机换一批">↻</button></div></div>
-              <div class="resource-chip-list" id="bangumiWriterChips"><span class="resource-chip-skeleton"></span><span class="resource-chip-skeleton"></span></div>
-            </div>
-            <div class="resource-rail">
-              <div class="resource-rail-head"><span>03 / STUDIO</span><div class="resource-rail-title"><b>随机厂商</b><button class="resource-cycle-button" type="button" data-resource-cycle="maker" aria-label="随机换一批厂商" title="随机换一批">↻</button></div></div>
-              <div class="resource-chip-list" id="bangumiMakerChips"><span class="resource-chip-skeleton"></span><span class="resource-chip-skeleton"></span></div>
-            </div>
-            <div class="resource-rail resource-era-rail"><div class="resource-rail-head"><span>04 / ERA</span><div class="resource-rail-title"><b>按年代</b></div></div><div class="resource-chip-list"><button type="button" data-resource-year="2020s">2020s</button><button type="button" data-resource-year="2010s">2010s</button><button type="button" data-resource-year="2000s">2000s</button><button type="button" data-resource-year="1990s">1990s</button></div></div>
-          </section>
-        </section>
-
       </section>
 
       <section class="product-view" data-product-view="omikuji">
@@ -336,141 +280,6 @@
         <div class="product-page-head"><div><h1>游戏档案</h1><p>Whatever our souls are made of, his and mine are the same</p></div></div>
         <div id="libraryBrowseView"><div class="library-controls"><div class="filter-pills library-status-tabs" id="libraryFilters"><button class="filter-pill active" data-library-filter="全部">全部</button><button class="filter-pill" data-library-filter="已全通">已全通</button><button class="filter-pill" data-library-filter="进行中">进行中</button><button class="filter-pill" data-library-filter="已封盘">已封盘</button><button class="filter-pill" data-library-filter="已买未打">已买未打</button><button class="filter-pill" data-library-filter="心愿单">心愿单</button><button class="filter-pill" data-library-filter="尚未分类">尚未分类</button></div><span id="libraryCountText" class="playing-meta">0 部作品</span><button class="product-button secondary small" id="libraryBatchToggle" type="button">批量管理</button></div><div class="batch-actions" id="libraryBatchActions" hidden><span class="playing-meta">已选 <strong id="librarySelectedCount">0</strong> 部</span><button class="product-button secondary small" id="libraryBatchAll" type="button">全选</button><select class="product-select small" id="libraryBatchStatus"><option value="">批量状态…</option><option>已全通</option><option>进行中</option><option>已封盘</option><option>已买未打</option><option>心愿单</option><option>尚未分类</option></select><select class="product-select small" id="libraryBatchCategory"><option value="">批量归类…</option><option value="hall_of_fame">殿堂入り</option><option value="love">大好き</option><option value="like">好き</option><option value="normal">普通</option><option value="difficult">苦手</option><option value="unclassified">未分類</option></select><button class="product-button secondary small" id="libraryBatchApply" type="button">应用更改</button><button class="product-button danger small" id="libraryBatchDelete" type="button">删除所选</button><button class="product-button secondary small" id="libraryBatchCancel" type="button">取消</button></div><div class="game-library-grid" id="gameLibraryGrid"></div></div>
         <div class="game-detail" id="gameDetailPanel" hidden></div>
-      </section>
-
-      <section class="product-view" data-product-view="profile">
-        <div class="product-page-head">
-              <div><h1>我的自介</h1><p>Wir lieben einander wie Mohn und Gedächtnis</p></div>
-          <div class="profile-page-nav">
-            <button class="product-button small profile-page-btn active" type="button" data-profile-page="1">属性表 / 01</button>
-            <button class="product-button small profile-page-btn" type="button" data-profile-page="2">偏好页 / 02</button>
-            <button class="product-button" id="profileCaptureButton" type="button">保存当前页图片</button>
-          </div>
-        </div>
-        <div class="profile-layout">
-          <aside class="product-card profile-editor" id="profileEditor">
-            <div class="profile-editor-tabs">
-              <button class="profile-tab active" type="button" data-profile-tab="basic">基础</button>
-              <button class="profile-tab" type="button" data-profile-tab="prefs">偏好</button>
-              <button class="profile-tab" type="button" data-profile-tab="works">作品</button>
-            </div>
-            <div class="profile-editor-section active" data-profile-section="basic">
-              <div class="editor-group"><label>显示名字</label><input class="product-input profile-field" data-profile-key="name" maxlength="24" placeholder="HARU"></div>
-              <div class="editor-group"><label>社交账号 / 昵称</label><input class="product-input profile-field" data-profile-key="handle" maxlength="40" placeholder="@yourname"></div>
-              <div class="editor-group"><label>关于我</label><textarea class="product-textarea profile-field" data-profile-key="bio" maxlength="220" placeholder="喜欢故事里无法被替代的相遇…"></textarea></div>
-              <div class="editor-group"><label>年龄</label><input class="product-input profile-field" data-profile-key="age" maxlength="10" placeholder="20"></div>
-              <div class="editor-group"><label>平台 ID</label><input class="product-input profile-field" data-profile-key="platformId" maxlength="40" placeholder="有人弄乱这些玫瑰"></div>
-              <div class="editor-group"><label>同担拒否</label><input class="product-input profile-field" data-profile-key="sameFan" maxlength="20" placeholder="拒 / 不拒 / 选拒"></div>
-              <div class="editor-group"><label>入坑年份</label><input class="product-input profile-field" data-profile-key="years" maxlength="20" placeholder="2020"></div>
-              <div class="editor-group"><label>游玩平台（用逗号分隔）</label><input class="product-input profile-field" data-profile-key="platforms" maxlength="80" placeholder="PC, Switch, PSV, PSP"></div>
-              <div class="editor-group"><label>可玩语言（用逗号分隔）</label><input class="product-input profile-field" data-profile-key="languages" maxlength="60" placeholder="中文, 日语, 英语"></div>
-              <div class="editor-group"><label>我的关键词（用逗号分隔）</label><input class="product-input profile-field" data-profile-key="tags" maxlength="80" placeholder="乙女游戏, 剧情党, 长评选手"></div>
-            </div>
-            <div class="profile-editor-section" data-profile-section="prefs">
-              <div class="editor-group"><label>偏好类型</label><input class="product-input profile-field" data-profile-key="type" maxlength="60" placeholder="强剧情 · 成长型角色"></div>
-              <div class="editor-group"><label>推角 / 推 CP（每行一个）</label><textarea class="product-textarea profile-field" data-profile-key="oshiChars" maxlength="300" placeholder="辉夜姬&#10;有村乃亚&#10;久世円"></textarea></div>
-              <div class="editor-group"><label>玩法</label><input class="product-input profile-field" data-profile-key="playstyle" maxlength="80" placeholder="代入 / 磕代"></div>
-              <div class="editor-group"><label>喜欢的声优</label><textarea class="product-textarea profile-field" data-profile-key="voiceActors" maxlength="200" placeholder="内田雄马 小野友树&#10;没有特别喜好，视角色而定"></textarea></div>
-              <div class="editor-group"><label>XP / 角色偏好</label><textarea class="product-textarea profile-field" data-profile-key="xp" maxlength="200" placeholder="温柔 轻飘飘 天然呆&#10;天降竹马 浪漫 命运 骑士役"></textarea></div>
-              <div class="editor-group"><label>世界观偏好</label><textarea class="product-textarea profile-field" data-profile-key="worldview" maxlength="200" placeholder="最喜欢西幻&#10;暗黑童话就更好了"></textarea></div>
-              <div class="editor-group"><label>剧本娘</label><textarea class="product-textarea profile-field" data-profile-key="scriptWriters" maxlength="200" placeholder="藤文 中村幸代&#10;中山智美 七雾花男"></textarea></div>
-            </div>
-            <div class="profile-editor-section" data-profile-section="works">
-              <div class="editor-group"><label>本命作品</label><input class="product-input profile-field" data-profile-key="favorite" maxlength="60" placeholder="大正对称爱丽丝"></div>
-              <div class="editor-group"><label>喜欢的作品（每行一个）</label><textarea class="product-textarea profile-field" data-profile-key="likedWorks" maxlength="300" placeholder="终远&#10;茉莉花&#10;时计"></textarea></div>
-              <div class="editor-group"><label>待打 / 待购入（每行一个）</label><textarea class="product-textarea profile-field" data-profile-key="wishlist" maxlength="300" placeholder="吉原彼岸花&#10;妖怪米饭&#10;黑蝶幻境"></textarea></div>
-              <div class="editor-group" style="padding-top:10px;border-top:1px dashed var(--product-line);margin-top:6px"><label>正在玩 / 全通游戏</label></div>
-            </div>
-          </aside>
-          <div class="profile-canvas-wrap">
-            <article class="profile-canvas active" id="profileCanvas1" data-profile-card="1">
-              <div class="profile-index">OTOME PLAYER PROFILE / 01</div>
-              <h2 class="profile-display-name" id="profileDisplayName">HARU</h2>
-              <div class="profile-handle" id="profileDisplayHandle">@yourname</div>
-              <div class="profile-rule"></div>
-              <div class="profile-bio" id="profileDisplayBio"></div>
-              <div class="profile-facts">
-                <div class="profile-fact"><span>PLAYING SINCE</span><strong id="profileDisplayYears">—</strong></div>
-                <div class="profile-fact"><span>AGE</span><strong id="profileDisplayAge">—</strong></div>
-                <div class="profile-fact"><span>PLATFORM ID</span><strong id="profileDisplayPlatformId">—</strong></div>
-                <div class="profile-fact"><span>同担拒否</span><strong id="profileDisplaySameFan">—</strong></div>
-              </div>
-              <div class="profile-section-divider"></div>
-              <div class="profile-chip-section">
-                <span class="profile-section-label">PLAYING ON</span>
-                <div class="profile-chips" id="profileDisplayPlatforms"></div>
-              </div>
-              <div class="profile-chip-section">
-                <span class="profile-section-label">LANGUAGES</span>
-                <div class="profile-chips" id="profileDisplayLanguages"></div>
-              </div>
-              <div class="profile-list-section">
-                <span class="profile-section-label">推角 / 推 CP</span>
-                <div class="profile-list" id="profileDisplayOshi"></div>
-              </div>
-              <div class="profile-inline-section">
-                <span class="profile-section-label">MY TYPE</span>
-                <strong id="profileDisplayType">—</strong>
-              </div>
-              <div class="profile-inline-section">
-                <span class="profile-section-label">玩法</span>
-                <strong id="profileDisplayPlaystyle">—</strong>
-              </div>
-              <div class="profile-tags" id="profileDisplayTags"></div>
-            </article>
-            <article class="profile-canvas" id="profileCanvas2" data-profile-card="2" style="display:none">
-              <div class="profile-index">OTOME PLAYER PROFILE / 02</div>
-              <h2 class="profile-display-name-sm" id="profileDisplayName2">HARU</h2>
-              <div class="profile-rule"></div>
-              <div class="profile-two-col">
-                <div class="profile-col">
-                  <div class="profile-block">
-                    <span class="profile-section-label">喜欢的声优</span>
-                    <div class="profile-block-text" id="profileDisplayVA"></div>
-                  </div>
-                  <div class="profile-block">
-                    <span class="profile-section-label">XP / 角色偏好</span>
-                    <div class="profile-block-text" id="profileDisplayXP"></div>
-                  </div>
-                </div>
-                <div class="profile-col">
-                  <div class="profile-block">
-                    <span class="profile-section-label">世界观偏好</span>
-                    <div class="profile-block-text" id="profileDisplayWorld"></div>
-                  </div>
-                  <div class="profile-block">
-                    <span class="profile-section-label">剧本娘</span>
-                    <div class="profile-block-text" id="profileDisplayScript"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="profile-section-divider"></div>
-              <div class="profile-game-section">
-                <span class="profile-section-label">ALL-TIME FAVORITE</span>
-                <strong class="profile-game-title" id="profileDisplayFavorite">—</strong>
-              </div>
-              <div class="profile-game-section">
-                <span class="profile-section-label">喜欢的作品</span>
-                <div class="profile-game-chips" id="profileDisplayLiked"></div>
-              </div>
-              <div class="profile-game-section profile-game-sync">
-                <span class="profile-section-label">正在玩 <em>← 游戏档案</em></span>
-                <div class="profile-game-chips" id="profileDisplayPlaying"></div>
-              </div>
-              <div class="profile-game-section profile-game-sync">
-                <span class="profile-section-label">已全通 <em>← 游戏档案</em></span>
-                <div class="profile-game-chips" id="profileDisplayFinished"></div>
-              </div>
-              <div class="profile-game-section">
-                <span class="profile-section-label">待打 / 待购入</span>
-                <div class="profile-game-chips" id="profileDisplayWishlist"></div>
-              </div>
-              <div class="profile-archive-foot">
-                <strong id="profileArchiveStats">游戏档案 0 · 全通 0</strong>
-              </div>
-            </article>
-          </div>
-        </div>
       </section>
 
       <section class="product-view" data-product-view="forms">
@@ -794,7 +603,7 @@
   </div>
 
   <nav class="mobile-nav" aria-label="移动端主要导航">
-    <button class="product-nav-btn active" type="button" data-product-target="home"><span class="product-nav-icon">⌂</span><span>首页</span></button>
+    <button class="product-nav-btn active" type="button" data-product-target="home"><span class="product-nav-icon">⌂</span><span>个人主页</span></button>
     <button class="product-nav-btn" type="button" data-product-target="library"><span class="product-nav-icon">▦</span><span>游戏</span></button>
     <button class="product-nav-btn" type="button" data-product-target="characters"><span class="product-nav-icon">♡</span><span>角色</span></button>
     <button class="product-nav-btn" type="button" data-product-target="timeline"><span class="product-nav-icon">◷</span><span>游玩日历</span></button>
@@ -809,7 +618,7 @@
         <button type="button" data-product-target="omikuji"><span>籤</span><b>御签所</b><small>抽取今日的缘分</small></button>
         <button type="button" data-product-target="oshi"><span>♡</span><b>推角展示</b><small>人物主页与记录</small></button>
         <button type="button" data-product-target="forms"><span>⊞</span><b>图文创作</b><small>九宫格、Tier 与偏好卡</small></button>
-        <button type="button" data-product-target="profile"><span>◎</span><b>我的自介</b><small>编辑玩家名片</small></button>
+        <button type="button" data-product-target="home"><span>◎</span><b>个人主页</b><small>个人资料与偏好</small></button>
       </div>
     </section>
   </div>

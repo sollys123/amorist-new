@@ -1,13 +1,20 @@
 {
   "type": "amorist-media-manifest",
   "schemaVersion": 1,
-  "generatedAt": "2026-08-01T10:16:41.170Z",
+  "generatedAt": "2026-08-02T09:00:30.505Z",
   "files": {
+    "img-63f3f3a3d61332264d1cc369.webp": {
+      "sourceHash": "63f3f3a3d61332264d1cc369a3cce530d248e010c35a4e56f67147d2d436ef55",
+      "mime": "image/webp",
+      "bytes": 95480
+    },
     "img-e0d809fdf62d3543c5ea25e0.webp": {
       "sourceHash": "e0d809fdf62d3543c5ea25e0724bef6667abb77f68191cf03e6cd3abbb0a7502",
       "mime": "image/webp",
       "bytes": 18966
     }
   },
-  "possiblyUnused": []
+  "possiblyUnused": [
+    "enmusubi-shrine-map.png"
+  ]
 }

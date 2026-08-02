@@ -59,26 +59,21 @@ p,li,dd {text-wrap:pretty}
 .product-nav-btn.active::before {background:#dc8ca8;transform:scaleY(1.25)}
 .product-nav-icon {width:18px;text-align:center;color:#c8b9cf}
 .product-nav-btn.active .product-nav-icon {color:#f0b5ca}
-.sidebar-profile-button {transition:background-color .16s ease,transform .16s ease}
-.sidebar-profile-button:hover {background:rgba(255,255,255,.06);transform:translateY(-1px)}
 
 .product-main {min-width:0}
 .product-view {isolation:isolate}
 
-.product-page-head,.home-page-head,.resource-page-head {padding-bottom:18px;border-bottom:1px solid rgba(89,78,94,.09)}
+.product-page-head,.resource-page-head {padding-bottom:18px;border-bottom:1px solid rgba(89,78,94,.09)}
 .page-eyebrow,.card-eyebrow,.oshi-micro,.oshi-section-label,.resource-rail-head>span {
   font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
   letter-spacing:.16em;
 }
-.product-page-head h1,.home-page-head h1,.resource-page-head h1 {letter-spacing:-.025em}
+.product-page-head h1,.resource-page-head h1 {letter-spacing:-.025em}
 
-.product-card,.home-omikuji-card,.home-recent-card,.home-characters-card,.home-activity-card,
-.game-card,.char-card,.resource-feature-card {
+.product-card,.game-card,.char-card,.resource-feature-card {
   border-color:rgba(83,73,88,.12);
   box-shadow:0 12px 34px rgba(50,42,55,.055);
 }
-.home-journey-card {box-shadow:0 18px 44px rgba(44,35,50,.13)}
-.home-metrics-strip {box-shadow:0 9px 28px rgba(50,42,55,.035)}
 .game-card,.char-card,.bangumi-db-card,.form-template,.asset-pick {
   transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background-color .16s ease;
 }
@@ -86,7 +81,7 @@ p,li,dd {text-wrap:pretty}
   transform:translateY(-2px);border-color:rgba(181,101,125,.34);box-shadow:0 16px 38px rgba(50,42,55,.09);
 }
 
-.product-button,.filter-pill,.profile-tab,.profile-page-btn,.asset-picker-tab,.route-chip,
+.product-button,.filter-pill,.asset-picker-tab,.route-chip,
 .resource-primary-action,.resource-secondary-action,.clear-filter-button {
   transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s ease;
 }
@@ -112,7 +107,7 @@ p,li,dd {text-wrap:pretty}
 :where(button,a,input,textarea,select,[tabindex]):focus-visible {
   outline:2px solid var(--polish-focus);outline-offset:3px;
 }
-:where(.product-nav-btn,.product-button,.filter-pill,.profile-tab,.asset-picker-tab):focus-visible {
+:where(.product-nav-btn,.product-button,.filter-pill,.asset-picker-tab):focus-visible {
   outline-color:#e5a1b8;
 }
 .product-sidebar :where(button,a):focus-visible {outline-color:#f1b0c7}
@@ -151,7 +146,7 @@ p,li,dd {text-wrap:pretty}
 @media (max-width:900px) {
   .product-nav-btn {min-height:44px}
   .product-button,.filter-pill,.asset-picker-tab,.route-chip {min-height:40px}
-  .product-page-head,.home-page-head,.resource-page-head {padding-bottom:14px}
+.product-page-head,.resource-page-head {padding-bottom:14px}
   .product-input,.product-textarea,.product-select,.product-search,
   .oshi-form-grid input:not([type="range"]),.oshi-form-grid textarea,.oshi-form-grid select {font-size:16px}
 }
@@ -198,25 +193,23 @@ body {font-size:14px;background:var(--product-bg)}
 .product-nav-btn.active {background:rgba(255,255,255,.09);box-shadow:none}
 .product-nav-btn.active::before {top:7px;bottom:7px;width:3px;background:#df8daa;transform:none}
 .product-nav-icon {width:20px;font-size:14px}
-.product-sidebar-foot {padding:14px 10px 0}
-.sidebar-profile-button {border-radius:9px!important;padding:10px!important}
 
 .product-view {padding:30px var(--layout-gutter) 64px}
 .product-view[data-product-view="studio"] {padding:24px var(--layout-gutter) 54px!important}
-.product-page-head,.home-page-head,.resource-page-head {
+.product-page-head,.resource-page-head {
   width:100%;max-width:var(--layout-max)!important;margin:0 auto 24px!important;
   min-height:72px;align-items:flex-end;padding:0 0 18px!important;
 }
-.product-page-head h1,.home-page-head h1,.resource-page-head h1 {
+.product-page-head h1,.resource-page-head h1 {
   margin:0;font-size:clamp(32px,3.1vw,42px)!important;line-height:1.04!important;
 }
-.product-page-head p,.home-page-head p,.resource-page-head p {
+.product-page-head p,.resource-page-head p {
   max-width:700px;margin:9px 0 0;font-size:13px;line-height:1.65;
 }
 .page-eyebrow,.section-kicker,.card-eyebrow {font-size:9px;letter-spacing:.18em}
 
-.product-card,.home-omikuji-card,.game-card,.char-card,.resource-feature-card,
-.profile-editor,.profile-canvas-wrap,.workshop-sidebar,.workshop-main,.workshop-library-sidebar {
+.product-card,.game-card,.char-card,.resource-feature-card,
+.workshop-sidebar,.workshop-main,.workshop-library-sidebar {
   border-radius:var(--radius-panel)!important;
 }
 .product-card,.game-card,.char-card,.resource-feature-card {
@@ -233,27 +226,8 @@ body {font-size:14px;background:var(--product-bg)}
 }
 .resource-cycle-button {min-width:34px;min-height:34px}
 .resource-chip-list button {min-height:32px}
-#homeOmikujiOpen,#homeOmikujiDraw {min-height:34px}
-
-/* Home: a composed archive spread rather than a stack of generic cards. */
-.home-feature-grid,.home-content-grid,.home-metrics-strip,.home-activity-section,.home-resource-discovery {
-  width:100%;max-width:var(--layout-max)!important;margin-left:auto!important;margin-right:auto!important;
-}
-.home-feature-grid {display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.82fr);gap:18px}
-.home-journey-card {min-height:300px;grid-template-columns:180px minmax(0,1fr);border-radius:16px}
-.journey-copy {padding:30px 34px!important}
-.journey-copy h2 {font-size:clamp(24px,2.3vw,33px)!important;line-height:1.2!important}
-.journey-copy p {font-size:12px!important}
-.home-omikuji-card {min-height:300px;padding:20px}
-.home-metrics-strip {margin-top:16px;padding:18px 16px;border-radius:12px}
-.home-metrics-strip>div {padding:0 16px}
-.home-metrics-strip>div>strong {font-size:27px}
-.home-content-grid {grid-template-columns:minmax(0,1.45fr) minmax(280px,.72fr)!important;gap:16px!important;margin-top:16px!important}
-.home-section-card,.home-activity-section {padding:22px!important}
 .section-head {margin-bottom:16px}
 .section-head h2 {font-size:20px}
-.recent-item {border-radius:9px;background:#fbfaf8}
-.activity-day {min-height:76px;border-radius:8px}
 .resource-explore-rails {border-radius:12px!important;overflow:hidden}
 
 /* Filters read as one tool row and stay visually attached to their results. */
@@ -330,16 +304,8 @@ body {font-size:14px;background:var(--product-bg)}
 .oshi-profile-visual {min-height:460px;border-radius:8px}
 .oshi-editorial-info {margin-top:16px;border:1px solid var(--product-line-soft);border-radius:14px;overflow:hidden}
 
-/* Profile: a practical editor next to a calm, properly framed card preview. */
-.product-view[data-product-view="profile"] .product-page-head {max-width:var(--layout-max)!important}
-.profile-layout {max-width:var(--layout-max)!important;grid-template-columns:330px minmax(0,1fr)!important;gap:18px!important}
-.profile-editor {top:20px!important;max-height:calc(100vh - 40px)!important;padding:18px!important}
-.profile-editor-tabs {position:sticky;top:-18px;z-index:2;margin:-18px -18px 18px;padding:12px;background:rgba(255,254,253,.96);border-bottom:1px solid var(--product-line-soft);border-radius:14px 14px 0 0}
-.profile-tab {min-height:36px;font-size:12px}
 .editor-group {gap:8px;margin-bottom:16px}
 .editor-group label {font-size:10px}
-.profile-canvas-wrap {max-height:calc(100vh - 40px)!important;padding:18px!important;background:#e7e4e4}
-.profile-canvas {width:min(100%,640px)!important;min-height:650px!important;padding:42px 40px!important;box-shadow:0 18px 45px rgba(49,41,53,.12)}
 
 /* Creation workshop and REPO: prioritize the working canvas. */
 .product-view[data-product-view="forms"] {padding:24px var(--layout-gutter) 36px!important;overflow:visible!important}
@@ -365,11 +331,9 @@ body {font-size:14px;background:var(--product-bg)}
   .product-shell {grid-template-columns:76px minmax(0,1fr)}
   .product-sidebar {padding:20px 9px}
   .product-brand {justify-content:center;padding-inline:0}
-  .product-brand-copy,.product-nav-label,.product-nav-btn>span:not(.product-nav-icon),.product-sidebar-foot {display:none}
+  .product-brand-copy,.product-nav-label,.product-nav-btn>span:not(.product-nav-icon) {display:none}
   .product-nav-btn {justify-content:center;padding:9px 6px}
-  .home-feature-grid {grid-template-columns:minmax(0,1.45fr) minmax(250px,.8fr)}
   .bangumi-timeline-items {grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  .profile-layout {grid-template-columns:300px minmax(0,1fr)!important}
   .product-view[data-product-view="forms"] .workshop-shell {grid-template-columns:200px minmax(360px,1fr) 180px!important}
 }
 
@@ -377,24 +341,15 @@ body {font-size:14px;background:var(--product-bg)}
   .product-view {padding:24px 24px 54px}
   .mobile-nav {grid-template-columns:repeat(6,minmax(0,1fr))!important}
   body.mobile-sheet-open {overflow:hidden}
-  .home-feature-grid,.home-content-grid {grid-template-columns:1fr!important}
-  .home-journey-card,.home-omikuji-card {min-height:270px}
-  .profile-layout {grid-template-columns:1fr!important}
-  .profile-editor {position:static!important;max-height:none!important}
-  .profile-canvas-wrap {max-height:none!important}
   .product-view[data-product-view="forms"] .workshop-shell {height:auto!important;grid-template-columns:1fr!important}
   .product-view[data-product-view="forms"] .workshop-main {min-height:620px!important}
 }
 
 @media (max-width:720px) {
   .product-view {padding:20px 15px 84px}
-  .product-page-head,.home-page-head,.resource-page-head {min-height:0;margin-bottom:18px!important;padding-bottom:14px!important}
-  .product-page-head h1,.home-page-head h1,.resource-page-head h1 {font-size:30px!important}
-  .product-page-head p,.home-page-head p,.resource-page-head p {font-size:12px}
-  .home-journey-card {grid-template-columns:1fr;min-height:0}
-  .journey-cover {min-height:120px!important}
-  .journey-copy {padding:24px!important}
-  .home-metrics-strip {grid-template-columns:repeat(2,1fr)!important}
+  .product-page-head,.resource-page-head {min-height:0;margin-bottom:18px!important;padding-bottom:14px!important}
+  .product-page-head h1,.resource-page-head h1 {font-size:30px!important}
+  .product-page-head p,.resource-page-head p {font-size:12px}
   .library-controls,.char-filter-bar {align-items:stretch;flex-direction:column;padding:10px}
   .library-controls>.playing-meta {margin-left:0}
   .game-library-grid,.character-grid {grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
@@ -407,7 +362,6 @@ body {font-size:14px;background:var(--product-bg)}
   .oshi-index {grid-template-columns:1fr}
   .oshi-profile {grid-template-columns:1fr;padding:20px}
   .oshi-profile-visual {min-height:340px}
-  .profile-canvas {min-height:540px!important;padding:28px 24px!important}
   .product-view[data-product-view="studio"] .app {grid-template-columns:1fr!important}
   .product-view[data-product-view="studio"] .toolbar {position:static!important}
   .text-action,.text-button,.resource-cycle-button {
@@ -418,8 +372,7 @@ body {font-size:14px;background:var(--product-bg)}
 
 @media (max-width:420px) {
   .game-library-grid,.character-grid {grid-template-columns:1fr!important}
-  .profile-page-nav,.oshi-head-actions {width:100%}
-  .profile-page-nav .product-button {flex:1}
+  .oshi-head-actions {width:100%}
 }
 
 /* Oshi detail: one archive system, with the portrait as the single editorial gesture. */
@@ -1179,58 +1132,7 @@ body.theme-dialog-open {overflow:hidden!important}
   .timeline-calendar-grid {grid-auto-rows:62px}.timeline-calendar-events{inset:23px 2px 2px}.timeline-calendar-number{left:5px;top:6px}.timeline-calendar-event{width:24px;height:33px}.timeline-calendar-event-1,.timeline-calendar-event-2,.timeline-calendar-event-1:hover,.timeline-calendar-event-1:focus-visible,.timeline-calendar-event-2:hover,.timeline-calendar-event-2:focus-visible{transform:translateX(-50%)}.timeline-calendar-events:has(.timeline-calendar-event-1) .timeline-calendar-event-0{left:25%}.timeline-calendar-events:has(.timeline-calendar-event-1) .timeline-calendar-event-1{left:75%}.timeline-calendar-events:has(.timeline-calendar-event-2) .timeline-calendar-event-0{left:20%}.timeline-calendar-events:has(.timeline-calendar-event-2) .timeline-calendar-event-1{left:50%}.timeline-calendar-events:has(.timeline-calendar-event-2) .timeline-calendar-event-2{left:80%}.timeline-calendar-badge{padding:2px 3px;font-size:5px}.timeline-calendar-event-name{display:none}.timeline-calendar-legend{justify-content:flex-start;gap:8px;flex-wrap:wrap}
 }
 
-/* ponytail: homepage visual pass, data and existing event hooks stay shared. */
-body:has(.product-view[data-product-view="home"].active){overflow-x:hidden!important}body:has(.product-view[data-product-view="home"].active),body:has(.product-view[data-product-view="home"].active) .product-shell{background:#f5f1e8!important}
-body:has(.product-view[data-product-view="home"].active) .product-shell{grid-template-columns:220px minmax(0,1fr)!important}
-body:has(.product-view[data-product-view="home"].active) .product-sidebar{padding:30px 20px 24px!important}
-.product-view[data-product-view="home"]{display:flex;flex-direction:column;max-width:none!important;padding:0 clamp(28px,4vw,72px) 70px!important;background:#faf7f0!important;color:#26232a}
-.product-view[data-product-view="home"] .home-page-head{position:relative;max-width:1290px;width:100%;margin:0 auto 30px;display:flex;align-items:flex-start;justify-content:space-between;gap:40px}
-.product-view[data-product-view="home"] .home-page-head h1{margin:12px 0 7px;color:#26232a;font:400 47px/1 Georgia,"Songti SC",serif!important;letter-spacing:-.035em}
-.product-view[data-product-view="home"] .home-page-head p{margin:0;color:#7d7680;font:italic 10px/1.7 Georgia,"Songti SC",serif}
-.product-view[data-product-view="home"] .home-page-head .page-eyebrow{color:#665578;font:700 9px/1 Georgia,serif;letter-spacing:.22em}
-.product-view[data-product-view="home"] .home-date-note{position:absolute;right:0;top:0;color:#7d7680;text-align:right;font:10px/1.7 Georgia,serif;letter-spacing:.12em}
-.product-view[data-product-view="home"] .home-feature-grid{max-width:1290px;width:100%;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,.75fr);grid-auto-rows:420px;gap:0;border-top:1px solid #d9d1c5;border-bottom:1px solid #d9d1c5;align-items:stretch}
-.product-view[data-product-view="home"] .home-journey-card{min-height:420px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);overflow:hidden;border:0;border-right:1px solid #d9d1c5;border-radius:0;background:#faf7f0;color:#26232a;box-shadow:none}
-.product-view[data-product-view="home"] .journey-cover{min-height:420px;background:#292330}
-.product-view[data-product-view="home"] .journey-cover::after{border:0}
-.product-view[data-product-view="home"] .journey-cover>span{left:22px;bottom:20px;color:rgba(255,255,255,.48);font:700 8px Georgia,serif;letter-spacing:.18em}
-.product-view[data-product-view="home"] .journey-copy{padding:28px 28px 24px;background:#faf7f0;color:#26232a}
-.product-view[data-product-view="home"] .journey-heading{align-items:start}
-.product-view[data-product-view="home"] .journey-copy .card-eyebrow{color:#665578!important;font:700 8px/1 Georgia,serif;letter-spacing:.2em}
-.product-view[data-product-view="home"] .journey-copy h2{margin:27px 0 8px;color:#26232a;font:400 29px/1.15 Georgia,"Songti SC",serif;letter-spacing:0}
-.product-view[data-product-view="home"] .journey-copy p{color:#7d7680;font-size:10px;line-height:1.7}
-.product-view[data-product-view="home"] .journey-progress-line{margin-top:auto;padding-top:28px;color:#7d7680;font-size:8px;letter-spacing:.12em}
-.product-view[data-product-view="home"] .journey-progress-line strong{color:#728064;font:400 38px/1 Georgia,serif}
-.product-view[data-product-view="home"] .journey-copy .progress-track{height:3px;margin:12px 0 0;background:#ddd6cb!important}
-.product-view[data-product-view="home"] .journey-copy .progress-track i{background:#728064!important}
-.product-view[data-product-view="home"] .journey-actions{margin-top:19px}
-.product-view[data-product-view="home"] .text-action{padding:0 0 5px;border-bottom:1px solid #ddd4e4;color:#4d405d;font-size:9px}
-.product-view[data-product-view="home"] .home-omikuji-card{min-height:420px;border:0;border-radius:0;padding:29px 28px 26px;background:#4d405d;color:#fff;box-shadow:none}
-.product-view[data-product-view="home"] .home-omikuji-card::after{inset:auto -6px -35px auto;width:auto;height:auto;border:0;border-radius:0;content:"邵・";color:rgba(255,255,255,.045);font:150px "Songti SC",serif}
-.product-view[data-product-view="home"] .home-omikuji-head{z-index:1}.product-view[data-product-view="home"] .home-omikuji-head span{color:#fff;font:400 12px/1.2 "Songti SC",serif;letter-spacing:.18em}.product-view[data-product-view="home"] .home-omikuji-head time{color:#c9c1d1;font:8px Georgia,serif;letter-spacing:.12em}
-.product-view[data-product-view="home"] .home-omikuji-sealed{min-height:330px;gap:18px}.product-view[data-product-view="home"] .home-omikuji-seal{width:78px;height:78px;color:#dfe5d8;font:34px "Songti SC",serif;transform:rotate(45deg);border:1px solid rgba(255,255,255,.42)}
-.product-view[data-product-view="home"] .home-omikuji-sealed button{margin-top:30px;padding:10px 30px;border:1px solid rgba(255,255,255,.55);color:#fff;font:11px Georgia,serif;letter-spacing:.18em}.product-view[data-product-view="home"] .home-omikuji-sealed small{color:#bbb2c6;font-size:8px;letter-spacing:.16em}
-.product-view[data-product-view="home"] .home-metrics-strip{order:3;max-width:1290px;width:100%;margin:0 auto;padding:19px 0;display:grid;grid-template-columns:repeat(4,1fr);border:0;border-bottom:1px solid #d9d1c5;border-radius:0;background:transparent;box-shadow:none}
-.product-view[data-product-view="home"] .home-metrics-strip>div{padding:0 23px;border-right:1px solid #d9d1c5}.product-view[data-product-view="home"] .home-metrics-strip>div:first-child{padding-left:0}.product-view[data-product-view="home"] .home-metrics-strip>div:last-of-type{border-right:0}.product-view[data-product-view="home"] .home-metrics-strip>i{display:none}
-.product-view[data-product-view="home"] .home-metrics-strip>div>span{display:block;color:#665578;font:8px/1 Georgia,serif;letter-spacing:.14em}.product-view[data-product-view="home"] .home-metrics-strip>div>strong{display:inline-block;margin:7px 10px 0 0;font:400 28px/1 Georgia,serif}.product-view[data-product-view="home"] .home-metrics-strip>div>small{color:#7d7680;font-size:8px}
-.product-view[data-product-view="home"] .home-resource-discovery{order:4;max-width:1290px;width:100%;margin:0 auto;padding:37px 0 34px;overflow:visible;border:0;border-bottom:1px solid #d9d1c5;border-radius:0;background:transparent;box-shadow:none}
-.product-view[data-product-view="home"] .resource-discovery-hero{grid-template-columns:minmax(0,1fr) 348px;gap:38px;padding:0;background:transparent;border:0;align-items:start}
-.product-view[data-product-view="home"] .home-discovery-main{position:relative;min-width:0}.product-view[data-product-view="home"] .home-discovery-main .resource-discovery-copy{display:flex;flex-direction:column;align-items:flex-start}.product-view[data-product-view="home"] .home-discovery-main .resource-feature-card{margin-top:18px}.product-view[data-product-view="home"] .home-discovery-main .resource-hero-actions{position:absolute;left:240px;bottom:8px;z-index:2}
-.product-view[data-product-view="home"] .resource-discovery-copy{padding:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,1fr);column-gap:32px;align-items:end}.product-view[data-product-view="home"] .resource-discovery-copy .section-kicker,.product-view[data-product-view="home"] .resource-discovery-copy h2{grid-column:1}.product-view[data-product-view="home"] .resource-discovery-copy h2{margin:7px 0 0;color:#26232a;font:400 27px/1.2 Georgia,"Songti SC",serif}.product-view[data-product-view="home"] .resource-discovery-intro{grid-column:2;grid-row:1 / span 2;align-self:end;margin:0;color:#7d7680;font-size:9px;line-height:1.7;text-align:right}.product-view[data-product-view="home"] .resource-hero-actions{gap:9px;margin-top:20px}
-.product-view[data-product-view="home"] .resource-primary-action,.product-view[data-product-view="home"] .resource-secondary-action{padding:0 0 5px;border:0;border-bottom:1px solid #ddd4e4;border-radius:0;background:transparent;color:#4d405d;font-size:9px}
-.product-view[data-product-view="home"] .resource-feature-card{min-height:270px;margin:0;background:#f5f1e8;border:0;border-radius:0;box-shadow:none}.product-view[data-product-view="home"] .resource-feature-card .feature-placeholder{border-radius:0;background:#f5f1e8}.product-view[data-product-view="home"] .discovery-feature-content{grid-template-columns:240px minmax(0,1fr);min-height:270px;gap:0}.product-view[data-product-view="home"] .discovery-feature-cover{width:240px;height:270px;border-radius:0;order:0}.product-view[data-product-view="home"] .discovery-feature-copy{order:1;padding:25px;border-right:0}.product-view[data-product-view="home"] .discovery-feature-copy h3{margin:16px 0 8px;color:#26232a;font:400 26px/1.15 Georgia,"Songti SC",serif}.product-view[data-product-view="home"] .discovery-feature-copy p{color:#7d7680;font-size:10px;line-height:1.8}
-.product-view[data-product-view="home"] .resource-explore-rails{margin:30px 0 12px;border-top:1px solid #d9d1c5;border-radius:0;background:transparent;box-shadow:none}.product-view[data-product-view="home"] .resource-rail{position:relative;grid-template-columns:180px minmax(0,1fr) 30px;gap:22px;min-height:54px;padding:0;border-bottom:1px solid #d9d1c5}.product-view[data-product-view="home"] .resource-rail-head{padding:14px 0}.product-view[data-product-view="home"] .resource-rail-head>span{color:#665578;font-size:8px}.product-view[data-product-view="home"] .resource-rail-title{margin-top:5px}.product-view[data-product-view="home"] .resource-rail-title b{font-size:11px}.product-view[data-product-view="home"] .resource-chip-list{gap:18px;padding:0;align-items:center}.product-view[data-product-view="home"] .resource-chip-list button,.product-view[data-product-view="home"] .resource-chip{padding:0 0 3px;color:#514b54;font-size:9px}.product-view[data-product-view="home"] .resource-cycle-button{position:absolute;right:0;top:50%;width:auto;height:auto;padding:0;border:0;background:transparent;color:#665578;transform:translateY(-50%)}
-.product-view[data-product-view="home"] .home-content-grid{display:none!important}.product-view[data-product-view="home"] .home-resource-discovery .home-recent-section{display:block!important;max-width:none;width:100%;margin:0;padding:37px 0 0!important}.product-view[data-product-view="home"] .home-resource-discovery .home-recent-section .recent-list{grid-template-columns:1.25fr repeat(3,minmax(0,1fr))!important;gap:27px!important}
-.product-view[data-product-view="home"] .home-section-card{padding:37px 0 34px!important;border:0!important;border-radius:0!important;border-bottom:1px solid #d9d1c5!important;background:transparent!important;box-shadow:none!important}
-.product-view[data-product-view="home"] .section-head{margin-bottom:18px!important}.product-view[data-product-view="home"] .section-head h2{font:400 27px Georgia,"Songti SC",serif!important}.product-view[data-product-view="home"] .home-recent-section .recent-list{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:27px!important}.product-view[data-product-view="home"] .recent-item{padding:0!important;background:transparent!important}.product-view[data-product-view="home"] .recent-cover{width:100%!important;height:190px!important;border-radius:0!important}.product-view[data-product-view="home"] .recent-info{padding-top:12px}.product-view[data-product-view="home"] .recent-info strong{font:400 15px Georgia,"Songti SC",serif!important}.product-view[data-product-view="home"] .recent-info span{display:block;margin-top:4px;color:#7d7680;font-size:8px!important}
-.product-view[data-product-view="home"] .home-character-section{display:block!important;min-width:0;padding:0 0 0 32px!important;border:0!important;border-left:1px solid #d9d1c5!important}.product-view[data-product-view="home"] .home-character-section .section-head{margin-bottom:18px!important}.product-view[data-product-view="home"] .home-character-card{display:block}.product-view[data-product-view="home"] .home-character-card .spotlight-avatar{width:100%;height:255px;border-radius:0;background:#ded7e4}.product-view[data-product-view="home"] .home-character-card .spotlight-avatar img{width:100%;height:100%;object-fit:cover;object-position:center 18%}.product-view[data-product-view="home"] .home-character-card>div:last-child{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end;margin-top:16px}.product-view[data-product-view="home"] .home-character-card h3{margin:0;font:400 23px Georgia,"Songti SC",serif}.product-view[data-product-view="home"] .home-character-card p{grid-column:1;color:#7d7680;font-size:9px;margin:6px 0 0}.product-view[data-product-view="home"] .home-character-section .text-button{grid-column:2;grid-row:1 / span 2;align-self:end}
-@media(max-width:1100px){.product-view[data-product-view="home"] .home-feature-grid{grid-template-columns:1fr;grid-auto-rows:auto}.product-view[data-product-view="home"] .home-journey-card{border-right:0;border-bottom:1px solid #d9d1c5}.product-view[data-product-view="home"] .home-character-section{padding-left:0!important;border-left:0!important}.product-view[data-product-view="home"] .resource-discovery-hero{grid-template-columns:1fr}.product-view[data-product-view="home"] .home-character-section{margin-top:28px;padding-top:28px!important;border-top:1px solid #d9d1c5!important}.product-view[data-product-view="home"] .resource-feature-card{margin-top:24px}}
-@media(max-width:760px){.product-view[data-product-view="home"]{padding:0 16px 50px!important}.product-view[data-product-view="home"] .home-topbar{height:58px;margin:0 -16px 25px;padding:0 16px}.product-view[data-product-view="home"] .home-topbar input{display:none}.product-view[data-product-view="home"] .home-page-head{margin-bottom:20px}.product-view[data-product-view="home"] .home-page-head h1{font-size:38px!important}.product-view[data-product-view="home"] .home-date-note{position:static;margin-top:12px;text-align:left}.product-view[data-product-view="home"] .home-journey-card{display:block;min-height:0}.product-view[data-product-view="home"] .journey-cover{height:280px;min-height:0}.product-view[data-product-view="home"] .journey-copy{padding:24px}.product-view[data-product-view="home"] .home-omikuji-card{min-height:370px}.product-view[data-product-view="home"] .home-metrics-strip{grid-template-columns:repeat(2,1fr)}.product-view[data-product-view="home"] .home-metrics-strip>div{padding:14px 12px;border-bottom:1px solid #d9d1c5}.product-view[data-product-view="home"] .home-metrics-strip>div:nth-of-type(odd){border-right:1px solid #d9d1c5}.product-view[data-product-view="home"] .home-metrics-strip>div:nth-last-of-type(-n+2){border-bottom:0}.product-view[data-product-view="home"] .resource-rail{grid-template-columns:1fr auto;gap:8px;padding:16px 0}.product-view[data-product-view="home"] .resource-chip-list{grid-column:1/-1;flex-wrap:wrap;padding-top:4px}.product-view[data-product-view="home"] .resource-feature-card{min-height:0}.product-view[data-product-view="home"] .discovery-feature-content{grid-template-columns:102px minmax(0,1fr);min-height:154px}.product-view[data-product-view="home"] .discovery-feature-cover{width:102px;height:154px}.product-view[data-product-view="home"] .discovery-feature-copy{padding:16px}.product-view[data-product-view="home"] .discovery-feature-copy h3{font-size:18px}.product-view[data-product-view="home"] .home-discovery-main .resource-hero-actions{position:static;margin-top:18px}.product-view[data-product-view="home"] .home-recent-section .recent-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important}.product-view[data-product-view="home"] .recent-cover{height:210px!important}}
-@media(max-width:560px){.product-view[data-product-view="home"] .home-page-head h1{font-size:32px!important}.product-view[data-product-view="home"] .home-feature-grid{display:block}.product-view[data-product-view="home"] .home-recent-section .recent-list{grid-template-columns:1fr!important}.product-view[data-product-view="home"] .recent-cover{height:210px!important}.product-view[data-product-view="home"] .home-character-card{grid-template-columns:82px minmax(0,1fr)}.product-view[data-product-view="home"] .home-character-card .spotlight-avatar{width:82px;height:118px}}
-
 /* Omikuji sanctuary — the home card becomes a full, quiet ritual page. */
-.product-view[data-product-view="home"] .home-feature-grid{grid-template-columns:minmax(0,1fr)!important}
-.product-view[data-product-view="home"] .home-journey-card{border-right:0!important}
 .product-view[data-product-view="omikuji"]{max-width:none!important;margin:0!important;padding:0!important;background:#332e3d!important;color:#f4eee6;overflow:hidden}
 body:has(.product-view[data-product-view="omikuji"].active) .product-main{background:#332e3d!important}
 .omikuji-sanctuary{--mizu:#332e3d;--mizu-deep:#25212e;--mizu-light:#61586b;--paper:#f1eadc;--paper-ink:#352d32;--vermillion:#9d3f43;position:relative;min-height:100dvh;padding:clamp(28px,4vw,58px) clamp(24px,5vw,78px) 34px;background:radial-gradient(circle at 72% 20%,rgba(137,125,151,.22),transparent 30%),radial-gradient(circle at 18% 82%,rgba(113,103,128,.16),transparent 34%),linear-gradient(145deg,#393341 0%,#302b39 46%,#27232f 100%);isolation:isolate}
@@ -1301,6 +1203,7 @@ body:has(.product-view[data-product-view="omikuji"].active) .product-main{backgr
 .product-main>.product-view[data-product-view="omikuji"]{min-height:0!important;max-width:none!important;margin:0!important;padding:0!important;background:#f5f0e7!important;color:#403a3c!important;overflow:hidden}
 body:has(.product-view[data-product-view="omikuji"].active) .product-main{background:#f5f0e7!important}
 .omikuji-sanctuary{--shrine-paper:#f5f0e7;--shrine-paper-deep:#e8dfd1;--shrine-ink:#403a3c;--shrine-muted:#8d817b;--shrine-red:#985052;--shrine-moss:#7f8577;min-height:100dvh;padding:21px clamp(24px,3.4vw,52px) 34px;background:radial-gradient(circle at 92% 7%,rgba(159,128,116,.09),transparent 25%),radial-gradient(circle at 7% 88%,rgba(125,133,119,.08),transparent 29%),#f5f0e7;color:var(--shrine-ink)}
+.product-view[data-product-view="omikuji"] .omikuji-sanctuary{background:var(--product-bg)}
 @media(min-width:761px){.omikuji-sanctuary[data-view="map"]{height:100dvh;min-height:0;padding:14px clamp(24px,3.2vw,46px) 16px;overflow:hidden}.omikuji-sanctuary[data-view="map"] .omikuji-map-head{margin-bottom:4px;padding-bottom:7px}.omikuji-sanctuary[data-view="map"] .omikuji-map-head h1{margin:5px 0 4px;font-size:clamp(36px,3.8vw,52px)}.omikuji-sanctuary[data-view="map"] .omikuji-map-head p{font-size:10px;line-height:1.55}.omikuji-sanctuary[data-view="map"] .shrine-map{width:min(100%,calc(167.7dvh - 243px));max-width:1040px}}
 .omikuji-sanctuary:is([data-view="ritual"],[data-view="sakura"],[data-view="bell"],[data-view="torii"],[data-view="ema"],[data-view="ink"]){height:100dvh;min-height:0;padding-bottom:17px;overflow:hidden}
 .omikuji-sanctuary::before{z-index:0;opacity:.36;background-image:repeating-linear-gradient(94deg,transparent 0 37px,rgba(92,75,64,.022) 38px,transparent 39px),repeating-radial-gradient(ellipse at 50% 50%,transparent 0 14px,rgba(91,74,64,.018) 15px,transparent 16px)}
@@ -1491,10 +1394,3 @@ body:has(.product-view[data-product-view="omikuji"].active) .product-main{backgr
 @media(max-width:760px){.omikuji-sanctuary[data-view="ink"]{height:calc(100dvh - 82px);padding:13px 16px 10px}.kotodama-ritual-head>button{left:18px;bottom:88px;padding:7px 1px}.kotodama-stage{height:calc(100dvh - 154px);min-height:430px;max-height:none}.kotodama-well{left:50%;top:54%;width:278px;height:274px}.kotodama-roof{height:63px}.kotodama-post{top:48px;height:160px;width:14px}.kotodama-post.left{left:35px}.kotodama-post.right{right:35px}.kotodama-rope{top:52px;height:110px}.kotodama-mouth{bottom:18px;width:194px;height:81px;border-width:15px}.kotodama-result{left:50%;right:auto;top:49%;width:min(340px,calc(100% - 28px));grid-template-columns:43px minmax(0,1fr);gap:16px;transform:translate(-46%,-42%)}.kotodama-result.is-visible{transform:translate(-50%,-50%)}.kotodama-result::before{inset:-54px -32px}.kotodama-seal{width:39px;height:39px;font-size:20px}.kotodama-copy{padding-left:16px}.kotodama-result h3{margin:13px 0 8px;font-size:28px}.kotodama-result em{margin-top:15px;font-size:8.5px}.kotodama-result footer{gap:17px;margin-top:18px}.kotodama-result button{font-size:8px}.kotodama-stage::after{right:17px;bottom:15px;font-size:25px}.omikuji-sanctuary[data-kotodama-phase="result"] .kotodama-well{opacity:.18}}
 @keyframes sakuraPaperFallMobile{0%,57%{opacity:0;clip-path:inset(2% 47%);transform:translate(50%,-50%) scale(.9,.72)}62%{opacity:.82;clip-path:inset(2% 45%);transform:translate(50%,-50%) scale(.92,.78)}78%{opacity:1;clip-path:inset(1% 24%);transform:translate(50%,-50%) scale(.96,.92)}100%{opacity:1;clip-path:inset(0);transform:translate(50%,-50%) scale(1)}}
 @media(prefers-reduced-motion:reduce){.map-sakura,.map-pond,.ema-tile{animation:none}.sakura-action,.sakura-action button,.sakura-result,.bell-result,.ema-result,.ema-result-inner,.kotodama-result{transition:none}.sakura-result.is-falling{animation:none}.omikuji-sanctuary[data-bell-phase="ringing"] .bell-action button,.omikuji-sanctuary[data-bell-phase="ringing"] .bell-body,.omikuji-sanctuary[data-bell-phase="ringing"] .bell-clapper,.omikuji-sanctuary[data-bell-phase="ringing"] .bell-echoes i,.omikuji-sanctuary[data-bell-phase="ringing"] .bell-companions i,.omikuji-sanctuary[data-kotodama-phase="summoning"] .kotodama-rope,.omikuji-sanctuary[data-kotodama-phase="summoning"] .kotodama-mouth i{animation:none}}
-
-.product-view[data-product-view="home"] .resource-chip-list{align-self:center;align-items:center;line-height:1.4}
-.product-view[data-product-view="home"] .resource-chip-list button,.product-view[data-product-view="home"] .resource-chip{font-size:11px;line-height:1.4}
-.product-view[data-product-view="home"]{display:none!important}.product-view[data-product-view="home"].active{display:flex!important}
-.product-view[data-product-view="home"] .resource-discovery-intro{display:none!important}
-.product-view[data-product-view="home"] .resource-hero-actions{position:static!important;grid-column:2;justify-content:flex-end;align-self:end;margin:0 0 10px auto!important}
-.product-view[data-product-view="home"] .home-resource-discovery .home-recent-section{display:none!important}
