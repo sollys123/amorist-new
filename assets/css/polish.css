@@ -2073,6 +2073,24 @@ html body .product-view[data-product-view="studio"] #themeBtn > span:first-child
   font-family:inherit!important;
 }
 
+/* REPO editor shell follows the visual-creation surface: no inner fill, one hairline frame. */
+html body:not(.screenshot-mode) .product-view[data-product-view="studio"] #toolbar,
+html body:not(.screenshot-mode) .product-view[data-product-view="studio"] .viewport{
+  border:1px solid var(--workspace-line)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+html body:not(.screenshot-mode) .product-view[data-product-view="studio"] #toolbar{
+  background:transparent!important;
+}
+@media (max-width:720px){
+  html body:not(.screenshot-mode) .product-view[data-product-view="studio"] #toolbar{
+    border:0!important;
+    border-bottom:1px solid var(--workspace-line)!important;
+  }
+}
+
 /* ===== repoScreenshotModeAndMobileRail ===== */
 /* The editor rail must never survive into a full-screen capture. */
 html:has(body.screenshot-mode){
