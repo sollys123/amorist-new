@@ -1697,3 +1697,337 @@ html body .product-view[data-product-view="forms"] .workshop-sheet :is(.workshop
   color:var(--workshop-muted,var(--product-muted))!important;
   -webkit-text-fill-color:var(--workshop-muted,var(--product-muted))!important;
 }
+
+/* ===== repoSidebarIndex ===== */
+/* REPO controls read like an archive index: one rail, flat rows, one active marker. */
+html body .product-view[data-product-view="studio"]{
+  --repo-rail-line:color-mix(in srgb,var(--product-line) 82%,transparent);
+  --repo-rail-hover:color-mix(in srgb,var(--product-plum) 7%,var(--product-surface));
+  --repo-rail-active:color-mix(in srgb,var(--product-plum) 10%,var(--product-surface));
+}
+html body .product-view[data-product-view="studio"] .repo-product-actions:empty{display:none!important}
+html body .product-view[data-product-view="studio"] #toolbar{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  justify-content:flex-start!important;
+  gap:0!important;
+  padding:18px 16px!important;
+  border:1px solid var(--product-line)!important;
+  border-radius:0!important;
+  background:var(--product-surface)!important;
+  box-shadow:none!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .toolbar-brand{
+  display:grid!important;
+  gap:4px!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0 0 16px!important;
+  border:0!important;
+  border-bottom:1px solid var(--repo-rail-line)!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .toolbar-title{
+  color:var(--product-ink)!important;
+  font:600 14px/1.25 Georgia,"Noto Serif SC",serif!important;
+  letter-spacing:.02em!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .toolbar-status{
+  color:var(--product-muted)!important;
+  font:400 10px/1.45 Georgia,"Noto Serif SC",serif!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .repo-sidebar-section{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:16px 0 0!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .repo-sidebar-section + .repo-sidebar-section{
+  margin-top:16px!important;
+  border-top:1px solid var(--repo-rail-line)!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .repo-sidebar-label{
+  display:block!important;
+  margin:0 0 7px!important;
+  color:var(--product-muted)!important;
+  font:700 9px/1 Georgia,"Noto Serif SC",serif!important;
+  letter-spacing:.16em!important;
+}
+html body .product-view[data-product-view="studio"] #paletteList{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:visible!important;
+}
+html body .product-view[data-product-view="studio"] #themeBtn{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:36px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:8px 8px!important;
+  border:0!important;
+  border-bottom:1px solid var(--repo-rail-line)!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--product-ink)!important;
+  box-shadow:none!important;
+  text-align:left!important;
+  font:600 12px/1.2 Georgia,"Noto Serif SC",serif!important;
+}
+html body .product-view[data-product-view="studio"] #themeBtn:hover,
+html body .product-view[data-product-view="studio"] #themeBtn:focus-visible{
+  background:var(--repo-rail-hover)!important;
+  color:var(--product-plum)!important;
+}
+html body .product-view[data-product-view="studio"] #themeBtn .theme-current-swatches{
+  flex:0 0 auto!important;
+  width:40px!important;
+  height:12px!important;
+  border:1px solid var(--repo-rail-line)!important;
+  border-radius:0!important;
+}
+html body .product-view[data-product-view="studio"] #pageSwitch{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  align-items:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:0!important;
+  height:auto!important;
+  margin:0!important;
+  padding:0!important;
+  gap:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  overflow:visible!important;
+}
+html body .product-view[data-product-view="studio"] #pageSwitch :is(.page-switch-btn,.page-add-btn){
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:36px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:8px 8px!important;
+  border:0!important;
+  border-left:2px solid transparent!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--product-muted)!important;
+  box-shadow:none!important;
+  text-align:left!important;
+  font:600 12px/1.25 Georgia,"Noto Serif SC",serif!important;
+  letter-spacing:0!important;
+  white-space:nowrap!important;
+}
+html body .product-view[data-product-view="studio"] #pageSwitch :is(.page-switch-btn,.page-add-btn):hover,
+html body .product-view[data-product-view="studio"] #pageSwitch :is(.page-switch-btn,.page-add-btn):focus-visible{
+  background:var(--repo-rail-hover)!important;
+  color:var(--product-ink)!important;
+}
+html body .product-view[data-product-view="studio"] #pageSwitch .page-switch-btn.active{
+  border-left-color:var(--product-plum)!important;
+  background:var(--repo-rail-active)!important;
+  color:var(--product-plum)!important;
+  box-shadow:none!important;
+}
+html body .product-view[data-product-view="studio"] #pageSwitch .long-page-buttons{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  width:100%!important;
+  gap:0!important;
+  margin:0!important;
+  padding:0!important;
+}
+html body .product-view[data-product-view="studio"] #pageSwitch .long-page-entry{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 30px!important;
+  align-items:stretch!important;
+  width:100%!important;
+  gap:0!important;
+  border-top:1px solid color-mix(in srgb,var(--repo-rail-line) 65%,transparent)!important;
+}
+html body .product-view[data-product-view="studio"] #pageSwitch .long-page-entry .page-switch-btn{grid-column:1!important}
+html body .product-view[data-product-view="studio"] #pageSwitch .long-page-delete{
+  display:grid!important;
+  place-items:center!important;
+  width:30px!important;
+  height:auto!important;
+  min-height:36px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--product-muted)!important;
+  font:400 14px/1 Georgia,serif!important;
+}
+html body .product-view[data-product-view="studio"] #pageSwitch .long-page-delete:hover,
+html body .product-view[data-product-view="studio"] #pageSwitch .long-page-delete:focus-visible{
+  background:var(--repo-rail-hover)!important;
+  color:var(--product-plum)!important;
+}
+html body .product-view[data-product-view="studio"] #pageSwitch .page-add-btn{
+  margin-top:5px!important;
+  border-top:1px dashed var(--repo-rail-line)!important;
+  color:var(--product-plum)!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .impression-row-tools:not([hidden]){
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 30px 30px!important;
+  align-items:center!important;
+  width:100%!important;
+  min-height:36px!important;
+  margin:8px 0 0!important;
+  padding:0 0 0 8px!important;
+  gap:0!important;
+  border:0!important;
+  border-top:1px solid var(--repo-rail-line)!important;
+  border-radius:0!important;
+  background:transparent!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .impression-row-tools[hidden]{display:none!important}
+html body .product-view[data-product-view="studio"] #toolbar .impression-row-count{
+  min-width:0!important;
+  padding:0!important;
+  color:var(--product-muted)!important;
+  font:400 10px/1 Georgia,"Noto Serif SC",serif!important;
+  text-align:left!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .impression-row-tool{
+  display:grid!important;
+  place-items:center!important;
+  width:30px!important;
+  height:30px!important;
+  min-height:30px!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--product-plum)!important;
+  font:400 18px/1 Georgia,serif!important;
+}
+html body .product-view[data-product-view="studio"] #toolbar .impression-row-tool:hover,
+html body .product-view[data-product-view="studio"] #toolbar .impression-row-tool:focus-visible{
+  background:var(--repo-rail-hover)!important;
+}
+html body .product-view[data-product-view="studio"] #repoActionGroup{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  width:100%!important;
+  gap:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  width:100%!important;
+  min-width:0!important;
+  min-height:36px!important;
+  height:auto!important;
+  margin:0!important;
+  padding:8px 8px!important;
+  border:0!important;
+  border-left:2px solid transparent!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--product-ink)!important;
+  box-shadow:none!important;
+  text-align:left!important;
+  font:600 12px/1.25 Georgia,"Noto Serif SC",serif!important;
+  letter-spacing:0!important;
+}
+html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn:hover,
+html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn:focus-visible{
+  border-left-color:var(--product-plum)!important;
+  background:var(--repo-rail-hover)!important;
+  color:var(--product-plum)!important;
+}
+html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn.danger,
+html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn.primary,
+html body .product-view[data-product-view="studio"] #repoActionGroup #screenshotBtn{
+  border-color:transparent!important;
+  background:transparent!important;
+  color:var(--product-ink)!important;
+}
+html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn + .tool-btn{
+  border-top:1px solid color-mix(in srgb,var(--repo-rail-line) 65%,transparent)!important;
+}
+html body .product-view[data-product-view="studio"] #repoActionGroup #screenshotBtn{
+  margin-top:8px!important;
+  border-top:1px solid var(--repo-rail-line)!important;
+}
+html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn:hover,
+html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn:focus-visible{
+  border-left-color:var(--product-plum)!important;
+}
+html body .product-view[data-product-view="studio"] #repoActionGroup #archiveBtn .archive-count{
+  min-width:0!important;
+  height:auto!important;
+  margin-left:auto!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  color:var(--product-muted)!important;
+  font:400 10px/1 Georgia,serif!important;
+}
+
+@media (min-width:901px){
+  html body:not(.screenshot-mode) .product-view[data-product-view="studio"] .app{
+    grid-template-columns:264px minmax(0,1fr)!important;
+    gap:18px!important;
+    align-items:start!important;
+  }
+  html body:not(.screenshot-mode) .product-view[data-product-view="studio"] #toolbar{
+    position:sticky!important;
+    top:16px!important;
+    height:calc(100dvh - 142px)!important;
+    min-height:0!important;
+    max-height:calc(100dvh - 142px)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+  }
+}
+@media (max-width:900px){
+  html body .product-view[data-product-view="studio"] #toolbar{
+    position:static!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0 0 14px!important;
+    overflow:visible!important;
+  }
+}
+@media (max-width:600px){
+  html body .product-view[data-product-view="studio"]{
+    padding:16px 10px 84px!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar{
+    padding:16px 14px!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar .repo-sidebar-section{
+    padding-top:14px!important;
+  }
+}
+@media (max-width:720px){
+  html body .product-view[data-product-view="studio"] #toolbar .toolbar-brand{
+    display:none!important;
+  }
+}

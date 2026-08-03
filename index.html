@@ -319,17 +319,32 @@
         <span class="toolbar-title">乙女游戏 REPO Maker</span>
         <span class="toolbar-status" id="saveStatus">当前为临时草稿 · 已自动保存</span>
       </div>
-      <div class="toolbar-group" id="paletteList" aria-label="选择配色"></div>
-      <div class="page-switch" id="pageSwitch" role="group" aria-label="选择 REPO 页面">
-        <button class="page-switch-btn active" type="button" data-repo-page="full" aria-pressed="true">完整页</button>
-        <div id="longPageButtons" class="long-page-buttons"></div>
-        <button class="page-add-btn" id="addLongPageBtn" type="button" title="增加新的长评页面">＋长评页</button>
+      <div class="repo-sidebar-section">
+        <span class="repo-sidebar-label">外观</span>
+        <div class="toolbar-group" id="paletteList" aria-label="选择配色"></div>
       </div>
-      <div class="toolbar-group">
-        <button class="tool-btn" id="repoBackToGame" type="button">返回游戏</button>
-        <button class="tool-btn" id="archiveBtn" type="button">存档<span class="archive-count" id="archiveCount">0</span></button>
-        <button class="tool-btn danger" id="resetBtn" type="button">清空</button>
-        <button class="tool-btn primary" id="screenshotBtn" type="button">截图当前页</button>
+      <div class="repo-sidebar-section">
+        <span class="repo-sidebar-label">页面索引</span>
+        <div class="page-switch" id="pageSwitch" role="group" aria-label="选择 REPO 页面">
+          <button class="page-switch-btn active" type="button" data-repo-page="full" aria-pressed="true">完整页</button>
+          <button class="page-switch-btn" type="button" data-repo-page="impression" aria-pressed="false">前后印象</button>
+          <div id="longPageButtons" class="long-page-buttons"></div>
+          <button class="page-add-btn" id="addLongPageBtn" type="button" title="增加新的长评页面">＋长评页</button>
+        </div>
+        <div class="impression-row-tools" id="impressionRowTools" aria-label="调整角色行数" hidden>
+          <span class="impression-row-count" id="impressionRowCount">5 行</span>
+          <button class="impression-row-tool" id="removeImpressionRowBtn" type="button" title="减少一行" aria-label="减少一行">−</button>
+          <button class="impression-row-tool" id="addImpressionRowBtn" type="button" title="增加一行" aria-label="增加一行">＋</button>
+        </div>
+      </div>
+      <div class="repo-sidebar-section repo-sidebar-actions">
+        <span class="repo-sidebar-label">操作</span>
+        <div class="toolbar-group" id="repoActionGroup">
+          <button class="tool-btn" id="repoBackToGame" type="button">返回游戏</button>
+          <button class="tool-btn" id="archiveBtn" type="button">存档<span class="archive-count" id="archiveCount">0</span></button>
+          <button class="tool-btn danger" id="resetBtn" type="button">清空</button>
+          <button class="tool-btn primary" id="screenshotBtn" type="button">截图当前页</button>
+        </div>
       </div>
     </section>
 
@@ -480,6 +495,22 @@
               <div class="repo-note-title">感想</div>
               <textarea class="repo-text persist auto-fit-text" id="repoText" data-key="repoText" data-max-font="18" data-min-font="4.5" data-line-height="1.42" aria-label="感想"></textarea>
             </section>
+          </section>
+        </article>
+        <article id="impressionRepoCard" class="repo-page impression-repo-page" data-page-id="impression" hidden>
+          <header class="impression-header">
+            <div class="impression-title-wrap">
+              <input class="impression-title persist" id="impressionTitle" data-key="impressionTitle" value="作品名前后印象表" placeholder="作品名前后印象表" aria-label="角色前后印象页标题">
+            </div>
+            <input type="hidden" class="impression-subject persist" id="impressionSubject" data-key="impressionSubject" aria-hidden="true" tabindex="-1">
+          </header>
+          <section class="impression-table" aria-label="角色前后印象表">
+            <div class="impression-table-head" aria-hidden="true">
+              <div class="impression-head-cell character">角色</div>
+              <div class="impression-head-cell before">BEFORE</div>
+              <div class="impression-head-cell after">AFTER</div>
+            </div>
+            <div class="impression-rows" id="impressionRows" style="--impression-row-count:5"></div>
           </section>
         </article>
         <article id="longRepoCard" class="repo-page long-repo-page" data-page-id="long-1" hidden>

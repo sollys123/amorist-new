@@ -5227,8 +5227,8 @@ body:has(.product-view[data-product-view="library"].active),body:has(.product-vi
 @media(max-width:1180px){.product-view[data-product-view="library"] .library-reference-toolbar .library-status-tabs{flex-basis:100%;order:3;}.product-view[data-product-view="library"] .game-library-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;}.product-view[data-product-view="library"] .library-reference-small-row{grid-template-columns:repeat(3,minmax(0,1fr));}}
 @media(max-width:900px){.product-view[data-product-view="library"]{padding:28px 24px 82px!important;}.product-view[data-product-view="library"] .library-reference-head{grid-template-columns:1fr;gap:22px;}.library-reference-metrics{justify-content:flex-start;}.product-view[data-product-view="library"] .library-reference-toolbar{display:flex!important;flex-wrap:wrap;align-items:flex-start;}.product-view[data-product-view="library"] .library-reference-toolbar .library-status-tabs{order:initial;width:100%;}.library-reference-tools{margin-left:auto;}.product-view[data-product-view="library"] .game-library-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:24px 14px!important;}.product-view[data-product-view="library"] .library-reference-feature,.product-view[data-product-view="library"] .library-reference-wide{grid-column:span 2;}.product-view[data-product-view="library"] .library-reference-small-row{grid-column:1/-1;grid-template-columns:repeat(2,minmax(0,1fr));}.product-view[data-product-view="library"] .library-list-mode .game-card{grid-template-columns:90px minmax(0,1fr);}.product-view[data-product-view="library"] .library-list-mode .game-to-repo{grid-column:2;justify-self:start;}.library-rank-intro{padding-left:0;}.library-rank-axis:before{left:83px;}.library-rank-tier{grid-template-columns:84px minmax(0,1fr);}.library-rank-tier:before{left:79px;}.library-rank-tier header{padding-right:18px;}.library-rank-tier header h3{font-size:16px;}.library-rank-tier header small{font-size:6px;}.library-rank-track{padding-left:25px;}.library-rank-card{flex-basis:100px;}}
 @media(max-width:560px){.product-view[data-product-view="library"]{padding:22px 16px 74px!important;}.library-reference-metrics{gap:12px!important;}.library-reference-metrics strong{font-size:24px;}.library-reference-search{width:135px;}.product-view[data-product-view="library"] .game-library-grid{grid-template-columns:1fr!important;gap:22px!important;}.product-view[data-product-view="library"] .library-reference-feature,.product-view[data-product-view="library"] .library-reference-wide{grid-column:span 1;}.product-view[data-product-view="library"] .library-reference-small-row{grid-column:1/-1;grid-template-columns:1fr;gap:22px;margin-top:0;padding-top:22px;}.product-view[data-product-view="library"] .library-reference-feature .game-cover,.product-view[data-product-view="library"] .library-reference-wide .game-cover{aspect-ratio:1.6/1!important;}.product-view[data-product-view="library"] .library-list-mode .game-card{grid-template-columns:82px minmax(0,1fr);}.product-view[data-product-view="library"] .library-list-mode .game-cover{width:82px;}.library-rank-intro{grid-template-columns:1fr;gap:12px;}.library-rank-note{text-align:left;}.library-rank-axis:before{left:53px;}.library-rank-tier{grid-template-columns:54px minmax(0,1fr);}.library-rank-tier:before{left:49px;}.library-rank-tier header{padding-right:12px;}.library-rank-tier header h3{font-size:13px;}.library-rank-tier header small{font-size:0;}.library-rank-tier header em{font-size:8px;}.library-rank-track{gap:14px;padding-left:18px;}.library-rank-card{flex-basis:88px;}.library-reference-tools{width:100%;justify-content:space-between;margin-left:0;}}
-.public-repo-preview{position:fixed;inset:0;z-index:13000;display:flex;flex-direction:column;padding:clamp(16px,3vh,34px) clamp(16px,4vw,56px);background:rgba(38,35,41,.42);backdrop-filter:blur(4px)}.public-repo-preview-head{display:flex;align-items:center;justify-content:space-between;width:min(900px,100%);margin:0 auto 10px;color:#fbf8f2;font:600 14px Georgia,"Noto Serif SC",serif;letter-spacing:.08em}.public-repo-preview-head button{width:32px;height:32px;border:1px solid rgba(251,248,242,.55);border-radius:50%;background:rgba(251,248,242,.12);color:#fbf8f2;font-size:22px;line-height:1;cursor:pointer}.public-repo-preview-stage{min-height:0;flex:1;display:flex;flex-direction:column;align-items:center;overflow:auto;padding:10px 18px 24px}.public-repo-preview-stage #repoCard,.public-repo-preview-stage .long-repo-page{position:relative;top:auto;left:auto;flex:0 0 auto;transform:none;width:var(--stage-w);height:var(--stage-h);pointer-events:none}.public-repo-preview-stage .long-repo-page{margin-top:18px}
-@media(max-width:720px){.public-repo-preview{padding:12px}.public-repo-preview-stage{padding:6px 0 18px;align-items:flex-start;justify-content:flex-start}.public-repo-preview-stage #repoCard,.public-repo-preview-stage .long-repo-page{transform:scale(.72);transform-origin:top left;margin-right:calc((var(--stage-w) * -.28))}.public-repo-preview-stage .long-repo-page{margin-top:calc(18px * .72)}}
+.public-repo-preview{position:fixed;inset:0;z-index:13000;display:flex;flex-direction:column;padding:clamp(16px,3vh,34px) clamp(16px,4vw,56px);background:rgba(38,35,41,.42);backdrop-filter:blur(4px)}.public-repo-preview-head{display:flex;align-items:center;justify-content:space-between;width:min(900px,100%);margin:0 auto 10px;color:#fbf8f2;font:600 14px Georgia,"Noto Serif SC",serif;letter-spacing:.08em}.public-repo-preview-head button{width:32px;height:32px;border:1px solid rgba(251,248,242,.55);border-radius:50%;background:rgba(251,248,242,.12);color:#fbf8f2;font-size:22px;line-height:1;cursor:pointer}.public-repo-preview-stage{min-height:0;flex:1;display:flex;flex-direction:column;align-items:center;overflow:auto;padding:10px 18px 24px}.public-repo-preview-stage #repoCard,.public-repo-preview-stage .long-repo-page,.public-repo-preview-stage .impression-repo-page{position:relative;top:auto;left:auto;flex:0 0 auto;transform:none;width:var(--stage-w);height:var(--stage-h);pointer-events:none}.public-repo-preview-stage .long-repo-page,.public-repo-preview-stage .impression-repo-page{margin-top:18px}
+@media(max-width:720px){.public-repo-preview{padding:12px}.public-repo-preview-stage{padding:6px 0 18px;align-items:flex-start;justify-content:flex-start}.public-repo-preview-stage #repoCard,.public-repo-preview-stage .long-repo-page,.public-repo-preview-stage .impression-repo-page{transform:scale(.72);transform-origin:top left;margin-right:calc((var(--stage-w) * -.28))}.public-repo-preview-stage .long-repo-page,.public-repo-preview-stage .impression-repo-page{margin-top:calc(18px * .72)}}
 .product-view[data-product-view="library"] .library-rank-track{min-height:103px;display:flex;align-items:flex-start;align-content:flex-start;flex-wrap:wrap;column-gap:20px;row-gap:24px;padding-left:31px;overflow:visible;}
 @media(max-width:900px){.product-view[data-product-view="library"] .library-rank-track{padding-left:25px;}}
 @media(max-width:560px){.product-view[data-product-view="library"] .library-rank-track{column-gap:14px;row-gap:18px;padding-left:18px;}}
@@ -5455,3 +5455,447 @@ body:has(.product-view[data-product-view="oshi"].active),body:has(.product-view[
 #charManualFields>.editor-group{align-self:start;align-content:start;}
 #charManualFields>#charRoleTypeSourceHint{margin-top:0;}
 #charSearchPanel[hidden],#charManualFields[hidden],#charManualActions[hidden]{display:none!important;}
+
+/* ===== 前后印象页 ===== */
+.impression-row-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid color-mix(in srgb, var(--line) 82%, white);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--paper) 92%, var(--soft));
+}
+.impression-row-tools[hidden] { display: none !important; }
+.impression-row-count {
+  min-width: 44px;
+  padding: 0 5px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+  white-space: nowrap;
+}
+.impression-row-tool {
+  width: 28px;
+  height: 27px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--primary-strong);
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 900;
+  cursor: pointer;
+}
+.impression-row-tool:hover { background: color-mix(in srgb, var(--primary) 12%, transparent); }
+.impression-row-tool:disabled { opacity: .32; cursor: default; background: transparent; }
+
+.impression-repo-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--stage-w);
+  height: var(--stage-h);
+  transform-origin: top left;
+  overflow: hidden;
+  padding: 25px 28px 24px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 16px 38px color-mix(in srgb, var(--primary-strong) 7%, transparent);
+  display: flex;
+  flex-direction: column;
+}
+.impression-repo-page::before,
+.impression-repo-page::after { display: none; }
+
+.impression-header {
+  min-height: 78px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0 2px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.impression-title-wrap {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.impression-title-wrap .eyebrow { display: none; }
+.impression-title {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--primary-strong);
+  font-family: "LXGW WenKai", "Kaiti SC", "STKaiti", "KaiTi", "PingFang SC", sans-serif;
+  font-size: 36px;
+  line-height: 1.08;
+  font-weight: 950;
+  letter-spacing: -.01em;
+  text-shadow: none;
+  text-align: center;
+}
+.impression-title::placeholder { color: color-mix(in srgb, var(--primary) 42%, white); }
+.impression-meta { display: none !important; }
+.impression-meta-label { display: none; }
+.impression-subject { display: none !important; }
+.impression-subject::placeholder { color: color-mix(in srgb, var(--muted) 65%, transparent); }
+
+.impression-table {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+}
+.impression-table-head {
+  flex: 0 0 46px;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+  margin: 0;
+  background: color-mix(in srgb, var(--primary) 11%, var(--paper));
+}
+.impression-head-cell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  color: var(--primary-strong);
+  background: transparent;
+  font-size: 16px;
+  font-weight: 950;
+  letter-spacing: .04em;
+  box-shadow: none;
+}
+.impression-head-cell:not(:last-child) { border-right: 1px solid var(--line); }
+.impression-head-cell span { display: none; }
+.impression-head-cell.before,
+.impression-head-cell.after,
+.impression-head-cell.character { border-top: 0; }
+
+.impression-rows {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.impression-row {
+  min-height: 0;
+  flex: 1 1 0;
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0;
+}
+.impression-character-cell,
+.impression-text-cell {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--paper);
+  box-shadow: none;
+}
+.impression-row > :not(:last-child) { border-right: 1px solid var(--line); }
+.impression-character-cell { background: color-mix(in srgb, var(--soft) 13%, var(--paper)); }
+.impression-character-cell .image-tile {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.impression-character-cell .image-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 4%;
+}
+.impression-character-cell .image-empty {
+  padding: 9px;
+  color: var(--muted);
+  background: color-mix(in srgb, var(--soft) 24%, var(--paper));
+}
+.impression-character-cell .image-plus { font-size: 27px; color: var(--primary-strong); }
+.impression-character-cell .image-hint { font-size: 10px; }
+.impression-row-index { display: none; }
+
+.impression-text-cell.before,
+.impression-text-cell.after {
+  background: var(--paper);
+  display: flex;
+  align-items: stretch;
+}
+.impression-text-cell::before { display: none; }
+.impression-text-shell {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.impression-text {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 12px 15px 8px;
+  border: 0;
+  outline: 0;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  color: var(--ink);
+  font-family: "LXGW WenKai", "Kaiti SC", "STKaiti", "KaiTi", "PingFang SC", sans-serif;
+  font-size: 30px;
+  line-height: 1.38;
+  font-weight: 760;
+  text-align: left;
+}
+.impression-text::placeholder { color: color-mix(in srgb, var(--muted) 34%, transparent); }
+.impression-text-shell.media-only { position: relative; }
+.impression-text-shell.media-only .impression-text { display: none; }
+.impression-text-shell.media-only .impression-sticker-area {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 100%;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+}
+.impression-text-shell.media-only .impression-sticker-area[data-count="1"] .impression-sticker {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  border-radius: 0;
+  border: 0;
+  background: transparent;
+}
+.impression-text-shell.media-only .impression-sticker-area[data-count="1"] .impression-sticker .image-tile img {
+  object-fit: contain;
+  object-position: center;
+}
+.impression-text-shell.media-only .impression-sticker-area[data-count]:not([data-count="0"]) .impression-sticker-add {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 3;
+  margin: 0;
+}
+.impression-sticker-area {
+  --sticker-s: 58px;
+  --sticker-m: 74px;
+  --sticker-l: 92px;
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px 10px;
+  min-height: 0;
+}
+.impression-sticker-area[data-count="1"] {
+  --sticker-s: 86px;
+  --sticker-m: 116px;
+  --sticker-l: 142px;
+}
+.impression-sticker-area[data-count="2"] {
+  --sticker-s: 72px;
+  --sticker-m: 94px;
+  --sticker-l: 116px;
+}
+.impression-sticker-area[data-count="3"] {
+  --sticker-s: 58px;
+  --sticker-m: 74px;
+  --sticker-l: 90px;
+  gap: 6px;
+}
+.impression-rows[data-density="compact"] .impression-sticker-area[data-count="1"] {
+  --sticker-s: 66px;
+  --sticker-m: 88px;
+  --sticker-l: 108px;
+}
+.impression-rows[data-density="compact"] .impression-sticker-area[data-count="2"] {
+  --sticker-s: 58px;
+  --sticker-m: 76px;
+  --sticker-l: 92px;
+}
+.impression-rows[data-density="compact"] .impression-sticker-area[data-count="3"] {
+  --sticker-s: 48px;
+  --sticker-m: 62px;
+  --sticker-l: 74px;
+}
+.impression-rows[data-density="dense"] .impression-sticker-area {
+  gap: 4px;
+  padding: 0 8px 6px;
+}
+.impression-rows[data-density="dense"] .impression-sticker-area[data-count="1"] {
+  --sticker-s: 48px;
+  --sticker-m: 62px;
+  --sticker-l: 74px;
+}
+.impression-rows[data-density="dense"] .impression-sticker-area[data-count="2"] {
+  --sticker-s: 42px;
+  --sticker-m: 56px;
+  --sticker-l: 66px;
+}
+.impression-rows[data-density="dense"] .impression-sticker-area[data-count="3"] {
+  --sticker-s: 38px;
+  --sticker-m: 48px;
+  --sticker-l: 58px;
+}
+.impression-sticker-add {
+  appearance: none;
+  border: 1px dashed color-mix(in srgb, var(--primary) 34%, var(--line));
+  background: color-mix(in srgb, var(--primary) 6%, var(--paper));
+  color: var(--primary-strong);
+  border-radius: 10px;
+  height: 32px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: .01em;
+  flex: 0 0 auto;
+}
+.impression-sticker-area[data-count]:not([data-count="0"]) .impression-sticker-add {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 0;
+  align-self: center;
+}
+.impression-sticker-area[data-count]:not([data-count="0"]) .impression-sticker-add::before {
+  content: "＋";
+  font-size: 16px;
+  line-height: 1;
+}
+.impression-sticker-add:active { transform: translateY(1px); }
+.impression-sticker {
+  --sticker-height: var(--sticker-m);
+  --sticker-ratio: 1;
+  position: relative;
+  width: calc(var(--sticker-height) * var(--sticker-ratio));
+  max-width: 100%;
+  height: var(--sticker-height);
+  max-height: 100%;
+  border-radius: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  flex: 0 1 auto;
+  transition: width .16s ease, height .16s ease;
+}
+.impression-sticker.size-s { --sticker-height: var(--sticker-s); }
+.impression-sticker.size-m { --sticker-height: var(--sticker-m); }
+.impression-sticker.size-l { --sticker-height: var(--sticker-l); }
+.impression-sticker .image-tile {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.impression-sticker .image-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: 50% 50%;
+}
+.impression-sticker .image-empty {
+  padding: 6px;
+  background: color-mix(in srgb, var(--soft) 16%, var(--paper));
+  color: var(--muted);
+}
+.impression-sticker .image-plus { font-size: 18px; color: var(--primary-strong); }
+.impression-sticker .image-hint { display: none; }
+.impression-sticker-toolbar {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+}
+.impression-sticker-mini {
+  appearance: none;
+  border: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--paper) 78%, rgba(255,255,255,.86));
+  color: var(--primary-strong);
+  font-size: 10px;
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+.impression-sticker-mini.size-badge { width: 20px; font-size: 9px; letter-spacing: .02em; }
+.impression-footer { display: none; }
+
+body[data-color-style="dark"] .impression-row-tools {
+  background: color-mix(in srgb, var(--soft) 76%, var(--paper));
+  border-color: var(--line);
+}
+body[data-color-style="dark"] .impression-repo-page,
+body[data-color-style="dark"] .impression-table,
+body[data-color-style="dark"] .impression-character-cell,
+body[data-color-style="dark"] .impression-text-cell.before,
+body[data-color-style="dark"] .impression-text-cell.after {
+  background: var(--paper);
+  border-color: var(--line);
+}
+body[data-color-style="dark"] .impression-table-head { background: color-mix(in srgb, var(--primary) 13%, var(--paper)); }
+body[data-color-style="dark"] .impression-character-cell .image-empty { background: color-mix(in srgb, var(--soft) 42%, var(--paper)); }
+
+body.screenshot-mode .impression-repo-page { pointer-events: none; box-shadow: none; }
+body.screenshot-mode .impression-sticker-add,
+body.screenshot-mode .impression-sticker-toolbar { display: none !important; }
+body.screenshot-mode .impression-sticker-area[data-count="0"],
+body.screenshot-mode .impression-sticker:not(.has-image) { display: none !important; }
+@media print {
+  .impression-repo-page { transform: none !important; box-shadow: none; }
+  .impression-sticker-add,
+  .impression-sticker-toolbar,
+  .impression-sticker-area[data-count="0"],
+  .impression-sticker:not(.has-image) { display: none !important; }
+}
+@media (max-width: 700px) {
+  .impression-row-tools { order: 4; }
+  .impression-row-tool { width: 27px; height: 25px; }
+}

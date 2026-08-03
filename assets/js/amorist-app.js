@@ -1173,6 +1173,10 @@
         tastePlot: { img:'tastePlotImg', kind:'character', title:'选择“剧情”人物头像' },
         tasteDynamic: { img:'tasteDynamicImg', kind:'character', title:'选择“关系性”人物头像' }
       };
+      const STATIC_IMAGE_TARGET_KEYS = Object.keys(imageTargets);
+      const IMPRESSION_MIN_ROWS = 1;
+      const IMPRESSION_MAX_ROWS = 10;
+      const IMPRESSION_DEFAULT_ROWS = 5;
 
       let currentTarget = 'cover';
       let toastTimer;
@@ -1188,18 +1192,76 @@
       let cropDrag = null;
       let lastSavedAt = Date.now();
       let activeRepoPage = 'full';
-      const emptyImages = () => ({ cover:'', favorite:'', tasteBlind:'', tasteLooks:'', tasteVoice:'', tastePersonality:'', tastePlot:'', tasteDynamic:'' });
-      function defaultImageTransform(target) { return target === 'cover' ? {x:50,y:50,scale:1} : {x:50,y:4,scale:1}; }
-      function emptyImageTransforms() { return Object.fromEntries(Object.keys(imageTargets).map(target => [target, defaultImageTransform(target)])); }
+      const emptyImages = () => Object.fromEntries(STATIC_IMAGE_TARGET_KEYS.map(target => [target, '']));
+      function defaultImageTransform(target) {
+        if (target === 'cover') return {x:50,y:50,scale:1};
+        if (String(target || '').includes('sticker')) return {x:50,y:50,scale:1};
+        return {x:50,y:4,scale:1};
+      }
+      function emptyImageTransforms() { return Object.fromEntries(STATIC_IMAGE_TARGET_KEYS.map(target => [target, defaultImageTransform(target)])); }
+      function createImpressionRowId(seed='') {
+        const clean = String(seed || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 48);
+        if (clean) return clean;
+        return `r${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
+      }
+      function impressionTarget(rowId) { return `impression-${rowId}`; }
+      function createStickerId(seed='') {
+        const clean = String(seed || '').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 32);
+        if (clean) return clean;
+        return `s${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+      }
+      function impressionStickerTarget(rowId, side, stickerId) { return `impression-sticker-${side}-${rowId}-${stickerId}`; }
+      function normalizeStickerItems(items=[], rowId='', side='before', images={}, transforms={}) {
+        const source = Array.isArray(items) ? items.slice(0, 3) : [];
+        const used = new Set();
+        return source.map((raw, index) => {
+          let id = createStickerId(raw?.id || `${side}-${index + 1}`);
+          while (used.has(id)) id = createStickerId(`${id}-${index + 1}`);
+          used.add(id);
+          const target = impressionStickerTarget(rowId, side, id);
+          return {
+            id,
+            size:['s','m','l'].includes(raw?.size) ? raw.size : 'm',
+            image:String(raw?.image ?? images?.[target] ?? ''),
+            transform:normalizeTransform(target, raw?.transform || transforms?.[target])
+          };
+        });
+      }
+      function defaultImpressionRows(count=IMPRESSION_DEFAULT_ROWS) {
+        return Array.from({length:Math.max(IMPRESSION_MIN_ROWS, Math.min(IMPRESSION_MAX_ROWS, Number(count) || IMPRESSION_DEFAULT_ROWS))}, (_, index) => ({
+          id:`row-${index + 1}`,
+          before:'',
+          after:'',
+          image:'',
+          transform:defaultImageTransform(`impression-row-${index + 1}`),
+          beforeStickers:[],
+          afterStickers:[]
+        }));
+      }
       let state = {
         palette:'mintLavender', completion:'yes', platform:'', language:'',
         ratings:Object.fromEntries(ratingNames.map(name => [name, 0])),
-        images:emptyImages(), imageTransforms:emptyImageTransforms()
+        images:emptyImages(), imageTransforms:emptyImageTransforms(), impressionRows:defaultImpressionRows()
       };
 
       const $ = (selector, root=document) => root.querySelector(selector);
       const $$ = (selector, root=document) => [...root.querySelectorAll(selector)];
       const longRepoTemplate = $('#longRepoCard')?.cloneNode(true);
+
+      function isDefaultImpressionTitle(value='') {
+        return ['','角色前后印象','角色前后印象表','前后印象表','作品名前后印象表'].includes(String(value || '').trim());
+      }
+      function suggestedImpressionTitle() {
+        const subject = $('#impressionSubject')?.value?.trim() || '';
+        const gameName = $('#gameName')?.value?.trim() || '';
+        const base = subject || gameName;
+        return `${base || '作品名'}前后印象表`;
+      }
+      function normalizeImpressionTitle(force=false) {
+        const titleField = $('#impressionTitle');
+        if (!titleField) return;
+        if (force || isDefaultImpressionTitle(titleField.value)) titleField.value = suggestedImpressionTitle();
+      }
 
       function showToast(message) {
         const toast = $('#toast');
@@ -1211,7 +1273,346 @@
 
       function longRepoPages() { return $$('.long-repo-page'); }
 
+      function normalizeImpressionRows(rows=[], images={}, transforms={}) {
+        const source = Array.isArray(rows) && rows.length ? rows.slice(0, IMPRESSION_MAX_ROWS) : defaultImpressionRows();
+        const used = new Set();
+        return source.map((raw, index) => {
+          let id = createImpressionRowId(raw?.id || `row-${index + 1}`);
+          while (used.has(id)) id = createImpressionRowId(`${id}-${index + 1}`);
+          used.add(id);
+          const target = impressionTarget(id);
+          return {
+            id,
+            before:String(raw?.before ?? ''),
+            after:String(raw?.after ?? ''),
+            image:String(raw?.image ?? images?.[target] ?? ''),
+            transform:normalizeTransform(target, raw?.transform || transforms?.[target]),
+            beforeStickers:normalizeStickerItems(raw?.beforeStickers, id, 'before', images, transforms),
+            afterStickers:normalizeStickerItems(raw?.afterStickers, id, 'after', images, transforms)
+          };
+        });
+      }
+
+      function clearDynamicImageTargets() {
+        Object.keys(imageTargets).forEach(target => {
+          if (!STATIC_IMAGE_TARGET_KEYS.includes(target)) delete imageTargets[target];
+        });
+      }
+
+      function registerImpressionTarget(row, index) {
+        const target = impressionTarget(row.id);
+        imageTargets[target] = {
+          img:`impressionImg-${row.id}`,
+          kind:'character',
+          title:`选择第 ${index + 1} 位角色图片`
+        };
+        return target;
+      }
+
+      function registerStickerTarget(rowId, side, sticker, index) {
+        const target = impressionStickerTarget(rowId, side, sticker.id);
+        imageTargets[target] = {
+          img:`impressionStickerImg-${side}-${rowId}-${sticker.id}`,
+          kind:'character',
+          title:`选择${side === 'before' ? 'BEFORE' : 'AFTER'}栏第 ${index + 1} 个表情包`
+        };
+        return target;
+      }
+
+      function collectImpressionRows() {
+        const host = $('#impressionRows');
+        if (!host) return normalizeImpressionRows(state.impressionRows || []);
+        const rows = $$('.impression-row', host).map(row => {
+          const id = row.dataset.rowId;
+          const target = impressionTarget(id);
+          const collectStickers = side => $$('.impression-sticker', row.querySelector(`.impression-text-cell.${side}`)).map(sticker => {
+            const stickerId = sticker.dataset.stickerId;
+            const stickerTarget = impressionStickerTarget(id, side, stickerId);
+            return {
+              id:stickerId,
+              size:sticker.dataset.stickerSize || 'm',
+              image:state.images?.[stickerTarget] || '',
+              transform:normalizeTransform(stickerTarget, state.imageTransforms?.[stickerTarget])
+            };
+          });
+          return {
+            id,
+            before:row.querySelector('.impression-text.before')?.value || '',
+            after:row.querySelector('.impression-text.after')?.value || '',
+            image:state.images?.[target] || '',
+            transform:normalizeTransform(target, state.imageTransforms?.[target]),
+            beforeStickers:collectStickers('before'),
+            afterStickers:collectStickers('after')
+          };
+        });
+        return normalizeImpressionRows(rows, state.images, state.imageTransforms);
+      }
+
+      function bindImagePickers(root=document) {
+        root.querySelectorAll('.image-picker').forEach(tile => {
+          if (tile.dataset.imagePickerBound) return;
+          tile.dataset.imagePickerBound = '1';
+          const open = () => openImageModal(tile.dataset.target);
+          tile.addEventListener('click', open);
+          tile.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
+          });
+        });
+      }
+
+      function bindImpressionRowInputs(root=document) {
+        root.querySelectorAll('.impression-text').forEach(textarea => {
+          if (textarea.dataset.impressionBound) return;
+          textarea.dataset.impressionBound = '1';
+          textarea.addEventListener('input', () => {
+            autoFitTextArea(textarea);
+            updateImpressionTextCellLayout(textarea.closest('.impression-text-cell'));
+            state.impressionRows = collectImpressionRows();
+            saveState();
+          });
+        });
+      }
+
+      function updateImpressionTextCellLayout(cell) {
+        if (!cell) return;
+        const shell = cell.querySelector('.impression-text-shell');
+        const textarea = cell.querySelector('.impression-text');
+        const stickerArea = cell.querySelector('.impression-sticker-area');
+        if (!shell || !textarea || !stickerArea) return;
+        const hasText = Boolean(textarea.value.trim());
+        const stickerCount = Number(stickerArea.dataset.count || 0);
+        shell.classList.toggle('media-only', !hasText && stickerCount > 0);
+      }
+
+      function refreshImpressionTextCellLayouts(root=document) {
+        root.querySelectorAll('.impression-text-cell').forEach(updateImpressionTextCellLayout);
+      }
+
+      function bindImpressionStickerControls(root=document) {
+        root.querySelectorAll('.impression-sticker-add').forEach(button => {
+          if (button.dataset.bound) return;
+          button.dataset.bound = '1';
+          button.addEventListener('click', event => {
+            event.preventDefault();
+            addImpressionSticker(button.dataset.rowId, button.dataset.side);
+          });
+        });
+        root.querySelectorAll('.impression-sticker-remove').forEach(button => {
+          if (button.dataset.bound) return;
+          button.dataset.bound = '1';
+          button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            removeImpressionSticker(button.dataset.rowId, button.dataset.side, button.dataset.stickerId);
+          });
+        });
+        root.querySelectorAll('.impression-sticker-size').forEach(button => {
+          if (button.dataset.bound) return;
+          button.dataset.bound = '1';
+          button.addEventListener('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+            cycleImpressionStickerSize(button.dataset.rowId, button.dataset.side, button.dataset.stickerId);
+          });
+        });
+      }
+
+      function renderImpressionStickerArea(host, row, side) {
+        if (!host) return;
+        const key = side === 'before' ? 'beforeStickers' : 'afterStickers';
+        const stickers = Array.isArray(row[key]) ? row[key] : [];
+        host.innerHTML = '';
+        host.dataset.count = String(stickers.length);
+        stickers.forEach((sticker, index) => {
+          const target = registerStickerTarget(row.id, side, sticker, index);
+          state.images[target] = sticker.image || '';
+          state.imageTransforms[target] = normalizeTransform(target, sticker.transform);
+          const card = document.createElement('div');
+          card.className = `impression-sticker size-${sticker.size || 'm'}${sticker.image ? ' has-image' : ''}`;
+          card.dataset.rowId = row.id;
+          card.dataset.side = side;
+          card.dataset.stickerId = sticker.id;
+          card.dataset.stickerSize = sticker.size || 'm';
+          card.innerHTML = `
+            <div class="image-tile image-picker" data-target="${target}" tabindex="0" role="button" aria-label="选择表情包图片">
+              <img id="impressionStickerImg-${side}-${row.id}-${sticker.id}" alt="表情包图片">
+              <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">添加表情包</span></div>
+            </div>
+            <div class="impression-sticker-toolbar">
+              <button type="button" class="impression-sticker-mini size-badge impression-sticker-size" data-row-id="${row.id}" data-side="${side}" data-sticker-id="${sticker.id}" title="切换表情包大小">${(sticker.size || 'm').toUpperCase()}</button>
+              <button type="button" class="impression-sticker-mini impression-sticker-remove" data-row-id="${row.id}" data-side="${side}" data-sticker-id="${sticker.id}" title="删除这个表情包">×</button>
+            </div>`;
+          host.appendChild(card);
+          setImage(target, sticker.image || '', '', false, false, sticker.transform);
+        });
+        if (stickers.length < 3) {
+          const add = document.createElement('button');
+          add.type = 'button';
+          add.className = 'impression-sticker-add';
+          add.dataset.rowId = row.id;
+          add.dataset.side = side;
+          add.textContent = '＋ 表情包';
+          host.appendChild(add);
+        }
+      }
+
+      function updateImpressionControls() {
+        const rows = $$('.impression-row', $('#impressionRows'));
+        const count = rows.length || (state.impressionRows?.length || IMPRESSION_DEFAULT_ROWS);
+        const tools = $('#impressionRowTools');
+        if (tools) tools.hidden = activeRepoPage !== 'impression';
+        if ($('#impressionRowCount')) $('#impressionRowCount').textContent = `${count} 行`;
+        if ($('#removeImpressionRowBtn')) $('#removeImpressionRowBtn').disabled = count <= IMPRESSION_MIN_ROWS;
+        if ($('#addImpressionRowBtn')) $('#addImpressionRowBtn').disabled = count >= IMPRESSION_MAX_ROWS;
+        const host = $('#impressionRows');
+        if (host) {
+          host.style.setProperty('--impression-row-count', String(Math.max(1, count)));
+          host.dataset.density = count <= 5 ? 'spacious' : (count <= 7 ? 'compact' : 'dense');
+        }
+      }
+
+      function renderImpressionRows(rows=state.impressionRows || defaultImpressionRows()) {
+        const host = $('#impressionRows');
+        if (!host) return;
+        const normalized = normalizeImpressionRows(rows, state.images, state.imageTransforms);
+        state.impressionRows = normalized;
+        clearDynamicImageTargets();
+        Object.keys(state.images || {}).filter(key => key.startsWith('impression-')).forEach(key => delete state.images[key]);
+        Object.keys(state.imageTransforms || {}).filter(key => key.startsWith('impression-')).forEach(key => delete state.imageTransforms[key]);
+        host.innerHTML = '';
+
+        normalized.forEach((row, index) => {
+          const target = registerImpressionTarget(row, index);
+          const item = document.createElement('div');
+          item.className = 'impression-row';
+          item.dataset.rowId = row.id;
+          item.innerHTML = `
+            <div class="impression-character-cell">
+              <div class="image-tile image-picker" data-target="${target}" tabindex="0" role="button" aria-label="选择第 ${index + 1} 位角色图片">
+                <img id="impressionImg-${row.id}" alt="第 ${index + 1} 位角色">
+                <div class="image-empty"><span class="image-plus">＋</span><span class="image-hint">添加角色图</span></div>
+              </div>
+            </div>
+            <div class="impression-text-cell before">
+              <div class="impression-text-shell">
+                <textarea class="impression-text before auto-fit-text" data-max-font="30" data-min-font="5" data-line-height="1.38" aria-label="第 ${index + 1} 位角色游玩前印象" placeholder=""></textarea>
+                <div class="impression-sticker-area" data-row-id="${row.id}" data-side="before"></div>
+              </div>
+            </div>
+            <div class="impression-text-cell after">
+              <div class="impression-text-shell">
+                <textarea class="impression-text after auto-fit-text" data-max-font="30" data-min-font="5" data-line-height="1.38" aria-label="第 ${index + 1} 位角色游玩后印象" placeholder=""></textarea>
+                <div class="impression-sticker-area" data-row-id="${row.id}" data-side="after"></div>
+              </div>
+            </div>`;
+          item.querySelector('.impression-text.before').value = row.before;
+          item.querySelector('.impression-text.after').value = row.after;
+          host.appendChild(item);
+          state.images[target] = row.image || '';
+          state.imageTransforms[target] = normalizeTransform(target, row.transform);
+          setImage(target, row.image || '', '', false, false, row.transform);
+          renderImpressionStickerArea(item.querySelector('.impression-sticker-area[data-side="before"]'), row, 'before');
+          renderImpressionStickerArea(item.querySelector('.impression-sticker-area[data-side="after"]'), row, 'after');
+        });
+        bindImagePickers(host);
+        bindImpressionRowInputs(host);
+        bindImpressionStickerControls(host);
+        refreshImpressionTextCellLayouts(host);
+        updateImpressionControls();
+        requestAnimationFrame(() => {
+          $$('.impression-text', host).forEach(autoFitTextArea);
+          refreshImpressionTextCellLayouts(host);
+        });
+      }
+
+      function addImpressionRow() {
+        const rows = collectImpressionRows();
+        if (rows.length >= IMPRESSION_MAX_ROWS) { showToast(`最多可放 ${IMPRESSION_MAX_ROWS} 位角色`); return; }
+        rows.push({ id:createImpressionRowId(), before:'', after:'', image:'', transform:defaultImageTransform('impression-new'), beforeStickers:[], afterStickers:[] });
+        state.impressionRows = rows;
+        renderImpressionRows(rows);
+        saveState();
+        showToast('已增加一行');
+      }
+
+      function addImpressionSticker(rowId, side) {
+        const rows = collectImpressionRows();
+        const row = rows.find(item => item.id === rowId);
+        if (!row) return;
+        const key = side === 'before' ? 'beforeStickers' : 'afterStickers';
+        row[key] = Array.isArray(row[key]) ? row[key] : [];
+        if (row[key].length >= 3) { showToast('每格最多添加 3 个表情包'); return; }
+        const sticker = { id:createStickerId(), size:'m', image:'', transform:defaultImageTransform('impression-sticker') };
+        row[key].push(sticker);
+        state.impressionRows = rows;
+        renderImpressionRows(rows);
+        saveState();
+        requestAnimationFrame(() => openImageModal(impressionStickerTarget(rowId, side, sticker.id)));
+      }
+
+      function removeImpressionSticker(rowId, side, stickerId) {
+        const rows = collectImpressionRows();
+        const row = rows.find(item => item.id === rowId);
+        if (!row) return;
+        const key = side === 'before' ? 'beforeStickers' : 'afterStickers';
+        row[key] = (row[key] || []).filter(sticker => sticker.id !== stickerId);
+        const target = impressionStickerTarget(rowId, side, stickerId);
+        if (currentTarget === target) closeImageModal();
+        delete state.images?.[target];
+        delete state.imageTransforms?.[target];
+        delete imageTargets[target];
+        state.impressionRows = rows;
+        renderImpressionRows(rows);
+        saveState();
+      }
+
+      function cycleImpressionStickerSize(rowId, side, stickerId) {
+        const rows = collectImpressionRows();
+        const row = rows.find(item => item.id === rowId);
+        if (!row) return;
+        const key = side === 'before' ? 'beforeStickers' : 'afterStickers';
+        const sticker = (row[key] || []).find(item => item.id === stickerId);
+        if (!sticker) return;
+        const order = ['s', 'm', 'l'];
+        sticker.size = order[(order.indexOf(sticker.size || 'm') + 1) % order.length];
+        state.impressionRows = rows;
+        renderImpressionRows(rows);
+        saveState();
+      }
+
+      function removeImpressionRow() {
+        const rows = collectImpressionRows();
+        if (rows.length <= IMPRESSION_MIN_ROWS) { showToast('至少保留一行'); return; }
+        const last = rows[rows.length - 1];
+        const hasSticker = [...(last.beforeStickers || []), ...(last.afterStickers || [])].some(item => item.image || item.id);
+        if ((last.before.trim() || last.after.trim() || last.image || hasSticker) && !confirm('最后一行已有内容，仍要删除吗？')) return;
+        const target = impressionTarget(last.id);
+        closeImageModal();
+        delete state.images?.[target];
+        delete state.imageTransforms?.[target];
+        delete imageTargets[target];
+        ['before', 'after'].forEach(side => {
+          (last[side === 'before' ? 'beforeStickers' : 'afterStickers'] || []).forEach(sticker => {
+            const stickerTarget = impressionStickerTarget(last.id, side, sticker.id);
+            delete state.images?.[stickerTarget];
+            delete state.imageTransforms?.[stickerTarget];
+            delete imageTargets[stickerTarget];
+          });
+        });
+        rows.pop();
+        state.impressionRows = rows;
+        renderImpressionRows(rows);
+        saveState();
+        showToast('已减少一行');
+      }
+
       function renderPageSwitch() {
+        $$('[data-repo-page="full"], [data-repo-page="impression"]', $('#pageSwitch')).forEach(button => {
+          const active = button.dataset.repoPage === activeRepoPage;
+          button.classList.toggle('active', active);
+          button.setAttribute('aria-pressed', String(active));
+        });
+        updateImpressionControls();
         const host = $('#longPageButtons'); if (!host) return;
         host.innerHTML = '';
         longRepoPages().forEach((card, index) => {
@@ -1297,7 +1698,9 @@
         fitCanvas();
         requestAnimationFrame(() => {
           if (activeRepoPage !== 'full') autoFitTextArea(activeCard?.querySelector('.long-repo-text'));
+          if (activeRepoPage === 'impression') $$('.impression-text', activeCard).forEach(autoFitTextArea);
           updateLongRepoCount(activeCard);
+          updateImpressionControls();
         });
       }
 
@@ -1527,6 +1930,7 @@
 
       function applyImageTransform(target) {
         const config = imageTargets[target];
+        if (!config) return;
         const img = document.getElementById(config.img);
         if (!img) return;
         const transform = normalizeTransform(target, state.imageTransforms?.[target]);
@@ -1537,8 +1941,17 @@
         img.style.transformOrigin = `${transform.x}% ${transform.y}%`;
       }
 
+      function syncStickerImageMetrics(img) {
+        const sticker = img?.closest('.impression-sticker');
+        if (!sticker) return;
+        const ratio = img?.naturalWidth && img?.naturalHeight ? Math.max(0.35, Math.min(4, img.naturalWidth / img.naturalHeight)) : 1;
+        sticker.style.setProperty('--sticker-ratio', String(ratio));
+        sticker.classList.toggle('has-image', Boolean(img?.src));
+      }
+
       function setImage(target, src, name='', persist=true, resetCrop=false, preferredTransform=null) {
         const config = imageTargets[target];
+        if (!config) return;
         const img = document.getElementById(config.img);
         const changed = src !== (state.images?.[target] || '');
         if (!state.images) state.images = emptyImages();
@@ -1556,10 +1969,26 @@
             return;
           }
           img.closest('.image-tile').classList.remove('has-image');
+          const sticker = img.closest('.impression-sticker');
+          if (sticker) {
+            sticker.classList.remove('has-image');
+            sticker.style.setProperty('--sticker-ratio', '1');
+          }
         };
-        img.onload = () => { img.closest('.image-tile').classList.toggle('has-image', Boolean(src)); applyImageTransform(target); };
+        img.onload = () => {
+          img.closest('.image-tile').classList.toggle('has-image', Boolean(src));
+          syncStickerImageMetrics(img);
+          applyImageTransform(target);
+        };
         img.src = src || '';
         img.closest('.image-tile').classList.toggle('has-image', Boolean(src));
+        if (!src) {
+          const sticker = img.closest('.impression-sticker');
+          if (sticker) {
+            sticker.classList.remove('has-image');
+            sticker.style.setProperty('--sticker-ratio', '1');
+          }
+        }
         state.images[target] = src || '';
         applyImageTransform(target);
         if (name && config.name) document.getElementById(config.name).value = name;
@@ -1759,10 +2188,28 @@
         result.platform = result.platform || '';
         result.language = result.language || '';
         result.ratings = { ...Object.fromEntries(ratingNames.map(name => [name,0])), ...(result.ratings || {}) };
-        result.images = { ...emptyImages(), ...(result.images || {}) };
-        const transforms = emptyImageTransforms();
-        Object.keys(transforms).forEach(target => transforms[target] = normalizeTransform(target, result.imageTransforms?.[target]));
-        result.imageTransforms = transforms;
+        const sourceImages = result.images || {};
+        const sourceTransforms = result.imageTransforms || {};
+        result.images = emptyImages();
+        STATIC_IMAGE_TARGET_KEYS.forEach(target => { result.images[target] = String(sourceImages[target] || ''); });
+        result.imageTransforms = emptyImageTransforms();
+        STATIC_IMAGE_TARGET_KEYS.forEach(target => { result.imageTransforms[target] = normalizeTransform(target, sourceTransforms[target]); });
+        result.impressionRows = normalizeImpressionRows(result.impressionRows, sourceImages, sourceTransforms);
+        result.impressionRows.forEach(row => {
+          const target = impressionTarget(row.id);
+          result.images[target] = row.image;
+          result.imageTransforms[target] = row.transform;
+          (row.beforeStickers || []).forEach(sticker => {
+            const stickerTarget = impressionStickerTarget(row.id, 'before', sticker.id);
+            result.images[stickerTarget] = sticker.image || '';
+            result.imageTransforms[stickerTarget] = normalizeTransform(stickerTarget, sticker.transform);
+          });
+          (row.afterStickers || []).forEach(sticker => {
+            const stickerTarget = impressionStickerTarget(row.id, 'after', sticker.id);
+            result.images[stickerTarget] = sticker.image || '';
+            result.imageTransforms[stickerTarget] = normalizeTransform(stickerTarget, sticker.transform);
+          });
+        });
         result.fields = { ...(result.fields || {}) };
         const pageKeys = Object.keys(result.fields).map(key => key.match(/^longRepo(?:Title|PageNumber|Subject|Keywords|Text)-(\d+)$/)?.[1]).filter(Boolean).map(Number);
         result.longPageCount = Math.max(0, Number(result.longPageCount) || 0, ...(pageKeys.length ? pageKeys : [0]));
@@ -1771,6 +2218,18 @@
       }
 
       function makeSnapshot() {
+        const impressionRows = collectImpressionRows();
+        state.impressionRows = impressionRows;
+        const imageKeys = [
+          ...STATIC_IMAGE_TARGET_KEYS,
+          ...impressionRows.map(row => impressionTarget(row.id)),
+          ...impressionRows.flatMap(row => [
+            ...(row.beforeStickers || []).map(sticker => impressionStickerTarget(row.id, 'before', sticker.id)),
+            ...(row.afterStickers || []).map(sticker => impressionStickerTarget(row.id, 'after', sticker.id))
+          ])
+        ];
+        const images = Object.fromEntries(imageKeys.map(target => [target, state.images?.[target] || '']));
+        const imageTransforms = Object.fromEntries(imageKeys.map(target => [target, normalizeTransform(target, state.imageTransforms?.[target])]));
         return {
           schemaVersion:BACKUP_VERSION,
           palette:state.palette,
@@ -1778,8 +2237,9 @@
           platform:state.platform,
           language:state.language,
           ratings:{ ...state.ratings },
-          images:{ ...state.images },
-          imageTransforms:JSON.parse(JSON.stringify(state.imageTransforms || emptyImageTransforms())),
+          images,
+          imageTransforms,
+          impressionRows,
           longPageCount:longRepoPages().length,
           fields:collectFields()
         };
@@ -2065,14 +2525,17 @@
           const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); if(!saved) return;
           const migrated=migrateSnapshot(saved); ensureLongRepoPages(migrated.longPageCount); state={...migrated};
           Object.entries(migrated.fields||{}).forEach(([key,value])=>{const field=document.querySelector(`[data-key="${CSS.escape(key)}"]`);if(field)field.value=value??'';});
+          normalizeImpressionTitle();
           renderPageSwitch();
         } catch(error){ console.warn('读取失败',error); }
       }
 
       function renderState() {
+        renderImpressionRows(state.impressionRows || defaultImpressionRows());
         applyPalette(state.palette); setCompletion(state.completion); setChoice('platform',state.platform||''); setChoice('language',state.language||''); ratingNames.forEach(updateRating);
         Object.entries(state.images||{}).forEach(([target,src])=>setImage(target,src,'',false,false));
         Object.keys(imageTargets).forEach(applyImageTransform);
+        updateImpressionControls();
       }
 
       function clearFormWithoutConfirm() {
@@ -2086,8 +2549,9 @@
         state = {
           palette:'mintLavender', completion:'yes', platform:'', language:'',
           ratings:Object.fromEntries(ratingNames.map(name => [name, 0])),
-          images:emptyImages(), imageTransforms:emptyImageTransforms()
+          images:emptyImages(), imageTransforms:emptyImageTransforms(), impressionRows:defaultImpressionRows()
         };
+        normalizeImpressionTitle(true);
         renderState();
         fitAllAdaptiveText();
         updateLongRepoCount($('#longRepoCard'));
@@ -2919,17 +3383,14 @@
         bindPersistFields();
         $('#addLongPageBtn').addEventListener('click', () => addLongRepoPage(true));
         $('[data-repo-page="full"]').addEventListener('click', () => applyRepoPage('full', true));
+        $('[data-repo-page="impression"]').addEventListener('click', () => applyRepoPage('impression', true));
+        $('#addImpressionRowBtn').addEventListener('click', addImpressionRow);
+        $('#removeImpressionRowBtn').addEventListener('click', removeImpressionRow);
         $$('#completionToggle button').forEach(btn => btn.addEventListener('click', () => setCompletion(btn.dataset.value, true)));
         $$('#platformChoices .choice-pill').forEach(btn => btn.addEventListener('click', () => setChoice('platform', state.platform === btn.dataset.value ? '' : btn.dataset.value, true)));
         $$('#languageChoices .choice-pill').forEach(btn => btn.addEventListener('click', () => setChoice('language', state.language === btn.dataset.value ? '' : btn.dataset.value, true)));
 
-        $$('.image-picker').forEach(tile => {
-          const open = () => openImageModal(tile.dataset.target);
-          tile.addEventListener('click', open);
-          tile.addEventListener('keydown', event => {
-            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
-          });
-        });
+        bindImagePickers();
 
         $('#closeModal').addEventListener('click', closeImageModal);
         $('#imageModal').addEventListener('click', event => { if (event.target === $('#imageModal')) closeImageModal(); });
@@ -3015,6 +3476,14 @@
         $('#randomThemeBtn').addEventListener('click',()=>{const options=showOnlyFavoriteThemes?palettes.filter(p=>themeFavorites().includes(p.id)):palettes;const pool=options.length?options:palettes;const pick=pool[Math.floor(Math.random()*pool.length)];applyPalette(pick.id,true);closeThemePanel();});
         $('#favoriteThemeFilter').addEventListener('click',()=>{showOnlyFavoriteThemes=!showOnlyFavoriteThemes;renderThemePanel();});
         $$('.color-style-btn').forEach(button => button.addEventListener('click', () => applyColorStyle(button.dataset.colorStyle, true)));
+        $('#gameName')?.addEventListener('input', () => {
+          const titleField = $('#impressionTitle');
+          if (!titleField) return;
+          if (isDefaultImpressionTitle(titleField.value)) {
+            normalizeImpressionTitle(true);
+            saveState();
+          }
+        });
         $('#resetBtn').addEventListener('click', resetAll);
         $('#screenshotBtn').addEventListener('click', enterScreenshotMode);
         $('#closePreview').addEventListener('click', closePreview);
@@ -3937,6 +4406,10 @@
           button.disabled=activeRepoReadonly;
           button.setAttribute('aria-disabled',String(activeRepoReadonly));
         });
+        root.querySelectorAll('.impression-text,.impression-row-tool,.impression-sticker-add,.impression-sticker-size,.impression-sticker-remove').forEach(control=>{
+          control.disabled=activeRepoReadonly;
+          control.setAttribute('aria-disabled',String(activeRepoReadonly));
+        });
         root.querySelectorAll('.image-picker').forEach(tile=>{
           tile.setAttribute('aria-disabled',String(activeRepoReadonly));
           tile.tabIndex=activeRepoReadonly?-1:0;
@@ -3968,7 +4441,7 @@
           window.amoristRepoManager.open(game,{readonly:true,inline:true});$('#publicRepoPreview')?.remove();
           const source=$('#repoCard');if(!source)return;
           const overlay=document.createElement('div');overlay.id='publicRepoPreview';overlay.className='public-repo-preview';overlay.innerHTML='<div class="public-repo-preview-head"><span>游戏 REPO</span><button type="button" aria-label="关闭 REPO 预览">×</button></div><div class="public-repo-preview-stage"></div>';
-          const pages=[source,...$$('.long-repo-page')].map((page,index)=>{const paper=page.cloneNode(true);if(index===0)paper.id='repoCard';else{paper.removeAttribute('id');paper.removeAttribute('hidden')}paper.querySelectorAll('input,textarea,select,button').forEach(control=>{control.disabled=true;control.tabIndex=-1});return paper});pages.forEach(paper=>overlay.querySelector('.public-repo-preview-stage').appendChild(paper));document.body.appendChild(overlay);const close=()=>overlay.remove();overlay.querySelector('button').onclick=close;overlay.addEventListener('click',event=>{if(event.target===overlay)close()});return;
+          const pages=[source,...$$('.impression-repo-page'),...$$('.long-repo-page')].map((page,index)=>{const paper=page.cloneNode(true);if(index===0)paper.id='repoCard';else{paper.removeAttribute('id');paper.removeAttribute('hidden')}paper.querySelectorAll('input,textarea,select,button').forEach(control=>{control.disabled=true;control.tabIndex=-1});return paper});pages.forEach(paper=>overlay.querySelector('.public-repo-preview-stage').appendChild(paper));document.body.appendChild(overlay);const close=()=>overlay.remove();overlay.querySelector('button').onclick=close;overlay.addEventListener('click',event=>{if(event.target===overlay)close()});return;
         }
         window.amoristRepoManager.open(game,{});toast(`已打开「${game.name}」的 REPO`);
       }
@@ -6362,16 +6835,6 @@
   $('workshopExport')?.addEventListener('click',directExportImage);$('workshopFullscreen').onclick=directExportImage;$('workshopFullscreen').textContent='\u5bfc\u51fa\u6574\u5f20\u56fe';
   window.addEventListener('resize',fitWorkshopCanvas);const workshopMain=document.querySelector('.workshop-main');if(workshopMain&&window.ResizeObserver)new ResizeObserver(()=>requestAnimationFrame(fitWorkshopCanvas)).observe(workshopMain);new MutationObserver(()=>{if(view.classList.contains('active'))requestAnimationFrame(fitWorkshopCanvas);}).observe(view,{attributes:true,attributeFilter:['class']});renderPresets();renderSaved();renderTemplates();renderPalettePanel();render();
   const savedTheme=state.paletteId?{style:'workshop',id:state.paletteId}:null,defaultTheme=savedTheme||{style:'workshop',id:'macaronPink'};applyWorkshopTheme(defaultTheme.style,defaultTheme.id,false);
-})();
-;
-
-/* ===== repoProfilePatternBridge ===== */
-(()=>{
-  const actions=document.getElementById('repoProductActions');
-  const pageSwitch=document.getElementById('pageSwitch');
-  const screenshot=document.getElementById('screenshotBtn');
-  if(actions&&pageSwitch)actions.append(pageSwitch);
-  if(actions&&screenshot){screenshot.classList.add('product-button');actions.append(screenshot);}
 })();
 ;
 
