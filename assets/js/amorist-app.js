@@ -4424,14 +4424,10 @@
         const control=event.target.closest('.color-style-btn,.theme-card,.theme-current-btn,.page-switch-btn,.page-add-btn,.image-picker');
         if(control||event.target.closest('.product-view[data-product-view="studio"]'))scheduleActiveGameRepoSave();
       },true);
-      $('#repoBackToGame')?.addEventListener('click',()=>{
-        const id=activeRepoGameId;window.amoristProductNavigate?.('library');
-        if(id)setTimeout(()=>renderGameDetail(id),30);
-      });
       window.addEventListener('pagehide',()=>saveActiveGameRepo(true),{capture:true});
       function writeLegacyGameToRepo(game){
         // Game detail pages are part of the public index and only showcase
-        // the saved repo.  The sidebar button remains the editing entrypoint.
+        // the saved repo.  The REPO page remains the editing entrypoint.
         window.amoristRepoManager.open(game,window.AMORIST_MODE==='public'?{readonly:true}:{});
         toast(`已打开「${game.name}」的 REPO`);
       }

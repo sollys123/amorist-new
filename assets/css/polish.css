@@ -2031,3 +2031,222 @@ html body .product-view[data-product-view="studio"] #repoActionGroup #archiveBtn
     display:none!important;
   }
 }
+
+/* ===== repoScreenshotModeAndMobileRail ===== */
+/* The editor rail must never survive into a full-screen capture. */
+html:has(body.screenshot-mode){
+  background:var(--paper)!important;
+}
+html body.screenshot-mode{
+  background:var(--paper)!important;
+  color:var(--ink)!important;
+}
+html body.screenshot-mode .product-view[data-product-view="studio"]{
+  display:block!important;
+  min-height:100vh!important;
+  padding:0!important;
+  background:var(--paper)!important;
+}
+html body.screenshot-mode .product-view[data-product-view="studio"] .app{
+  display:block!important;
+  width:100vw!important;
+  max-width:none!important;
+  min-height:100vh!important;
+  margin:0!important;
+  padding:0!important;
+  background:var(--paper)!important;
+}
+html body.screenshot-mode .product-view[data-product-view="studio"] #toolbar,
+html body.screenshot-mode .product-view[data-product-view="studio"] .repo-product-head,
+html body.screenshot-mode .toast{
+  display:none!important;
+}
+html body.screenshot-mode .product-view[data-product-view="studio"] .viewport{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100vw!important;
+  min-height:100vh!important;
+  height:100vh!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:var(--paper)!important;
+  box-shadow:none!important;
+  overflow:hidden!important;
+}
+html body.screenshot-mode .product-view[data-product-view="studio"] #canvasShell{
+  margin:0 auto!important;
+  max-width:none!important;
+  overflow:visible!important;
+  filter:none!important;
+}
+
+/* On small screens the rail becomes a compact tab/action strip, not a tall card. */
+@media (max-width:720px){
+  html body .product-view[data-product-view="studio"] #toolbar{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    flex-wrap:wrap!important;
+    gap:0!important;
+    width:100%!important;
+    margin:0 0 8px!important;
+    padding:6px 0 7px!important;
+    border:0!important;
+    border-bottom:1px solid var(--repo-rail-line)!important;
+    background:transparent!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar .repo-sidebar-section{
+    display:block!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar .repo-sidebar-label{
+    display:none!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar .repo-sidebar-appearance{
+    width:auto!important;
+    flex:1 1 auto!important;
+    order:1!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar .repo-sidebar-pages{
+    order:3!important;
+    margin-top:4px!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar .repo-sidebar-actions{
+    order:2!important;
+    width:auto!important;
+    flex:0 1 auto!important;
+  }
+  html body .product-view[data-product-view="studio"] #paletteList{
+    width:auto!important;
+  }
+  html body .product-view[data-product-view="studio"] #themeBtn{
+    width:auto!important;
+    min-height:32px!important;
+    padding:6px 2px!important;
+    border:0!important;
+    font-size:11px!important;
+  }
+  html body .product-view[data-product-view="studio"] #themeBtn > span:first-child{
+    overflow:hidden!important;
+    max-width:7em!important;
+    font-size:0!important;
+    white-space:nowrap!important;
+    text-overflow:ellipsis!important;
+  }
+  html body .product-view[data-product-view="studio"] #themeBtn > span:first-child::before{
+    content:"换肤";
+    font:600 11px/1 Georgia,"Noto Serif SC",serif!important;
+  }
+  html body .product-view[data-product-view="studio"] #themeBtn .theme-current-swatches{
+    width:34px!important;
+    height:10px!important;
+    margin-left:7px!important;
+  }
+  html body .product-view[data-product-view="studio"] #pageSwitch{
+    display:flex!important;
+    align-items:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    gap:0!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scrollbar-width:none!important;
+  }
+  html body .product-view[data-product-view="studio"] #pageSwitch::-webkit-scrollbar{display:none}
+  html body .product-view[data-product-view="studio"] #pageSwitch :is(.page-switch-btn,.page-add-btn){
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:max-content!important;
+    min-height:31px!important;
+    padding:6px 9px!important;
+    border:0!important;
+    border-bottom:2px solid transparent!important;
+    background:transparent!important;
+    font-size:11px!important;
+  }
+  html body .product-view[data-product-view="studio"] #pageSwitch .page-switch-btn.active{
+    border-left-color:transparent!important;
+    border-bottom-color:var(--product-plum)!important;
+    background:transparent!important;
+  }
+  html body .product-view[data-product-view="studio"] #pageSwitch .long-page-buttons{
+    display:flex!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    overflow:visible!important;
+  }
+  html body .product-view[data-product-view="studio"] #pageSwitch .long-page-entry{
+    display:flex!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    border:0!important;
+  }
+  html body .product-view[data-product-view="studio"] #pageSwitch .long-page-entry .page-switch-btn{
+    width:auto!important;
+  }
+  html body .product-view[data-product-view="studio"] #pageSwitch .long-page-delete{
+    flex:0 0 22px!important;
+    width:22px!important;
+    min-height:31px!important;
+    height:31px!important;
+    border:0!important;
+    font-size:13px!important;
+  }
+  html body .product-view[data-product-view="studio"] #pageSwitch .page-add-btn{
+    margin:0!important;
+    border-top:0!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar .impression-row-tools:not([hidden]){
+    display:flex!important;
+    grid-template-columns:none!important;
+    width:auto!important;
+    min-height:31px!important;
+    margin:0 0 0 5px!important;
+    padding:0 0 0 5px!important;
+    border:0!important;
+    border-left:1px solid var(--repo-rail-line)!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar .impression-row-count{
+    padding:0 4px!important;
+    font-size:9px!important;
+  }
+  html body .product-view[data-product-view="studio"] #toolbar .impression-row-tool{
+    width:26px!important;
+    height:28px!important;
+    min-height:28px!important;
+    font-size:16px!important;
+  }
+  html body .product-view[data-product-view="studio"] #repoActionGroup{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    width:auto!important;
+    max-width:100%!important;
+    gap:0!important;
+    overflow-x:auto!important;
+    scrollbar-width:none!important;
+  }
+  html body .product-view[data-product-view="studio"] #repoActionGroup::-webkit-scrollbar{display:none}
+  html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:max-content!important;
+    min-height:32px!important;
+    padding:6px 8px!important;
+    border:0!important;
+    border-left:1px solid var(--repo-rail-line)!important;
+    background:transparent!important;
+    font-size:10px!important;
+  }
+  html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn:first-child{border-left:0!important}
+  html body .product-view[data-product-view="studio"] #repoActionGroup .tool-btn + .tool-btn{border-top:0!important}
+  html body .product-view[data-product-view="studio"] #repoActionGroup #screenshotBtn{
+    margin:0!important;
+    border-top:0!important;
+  }
+}
