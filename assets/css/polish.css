@@ -2032,6 +2032,47 @@ html body .product-view[data-product-view="studio"] #repoActionGroup #archiveBtn
   }
 }
 
+/* Keep the workshop's two primary actions together in the working rail. */
+html body .product-view[data-product-view="forms"] .workshop-primary-actions{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;
+  width:100%!important;
+  margin:0 0 16px!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-primary-actions .workshop-new{
+  width:100%!important;
+  min-width:0!important;
+  min-height:40px!important;
+  margin:0!important;
+  padding:9px 7px!important;
+  white-space:nowrap!important;
+  font-size:12px!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-primary-actions .workshop-export{
+  background:var(--product-plum)!important;
+  border-color:var(--product-plum)!important;
+  color:#fff!important;
+}
+html body .product-view[data-product-view="forms"] .workshop-primary-actions .workshop-new:focus-visible{
+  outline:2px solid var(--product-accent)!important;
+  outline-offset:2px!important;
+}
+
+/* REPO rail uses the app's shared UI face; only the canvas keeps editorial serif type. */
+html body .product-view[data-product-view="studio"] #toolbar,
+html body .product-view[data-product-view="studio"] #toolbar :is(
+  .toolbar-title,.toolbar-status,.repo-sidebar-label,#themeBtn,
+  #pageSwitch :is(.page-switch-btn,.page-add-btn,.long-page-delete),
+  .impression-row-count,.impression-row-tool,#repoActionGroup .tool-btn,
+  #repoActionGroup .archive-count
+){
+  font-family:"LXGW WenKai","Kaiti SC","STKaiti","KaiTi","PingFang SC","Microsoft YaHei UI",sans-serif!important;
+}
+html body .product-view[data-product-view="studio"] #themeBtn > span:first-child::before{
+  font-family:inherit!important;
+}
+
 /* ===== repoScreenshotModeAndMobileRail ===== */
 /* The editor rail must never survive into a full-screen capture. */
 html:has(body.screenshot-mode){

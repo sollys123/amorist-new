@@ -6724,10 +6724,10 @@
   let activeCell=-1,assetTab='games',assetRows=[];
   view.innerHTML=`<div class="product-page-head workshop-page-head">
     <div><h1>图文创作</h1><p>در ازل پرتوِ حُسنت ز تجلی دَم زد ,عشق پیدا شد و آتش به همه عالم زد</p></div>
-    <div class="workshop-head-actions"><button class="product-button" id="workshopSave">保存图表</button><button class="product-button secondary" id="workshopSaveTemplate">保存模板</button><button class="product-button" id="workshopFullscreen">全屏截图</button></div>
+    <div class="workshop-head-actions"><button class="product-button" id="workshopSave">保存图表</button><button class="product-button secondary" id="workshopSaveTemplate">保存模板</button></div>
   </div><div class="workshop-shell">
     <aside class="workshop-sidebar">
-      <button class="workshop-new" id="workshopNew">＋ 自由创作</button>
+      <div class="workshop-primary-actions"><button class="workshop-new" id="workshopNew">＋ 自由创作</button><button class="workshop-new workshop-export" id="workshopFullscreen" type="button">导出整张图</button></div>
       <div class="workshop-side-title">配色</div>
       <div class="workshop-color-row"><button data-workshop-color="gradient">渐变</button><button data-workshop-color="solid">浅色</button><button data-workshop-color="dark">深色</button></div><div class="workshop-palette-panel" id="workshopPalettePanel"></div>
     </aside>
