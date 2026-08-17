@@ -1,3 +1,5 @@
+@import url('./y2k-acrylic.css?v=y2k-acrylic-20260818-1');
+
 /* Public/editor mode additions. Desktop layout from Amorist 2.3 remains unchanged. */
 .amorist-public-badge {
   display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border:1px solid var(--product-line);
