@@ -1,4 +1,6 @@
 /* High-specificity guardrails for late legacy stylesheets. */
+html body [class],html body [id],html body button,html body input,html body textarea,html body select,html body img,html body [role]{border-radius:0!important}
+html body [class]::before,html body [class]::after,html body [id]::before,html body [id]::after{border-radius:0!important}
 html body .product-shell{display:block!important;width:min(1240px,calc(100% - 64px))!important;margin:28px auto 54px!important;padding:10px!important}
 html body .product-sidebar{position:sticky!important;top:8px!important;width:100%!important;height:auto!important;min-height:0!important;display:grid!important;grid-template-columns:auto repeat(3,minmax(0,1fr))!important;padding:0!important;margin:0 0 10px!important}
 html body .product-nav{display:grid!important;grid-auto-flow:column!important;grid-auto-columns:minmax(0,1fr)!important;min-width:0!important}
