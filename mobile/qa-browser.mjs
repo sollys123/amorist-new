@@ -81,7 +81,7 @@ try {
   assert(libraryTypography.toolbarDisplay==='grid',
     'library must use a mobile toolbar: '+JSON.stringify(libraryTypography));
   assert.equal(libraryTypography.icons,3,'library view controls must be SVG');
-  await page.screenshot({path:path.join(screens,browserName+'-01b-library-layout.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-01b-library-layout.png'),fullPage:false});
   await page.evaluate(()=>window.amoristProductNavigate('home'));
   await page.waitForTimeout(100);
 
