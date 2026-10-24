@@ -6,7 +6,7 @@ const VERSION='20261024-v3';
 const CORE='amorist-mobile-core-'+VERSION;
 const EXTRA='amorist-mobile-artwork-'+VERSION;
 const CORE_URLS=[
-  './','./index.html','./app.css','./ios-polish.css','./native-core.css','./native-discovery.css','./native-shrine.css','./app.js','./ui-icons.js','./native-core.js','./native-discovery.js','./native-shrine.js','./bootstrap.js','./publish.js',
+  './','./index.html','./app.css','./ios-polish.css','./native-core.css','./native-discovery.css','./native-shrine.css','./native-forms.css','./app.js','./ui-icons.js','./native-core.js','./native-discovery.js','./native-shrine.js','./native-forms.js','./bootstrap.js','./publish.js',
   './manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png',
   './offline-assets.json',
   '../assets/css/amorist.css','../assets/css/site-modes.css',
