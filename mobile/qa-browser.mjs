@@ -34,98 +34,61 @@ try {
     bottom:Math.round(document.querySelector('.am-bottom-tabs').getBoundingClientRect().bottom)}));
   assert(viewport.scroll<=viewport.width+3,'horizontal overflow on phone');
   assert(viewport.bottom<=844,'bottom nav below screen');
-  await page.screenshot({path:path.join(screens,browserName+'-01-home.png'),fullPage:true});
+  await page.waitForFunction(()=>Boolean(window.AmoristNativeMobile?.state),null,{timeout:8000});
+  await assertVisible('#amv-home .amv-home-hero');
+  assert.equal(await page.locator('#amv-home .amv-quick-grid button').count(),3);
+  await page.screenshot({path:path.join(screens,browserName+'-01-home.png'),fullPage:false});
 
   const views=['library','characters','timeline','oshi','bangumi','omikuji','forms','studio','home'];
-  for(const view of views){
-    await page.evaluate(v=>window.amoristProductNavigate(v),view);
-    await page.waitForTimeout(100);
+  for(const v of views){
+    await page.evaluate(name=>window.amoristProductNavigate(name),v);
+    await page.waitForTimeout(180);
     const active=await page.locator('.product-view.active').getAttribute('data-product-view');
-    assert.equal(active,view,'navigation mismatch: '+view);
+    assert.equal(active,v,'native router mismatch: '+v);
     const dimensions=await page.evaluate(()=>({
-      documentWidth:document.documentElement.scrollWidth,
-      screenWidth:window.innerWidth,
-      bodyWidth:document.body.scrollWidth
+      screen:innerWidth,documentWidth:document.documentElement.scrollWidth
     }));
-    assert(dimensions.documentWidth<=dimensions.screenWidth+4,
-      view+' has unexpected horizontal page overflow: '+JSON.stringify(dimensions));
+    assert(dimensions.documentWidth<=dimensions.screen+4,
+      'mobile view overflow: '+v+' '+JSON.stringify(dimensions));
   }
 
-  // iOS regression: the old desktop rank axis squeezed Japanese tier names into
-  // a 54 px vertical column, and the grid/list controls became colored Emoji.
   await page.evaluate(()=>window.amoristProductNavigate('library'));
-  await page.waitForTimeout(300);
-  await page.waitForFunction(()=>document.querySelectorAll('.library-reference-views svg.am-line-icon').length===3,
-    null,{timeout:8000});
-  const libraryTypography=await page.evaluate(()=>{
-    const tier=document.querySelector('.library-rank-tier');
-    const title=tier?.querySelector('header h3');
-    const toolbar=document.querySelector('.library-reference-toolbar');
-    const list=document.querySelector('.library-status-tabs');
-    const icons=document.querySelectorAll('.library-reference-views svg.am-line-icon').length;
-    return {
-      titleWidth:title?.getBoundingClientRect().width || 0,
-      titleSize:title?parseFloat(getComputedStyle(title).fontSize):0,
-      tierWidth:tier?.getBoundingClientRect().width || 0,
-      tierColumns:tier?getComputedStyle(tier).gridTemplateColumns:'',
-      toolbarDisplay:toolbar?getComputedStyle(toolbar).display:'',
-      filterScrollWidth:list?.scrollWidth || 0,
-      filterClientWidth:list?.clientWidth || 0,
-      icons
-    };
-  });
-  assert(libraryTypography.titleWidth>65,
-    'rank title cramped on mobile: '+JSON.stringify(libraryTypography));
-  assert(libraryTypography.titleSize>=16,
-    'rank title too small: '+JSON.stringify(libraryTypography));
-  assert(libraryTypography.toolbarDisplay==='grid',
-    'library must use a mobile toolbar: '+JSON.stringify(libraryTypography));
-  assert.equal(libraryTypography.icons,3,'library view controls must be SVG');
-  const rankState=await page.evaluate(()=>({
-    selected:document.querySelector('.library-reference-views button.active')?.dataset.libraryView,
-    gridHidden:document.querySelector('#gameLibraryGrid')?.hidden,
-    gridDisplay:getComputedStyle(document.querySelector('#gameLibraryGrid')).display,
-    rankDisplay:getComputedStyle(document.querySelector('#libraryRankView')).display
-  }));
-  assert(rankState.selected==='rank' && rankState.gridHidden && rankState.gridDisplay==='none' && rankState.rankDisplay!=='none',
-    'rank mode must hide grid, not render all 96 cards behind it: '+JSON.stringify(rankState));
-  await page.locator('.library-reference-views button[data-library-view="grid"]').click();
-  const galleryState=await page.evaluate(()=>{
-    const grid=document.querySelector('#gameLibraryGrid');
-    const card=grid?.querySelector('.game-card');
-    const cover=card?.querySelector('.game-cover');
-    return {gridHidden:grid?.hidden,rankHidden:document.querySelector('#libraryRankView')?.hidden,
-      cardDisplay:card?getComputedStyle(card).display:'',
-      coverWidth:cover?.getBoundingClientRect().width||0,
-      cardWidth:card?.getBoundingClientRect().width||0};
-  });
-  assert(!galleryState.gridHidden && galleryState.rankHidden && galleryState.cardDisplay==='block' &&
-    galleryState.coverWidth>=galleryState.cardWidth-8,
-    'gallery cards must stack cover above text, without overlap: '+JSON.stringify(galleryState));
-  await page.locator('.library-reference-views button[data-library-view="rank"]').click();
-  await page.screenshot({path:path.join(screens,browserName+'-01b-library-layout.png'),fullPage:false});
+  await assertVisible('#amv-library .amv-metrics');
+  assert.equal(await page.locator('#amv-library .amv-filter-scroll button').count(),7);
+  await page.locator('#amv-library [data-amv="lib-layout"][data-value="rank"]').click();
+  await assertVisible('#amv-library .amv-rank-groups');
+  await page.locator('#amv-library [data-amv="lib-layout"][data-value="cover"]').click();
+  await assertVisible('#amv-library .amv-game-grid');
+  assert.equal(await page.locator('#amv-library .amv-game-grid .amv-game-card').count(),
+    await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]').length));
+  await page.screenshot({path:path.join(screens,browserName+'-01b-library-native.png'),fullPage:false});
+  await page.locator('#amv-library [data-amv="new-game"]').click();
+  await assertVisible('#gameDialogOverlay');
+  await page.locator('#libraryGameName').fill('QA 原生移动端新增作品');
+  await page.locator('#gameDialogForm button[type="submit"]').click();
+  assert(await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]')
+    .some(g=>g.name==='QA 原生移动端新增作品')),'new game did not save');
+  await page.evaluate(()=>window.amoristProductNavigate('characters'));
+  await assertVisible('#amv-characters .amv-library-controls');
+  await page.evaluate(()=>window.amoristProductNavigate('timeline'));
+  await assertVisible('#amv-timeline .amv-calendar-panel');
+  await page.locator('#amv-timeline [data-amv="timeline-mode"][data-value="feed"]').click();
+  await assertVisible('#amv-timeline .amv-feed');
   await page.evaluate(()=>window.amoristProductNavigate('home'));
-  await page.waitForTimeout(100);
+  await page.locator('#amv-home [data-amv="edit-profile"]').click();
 
-  await page.locator('#profileEditButton').click();
   await assertVisible('#profileEditModal');
   await page.locator('#profileEditModal [data-profile-key="name"]').fill('QA 手机版档案');
   await page.locator('#profileEditSave').click();
   const savedProfile=await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-profile-v1')||'{}').name);
   assert.equal(savedProfile,'QA 手机版档案','profile edit did not persist');
-  await page.screenshot({path:path.join(screens,browserName+'-02-profile.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-02-profile.png'),fullPage:false});
 
   await page.evaluate(()=>window.amoristProductNavigate('library'));
-  await page.waitForTimeout(200);
-  const add=page.locator('#libraryAddGameButton');
-  await add.waitFor({timeout:15000});
-  await add.click();
-  await assertVisible('#gameDialogOverlay');
-  await page.locator('#libraryGameName').fill('QA 手机版游戏');
-  await page.locator('#gameDialogForm button[type="submit"]').click();
-  const gameAdded=await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]').some(g=>g.name==='QA 手机版游戏'));
+  await page.waitForTimeout(250);
+  const gameAdded=await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]').some(g=>g.name==='QA 原生移动端新增作品'));
   assert(gameAdded,'new game was not saved');
-  await page.screenshot({path:path.join(screens,browserName+'-03-library.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-03-library.png'),fullPage:false});
 
   await page.evaluate(()=>window.amoristProductNavigate('studio'));
   await page.waitForTimeout(250);
@@ -134,7 +97,7 @@ try {
   assert.equal(await page.locator('#gameName').inputValue(),'手机原生 REPO 编辑同步测试','REPO input not synced');
   await page.locator('[data-am-studio-mode="canvas"]').click();
   await assertVisible('.product-view[data-product-view="studio"]>.app');
-  await page.screenshot({path:path.join(screens,browserName+'-04-repo.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-04-repo.png'),fullPage:false});
 
   await page.locator('#amOpenPublish').click();
   await assertVisible('#amPublishDialog');
