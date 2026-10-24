@@ -86,6 +86,22 @@
     return result;
   }
 
+  // Contents API returns a SHA for large JSON files, but omits their inline
+  // content above 1 MB. Git Blobs API gives us the actual remote version so
+  // a phone that was initialized while Pages lagged can never silently replace
+  // someone else's more recent publication.
+  async function readPublishedBlob(sha){
+    const [owner,name]=repo().split('/');
+    const url='https://api.github.com/repos/'+encodeURIComponent(owner)+'/'+
+      encodeURIComponent(name)+'/git/blobs/'+encodeURIComponent(sha);
+    const response=await fetch(url,{headers:authHeaders(),cache:'no-store'});
+    if(!response.ok)throw new Error('无法核对远端数据：GitHub '+response.status);
+    const blob=await response.json();
+    if(blob.encoding!=='base64'||!blob.content)
+      throw new Error('远端数据内容暂时无法读取，已中止以保护公开站');
+    try{return JSON.parse(new TextDecoder().decode(base64ToBytes(blob.content.replace(/\\s/g,''))))}
+    catch{throw new Error('远端档案无法解析，已中止以避免覆盖')}
+  }
   function bytesToDataUrl(bytes,type){
     return 'data:'+type+';base64,'+bytesToBase64(bytes);
   }
@@ -270,6 +286,12 @@
     try {
       status('正在核对远端版本…');
       const before=await validateToken();
+      const currentPublished=await readPublishedBlob(before.sha);
+      const expectedPublication=localStorage.getItem(VERSION_KEY)||mobile.remotePublicationAt||'';
+      if(currentPublished?.type!=='amorist-public-data'||!currentPublished.localStorage)
+        throw new Error('仓库中发布数据结构异常，已停止覆盖');
+      if(expectedPublication && String(currentPublished.exportedAt||'')!==String(expectedPublication))
+        throw new Error('远端档案的发布时间与本机基线不同，可能已有其他设备更新。请核对并合并数据后再发布');
       const knownSha=localStorage.getItem(BASE_SHA_KEY);
       baseline=knownSha||baseline;
       // If the public file has changed on another computer, do not overwrite it.
