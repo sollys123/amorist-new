@@ -164,3 +164,10 @@ body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-a
   .amf-template-grid{gap:10px}
   .amf-template{padding:9px}
 }
+.amf-resume{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:9px;width:100%;min-height:49px;padding:12px 15px;
+  margin:0 0 14px;border-radius:12px;border:1px solid #D8C6D3;
+  background:var(--amv-blush);color:var(--amv-accent);
+  font:600 12px/1.4 var(--amv-sans);text-align:left;
+}
