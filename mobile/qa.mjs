@@ -5,7 +5,7 @@ const root=path.resolve(import.meta.dirname,'..');
 const mobile=path.join(root,'mobile');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const html=read('mobile/index.html');
-const scripts=['mobile/app.js','mobile/bootstrap.js','mobile/publish.js','mobile/sw.js','mobile/native-core.js','mobile/native-discovery.js'];
+const scripts=['mobile/app.js','mobile/bootstrap.js','mobile/publish.js','mobile/sw.js','mobile/native-core.js','mobile/native-discovery.js','mobile/native-shrine.js'];
 const navViews=['home','library','characters','timeline','studio','forms','oshi','bangumi','omikuji'];
 for(const view of navViews)assert(html.includes('data-product-view="'+view+'"'),view+' view missing');
 for(const id of ['amTopbar','amPublishDialog','amStudioQuickform','profileEditButton','profileEditModal',
@@ -21,6 +21,7 @@ assert(html.includes('<base href="../">'),'asset base incorrect');
 assert(/mobile\/app.css/.test(html));
 assert(html.includes('mobile/native-core.css'),'native app style missing');
 assert(html.includes('mobile/native-discovery.css'),'native discovery style missing');
+assert(html.includes('mobile/native-shrine.css'),'native shrine style missing');
 assert(read('mobile/bootstrap.js').includes('mobile/native-core.js'),'native app bootstrap missing');
 assert(read('mobile/sw.js').includes('native-core.js') && read('mobile/sw.js').includes('native-core.css'),'offline cache must include native shell');
 for(const script of scripts)assert(fs.statSync(path.join(root,script)).size>100,script+' missing');
