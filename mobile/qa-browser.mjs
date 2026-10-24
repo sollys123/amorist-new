@@ -146,6 +146,18 @@ try {
   await assertVisible('#oshiDetailEditor');
   assert.equal(await page.locator('#oshiEditName').inputValue().then(Boolean),true);
   await page.screenshot({path:path.join(screens,browserName+'-v4-oshi-editor.png'),fullPage:false});
+  await page.locator('#oshiEditShort').fill('QA OSHI PROFILE / 保存验证');
+  await page.locator('#oshiSaveDetail').click();
+  const persistedOshi=await page.evaluate(id=>{
+    const data=JSON.parse(localStorage.getItem('amorist-oshi-hub-v1')||'{}');
+    return (data.records||[]).find(row=>String(row.id)===String(id))?.short||'';
+  },chosenOshiId);
+  assert.equal(persistedOshi,'QA OSHI PROFILE / 保存验证',
+    'edited Oshi record did not persist in local draft');
+  await page.locator('#oshiEditDetailButton').click();
+  await assertVisible('#oshiEditorDrawer');
+  assert.equal(await page.locator('#oshiEditShort').inputValue(),'QA OSHI PROFILE / 保存验证',
+    'reopening Oshi editor lost saved value');
   await page.locator('#oshiDrawerClose').click();
   await page.locator('#amv-oshi [data-amv="oshi-back"]').click();
   await assertVisible('#amv-oshi .amv-oshi-list');
