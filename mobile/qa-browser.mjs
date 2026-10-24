@@ -81,6 +81,28 @@ try {
   assert(libraryTypography.toolbarDisplay==='grid',
     'library must use a mobile toolbar: '+JSON.stringify(libraryTypography));
   assert.equal(libraryTypography.icons,3,'library view controls must be SVG');
+  const rankState=await page.evaluate(()=>({
+    selected:document.querySelector('.library-reference-views button.active')?.dataset.libraryView,
+    gridHidden:document.querySelector('#gameLibraryGrid')?.hidden,
+    gridDisplay:getComputedStyle(document.querySelector('#gameLibraryGrid')).display,
+    rankDisplay:getComputedStyle(document.querySelector('#libraryRankView')).display
+  }));
+  assert(rankState.selected==='rank' && rankState.gridHidden && rankState.gridDisplay==='none' && rankState.rankDisplay!=='none',
+    'rank mode must hide grid, not render all 96 cards behind it: '+JSON.stringify(rankState));
+  await page.locator('.library-reference-views button[data-library-view="grid"]').click();
+  const galleryState=await page.evaluate(()=>{
+    const grid=document.querySelector('#gameLibraryGrid');
+    const card=grid?.querySelector('.game-card');
+    const cover=card?.querySelector('.game-cover');
+    return {gridHidden:grid?.hidden,rankHidden:document.querySelector('#libraryRankView')?.hidden,
+      cardDisplay:card?getComputedStyle(card).display:'',
+      coverWidth:cover?.getBoundingClientRect().width||0,
+      cardWidth:card?.getBoundingClientRect().width||0};
+  });
+  assert(!galleryState.gridHidden && galleryState.rankHidden && galleryState.cardDisplay==='block' &&
+    galleryState.coverWidth>=galleryState.cardWidth-8,
+    'gallery cards must stack cover above text, without overlap: '+JSON.stringify(galleryState));
+  await page.locator('.library-reference-views button[data-library-view="rank"]').click();
   await page.screenshot({path:path.join(screens,browserName+'-01b-library-layout.png'),fullPage:false});
   await page.evaluate(()=>window.amoristProductNavigate('home'));
   await page.waitForTimeout(100);
