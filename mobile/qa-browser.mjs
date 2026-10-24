@@ -90,7 +90,27 @@ try {
   await page.evaluate(()=>window.amoristProductNavigate('characters'));
   await assertVisible('#amv-characters .amv-library-controls');
   await page.evaluate(()=>window.amoristProductNavigate('forms'));
-  await assertVisible('#amf-screen .amf-template-grid');
+  const formsState=await page.evaluate(()=>{
+    const root=document.querySelector('.product-view[data-product-view="forms"]');
+    const shell=document.getElementById('amf-screen');
+    const gallery=document.querySelector('#amf-screen .amf-template-grid');
+    const ws=document.getElementById('formWorkspace');
+    return {
+      loaded:Boolean(window.AmoristNativeForms),
+      rootActive:root?.classList.contains('active'),
+      rootClass:root?.className,
+      shellExists:Boolean(shell),
+      shellDisplay:shell?getComputedStyle(shell).display:null,
+      galleryExists:Boolean(gallery),
+      galleryDisplay:gallery?getComputedStyle(gallery).display:null,
+      galleryParent:gallery?.parentNode?.className||'',
+      html:shell?.innerHTML.slice(0,550)||'',
+      workspaceClass:ws?.className
+    };
+  });
+  console.log('Native forms state',formsState);
+  assert(await page.locator('#amf-screen .amf-template-grid').isVisible(),
+    'native forms template gallery missing '+JSON.stringify(formsState));
   assert.equal(await page.locator('#amf-screen [data-amf="open"]').count(),8,'eight original art templates required');
   await page.locator('#amf-screen [data-amf="open"]').first().click();
   await assertVisible('#formWorkspace');
