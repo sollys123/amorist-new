@@ -104,10 +104,19 @@ try {
   assert.equal(await page.locator('#amz-screen .amz-choice').count(),6,'all six shrine rituals must be present');
   const mapHidden=await page.evaluate(()=>getComputedStyle(document.querySelector('#omikujiSanctuary')).display);
   assert.equal(mapHidden,'none','old desktop shrine map should not be visible');
-  await page.locator('#amz-screen [data-amz="water"]').click();
-  await assertVisible('#omikujiRitual');
-  await page.locator('#omikujiMapBack').click();
-  await assertVisible('#amz-screen .amz-choices');
+  for(const ritual of [
+    {id:'water',panel:'omikujiRitual',back:'omikujiMapBack'},
+    {id:'sakura',panel:'sakuraRitual',back:'sakuraMapBack'},
+    {id:'bell',panel:'bellRitual',back:'bellMapBack'},
+    {id:'ink',panel:'kotodamaRitual',back:'kotodamaMapBack'},
+    {id:'ema',panel:'emaRitual',back:'emaMapBack'},
+    {id:'torii',panel:'toriiRitual',back:'toriiMapBack'}
+  ]){
+    await page.locator('#amz-screen [data-amz="'+ritual.id+'"]').click();
+    await assertVisible('#'+ritual.panel);
+    await page.locator('#'+ritual.back).click();
+    await assertVisible('#amz-screen .amz-choices');
+  }
   await page.screenshot({path:path.join(screens,browserName+'-v3-shrine-native.png'),fullPage:false});
   await page.evaluate(()=>window.amoristProductNavigate('characters'));
   await page.evaluate(()=>window.amoristProductNavigate('bangumi'));
