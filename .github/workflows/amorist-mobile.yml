@@ -1,0 +1,49 @@
+name: Amorist Mobile Quality Check
+on:
+  pull_request:
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/amorist-mobile.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/amorist-mobile.yml'
+permissions:
+  contents: read
+jobs:
+  mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check mobile/bootstrap.js
+          node --check mobile/app.js
+          node --check mobile/publish.js
+          node --check mobile/sw.js
+          node --check mobile/qa.mjs
+          node --check mobile/qa-browser.mjs
+      - name: Data and PWA structure
+        run: node mobile/qa.mjs
+      - name: Install Chromium test browser
+        run: |
+          npm --prefix mobile install --no-save playwright@1.56.0
+          cd mobile
+          npx playwright install --with-deps chromium
+      - name: iPhone viewport integration smoke test
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/amorist-server.log 2>&1 &
+          sleep 2
+          node mobile/qa-browser.mjs
+      - name: Keep test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: amorist-mobile-qa-screenshots
+          path: mobile/qa-screenshots/
+          if-no-files-found: ignore
