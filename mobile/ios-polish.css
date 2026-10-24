@@ -453,3 +453,27 @@ body.amorist-mobile-app .product-view[data-product-view="characters"] .char-card
     flex-basis:clamp(104px,34vw,125px)!important;width:clamp(104px,34vw,125px)!important;
   }
 }
+
+/* Respect the application's three mutually exclusive library views.
+ * A highly specific mobile gallery rule must never override [hidden] and
+ * accidentally render 96 extra cards below the ranking shelf. */
+body.amorist-mobile-app .product-view[data-product-view="library"] #gameLibraryGrid[hidden],
+body.amorist-mobile-app .product-view[data-product-view="library"] #libraryRankView[hidden]{
+  display:none!important;
+}
+body.amorist-mobile-app .product-view[data-product-view="library"] .game-library-grid:not(.library-list-mode) .game-card{
+  display:block!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  grid-template-columns:none!important;
+}
+body.amorist-mobile-app .product-view[data-product-view="library"] .game-library-grid:not(.library-list-mode) .game-card .game-cover{
+  display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;
+}
+body.amorist-mobile-app .product-view[data-product-view="library"] .game-library-grid:not(.library-list-mode) .game-card .game-card-body{
+  display:block!important;grid-template-columns:none!important;
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  padding:10px 0 0!important;overflow:hidden!important;
+}
+body.amorist-mobile-app .product-view[data-product-view="library"] .game-library-grid:not(.library-list-mode) .game-card .game-card-body>*{
+  max-width:100%!important;min-width:0!important;
+}
