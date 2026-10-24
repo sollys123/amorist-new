@@ -33,6 +33,7 @@
     ['#amBackBtn','back'],
     ['#amOpenPublish > span','publish'],
     ['#amMorePublish > span','publish'],
+    ['#amMoreModeToggle > span','pencil'],
     ['.mobile-more-grid [data-product-target="home"] > span','home'],
     ['.mobile-more-grid [data-product-target="studio"] > span','pencil'],
     ['.mobile-more-grid [data-product-target="bangumi"] > span','sparkles'],

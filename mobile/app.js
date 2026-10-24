@@ -4,8 +4,8 @@
   const mobile = window.AmoristMobile || (window.AmoristMobile = {});
   const $ = (q,root=document) => root.querySelector(q);
   const $$ = (q,root=document) => Array.from(root.querySelectorAll(q));
-  const viewNames = {home:'我的档案',library:'游戏档案',characters:'角色图鉴',timeline:'游玩日历',
-    studio:'REPO 制作',forms:'图文创作',oshi:'推角展示',bangumi:'作品索引',omikuji:'御签所'};
+  const viewNames = {home:'OTOME PROFILE',library:'游戏档案',characters:'角色图鉴',timeline:'游玩日历',
+    studio:'REPO',forms:'图文创作',oshi:'好きな人たち',bangumi:'作品索引',omikuji:'御签所'};
   const privatePrefixes = ['am-mobile-','am-publisher-','am-vault-'];
   let currentView = 'home';
   let previousView = 'home';

@@ -2,11 +2,11 @@
  * Small offline core by default; opt-in complete artwork download.
  */
 'use strict';
-const VERSION='20261024-v3';
+const VERSION='20261024-v4';
 const CORE='amorist-mobile-core-'+VERSION;
 const EXTRA='amorist-mobile-artwork-'+VERSION;
 const CORE_URLS=[
-  './','./index.html','./app.css','./ios-polish.css','./native-core.css','./native-discovery.css','./native-shrine.css','./native-forms.css','./app.js','./ui-icons.js','./native-core.js','./native-discovery.js','./native-shrine.js','./native-forms.js','./bootstrap.js','./publish.js',
+  './','./index.html','./app.css','./ios-polish.css','./native-core.css','./native-discovery.css','./native-shrine.css','./native-forms.css','./showcase-polish.css','./app.js','./ui-icons.js','./native-core.js','./native-discovery.js','./native-shrine.js','./native-forms.js','./mode.js','./bootstrap.js','./publish.js',
   './manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png',
   './offline-assets.json',
   '../assets/css/amorist.css','../assets/css/site-modes.css',
@@ -75,6 +75,9 @@ self.addEventListener('fetch',event=>{
   const url=new URL(request.url);
   if(!sameOrigin(url))return;
   if(isPublication(url)){event.respondWith(tryNetworkFirst(request));return}
+  // Prefer freshly deployed application code while preserving offline fallback.
+  // A stale iOS service worker must not mix an older JS bundle with new HTML.
+  if(/\.(?:js|css)$/i.test(url.pathname)){event.respondWith(tryNetworkFirst(request));return}
   if(request.mode==='navigate'){
     event.respondWith((async()=>{
       try {

@@ -4,8 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=yes"><base href="../">
   <meta name="color-scheme" content="light">
-  <link id="lxgwFont" rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/lxgw-wenkai-webfont/1.7.0/style.min.css" crossorigin="anonymous" onerror="this.onerror=null;this.href='https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css';">
-  <title>Amorist · 私人档案</title>
+  <title>Amorist · OTOME LIFE ARCHIVE</title>
   
 
 
@@ -36,7 +35,7 @@
     .product-view[data-product-view="oshi"] .oshi-canvas{background:#fbf8f2!important;border:0!important;border-radius:0!important;box-shadow:none!important}
     .product-view[data-product-view="oshi"] .oshi-magazine-copy{display:none!important}
   </style>
-  <meta name="theme-color" content="#f7f1f4">
+  <meta name="theme-color" content="#fffdfa">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Amorist">
@@ -52,9 +51,10 @@
   <link rel="stylesheet" href="./mobile/native-discovery.css?v=20261024-v3">
   <link rel="stylesheet" href="./mobile/native-shrine.css?v=20261024-v3">
   <link rel="stylesheet" href="./mobile/native-forms.css?v=20261024-v3">
+  <link rel="stylesheet" href="./mobile/showcase-polish.css?v=20261024-v4">
 </head>
-<body class="amorist-mobile-app">
-  <header class="am-topbar" id="amTopbar"><div class="am-topbar-start"><button class="am-back" id="amBackBtn" type="button" aria-label="返回" hidden>‹</button><div class="am-topbar-mark"><span class="am-topbar-kicker">AMORIST · OTOME LIFE</span><strong id="amTopbarTitle">我的档案</strong></div></div><div class="am-topbar-actions"><span class="am-save-indicator" id="amSaveIndicator" title="本机草稿自动保存"></span><button class="am-topbar-publish" id="amOpenPublish" type="button" aria-label="管理与发布">发布 <span aria-hidden="true">↗</span></button></div></header>
+<body class="amorist-mobile-app am-mode-viewer">
+  <header class="am-topbar" id="amTopbar"><div class="am-topbar-start"><button class="am-back" id="amBackBtn" type="button" aria-label="返回" hidden>‹</button><div class="am-topbar-mark"><span class="am-topbar-kicker">AMORIST · OTOME LIFE</span><strong id="amTopbarTitle">我的档案</strong></div></div><div class="am-topbar-actions"><span class="am-save-indicator" id="amSaveIndicator" title="本机草稿自动保存"></span><button type="button" class="am-mode-toggle" id="amModeHeader" aria-pressed="false" aria-label="进入个人档案编辑模式">编辑</button><button class="am-topbar-publish" id="amOpenPublish" hidden type="button" aria-label="管理与发布">发布 <span aria-hidden="true">↗</span></button></div></header>
   <a class="skip-link" href="#main-content">跳到主要内容</a>
   <div class="product-shell">
     <aside class="product-sidebar" aria-label="主要导航">
@@ -682,6 +682,7 @@
     <button class="mobile-more-backdrop" id="mobileMoreBackdrop" type="button" aria-label="关闭"></button>
     <section role="dialog" aria-modal="true" aria-labelledby="mobileMoreTitle"><div class="mobile-more-head"><div><span>AMORIST</span><strong id="mobileMoreTitle">更多空间</strong></div><button id="mobileMoreClose" type="button" aria-label="关闭更多菜单">×</button></div>
       <div class="mobile-more-grid">
+        <button id="amMoreModeToggle" type="button"><span>✎</span><b>进入编辑</b><small>编辑档案、人物及记录</small></button>
         <button type="button" data-product-target="studio"><span>✎</span><b>REPO 制作</b><small>作品记录与排版</small></button>
         <button type="button" id="amMorePublish"><span>↗</span><b>管理与发布</b><small>同步公开站 · 安全备份</small></button>
         <button type="button" data-product-target="bangumi"><span>✦</span><b>作品索引</b><small>按声优与制作阵容探索</small></button>
@@ -895,8 +896,8 @@
   <script src="./assets/vendor/p5.min.js?v=2.3.1"></script>
   <script src="./assets/js/torii-p5.js?v=ritual-layout-20260802-20"></script>
   <script src="./assets/js/kotodama-p5.js?v=kotodama-ritual-20260802-2"></script>
-  <script src="./mobile/ui-icons.js?v=20261024-2"></script>
-  <script src="./mobile/bootstrap.js?v=20261024-1"></script>
+  <script src="./mobile/ui-icons.js?v=20261024-v4"></script>
+  <script src="./mobile/bootstrap.js?v=20261024-v4"></script>
 <dialog class="am-dialog" id="amPublishDialog" aria-labelledby="amPublishTitle">
   <div class="am-dialog-heading"><div><span>OWNER'S WORKSPACE</span><h2 id="amPublishTitle">管理与发布</h2></div><button type="button" class="am-close" data-am-close="amPublishDialog" aria-label="关闭">×</button></div>
   <section class="am-publish-status"><div><span class="am-dot"></span><strong>本地私人档案</strong></div><p id="amDraftStatus">正在读取本机档案…</p><small id="amPublicationStatus">公开站发布状态将在此显示</small></section>

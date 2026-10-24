@@ -35,8 +35,28 @@ try {
   assert(viewport.scroll<=viewport.width+3,'horizontal overflow on phone');
   assert(viewport.bottom<=844,'bottom nav below screen');
   await page.waitForFunction(()=>Boolean(window.AmoristNativeMobile?.state),null,{timeout:8000});
+  await page.waitForFunction(()=>Boolean(window.AmoristMobileMode),null,{timeout:6000});
+  assert.equal(await page.evaluate(()=>window.AmoristMobileMode.isEditing()),false,
+    'PWA must start in showcase mode');
+  await assertVisible('#amModeHeader');
+  assert.equal(await page.locator('#amModeHeader').textContent(),'编辑');
+  assert.equal(await page.locator('#amOpenPublish').isVisible(),false,
+    'public showcase must not show publishing action');
+  assert.equal(await page.locator('#amv-home .amv-quick-grid').count(),0,
+    'showcase homepage must not be an editing dashboard');
+  assert.equal(await page.locator('#lxgwFont').count(),0,
+    'remote webfont must not cause mixed CJK font flash');
+  const originalCopy=await page.locator('#amv-home .amv-hero-copy').innerText();
+  assert(originalCopy.includes('OTOME')&&originalCopy.includes('PROFILE'),
+    'original self-introduction heading must be preserved');
+  await page.locator('#amv-home [data-amv="view-profile"]').click();
+  await assertVisible('#amv-home .amv-about');
+  assert.equal(await page.locator('#amv-home .amv-about-edit').count(),0,
+    'viewer profile must not contain owner edit actions');
+  await page.locator('#amv-home [data-amv="close-about"]').click();
   await assertVisible('#amv-home .amv-home-hero');
-  assert.equal(await page.locator('#amv-home .amv-quick-grid button').count(),3);
+  await assertVisible('#amv-home .amv-home-hero');
+  assert.equal(await page.locator('#amv-home .amv-quick-grid button').count(),0,'viewer must not show edit shortcuts');
   await page.screenshot({path:path.join(screens,browserName+'-01-home.png'),fullPage:false});
 
   const views=['library','characters','timeline','oshi','bangumi','omikuji','forms','studio','home'];
@@ -81,12 +101,74 @@ try {
   await page.locator('#amv-library [data-amv="back-games"]').click();
   await assertVisible('#amv-library .amv-game-grid');
 
+  // Verify that read-only visitors cannot accidentally change owner records.
+  assert.equal(await page.locator('#amv-library [data-amv="new-game"]').count(),0);
+  await page.locator('#amModeHeader').click();
+  assert.equal(await page.evaluate(()=>window.AmoristMobileMode.isEditing()),true,
+    'owner mode did not activate');
+  await assertVisible('#amOpenPublish');
+  assert.equal(await page.locator('#amv-home .amv-quick-grid button').count(),0,'not on home');
   await page.locator('#amv-library [data-amv="new-game"]').click();
   await assertVisible('#gameDialogOverlay');
   await page.locator('#libraryGameName').fill('QA 原生移动端新增作品');
   await page.locator('#gameDialogForm button[type="submit"]').click();
   assert(await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]')
     .some(g=>g.name==='QA 原生移动端新增作品')),'new game did not save');
+  await page.evaluate(()=>window.amoristProductNavigate('characters'));
+  await assertVisible('#amv-characters .amv-library-controls');
+  // The prior mobile Oshi code called .find() on a single DOM Element and
+  // silently opened the wrong character; test exact id and real editor drawer.
+  await page.evaluate(()=>window.amoristProductNavigate('oshi'));
+  await assertVisible('#amv-oshi .amv-oshi-list');
+  const oshiCard=page.locator('#amv-oshi [data-amv="open-oshi"]').first();
+  const chosenOshiId=await oshiCard.getAttribute('data-id');
+  await oshiCard.click();
+  await page.locator('#oshiDetailView').waitFor({state:'visible',timeout:7000}).catch(async(error)=>{
+    const diagnosis=await page.evaluate(()=>({
+      active:document.querySelector('.product-view.active')?.dataset.productView,
+      id:document.querySelector('#amv-oshi .amv-native-detail')?.textContent?.slice(0,100),
+      gateway:document.querySelector('#amv-oshi .amv-legacy-gateway')?.textContent?.slice(0,100),
+      allOriginalIds:Array.from(document.querySelectorAll('#oshiIndexList .oshi-index-link')).slice(0,10).map(x=>x.dataset.oshiOrderId),
+      oshiRoute:localStorage.getItem('amoristUi.oshiRoute.v1'),
+      detailHidden:document.getElementById('oshiDetailView')?.hidden,
+      cssClasses:document.body.className,
+      indexLength:document.querySelectorAll('#oshiIndexList .oshi-index-link').length,
+      detailComputed:document.getElementById('oshiDetailView')?getComputedStyle(document.getElementById('oshiDetailView')).display:'missing',
+    }));
+    throw new Error('Oshi exact-id profile did not open: '+JSON.stringify(diagnosis)+' '+error.message);
+  });
+  const selectedOshiId=await page.evaluate(()=>
+    JSON.parse(localStorage.getItem('amoristUi.oshiRoute.v1')||'{}').id);
+  assert.equal(String(selectedOshiId),String(chosenOshiId),
+    'Oshi detail opened the wrong character');
+  await page.locator('#oshiEditDetailButton').click();
+  await assertVisible('#oshiEditorDrawer');
+  await assertVisible('#oshiDetailEditor');
+  assert.equal(await page.locator('#oshiEditName').inputValue().then(Boolean),true);
+  await page.screenshot({path:path.join(screens,browserName+'-v4-oshi-editor.png'),fullPage:false});
+  await page.locator('#oshiEditShort').fill('QA OSHI PROFILE / 保存验证');
+  await page.locator('#oshiSaveDetail').click();
+  const persistedOshi=await page.evaluate(id=>{
+    const data=JSON.parse(localStorage.getItem('amorist-oshi-hub-v1')||'{}');
+    return (data.records||[]).find(row=>String(row.id)===String(id))?.short||'';
+  },chosenOshiId);
+  assert.equal(persistedOshi,'QA OSHI PROFILE / 保存验证',
+    'edited Oshi record did not persist in local draft');
+  await page.locator('#oshiEditDetailButton').click();
+  await assertVisible('#oshiEditorDrawer');
+  assert.equal(await page.locator('#oshiEditShort').inputValue(),'QA OSHI PROFILE / 保存验证',
+    'reopening Oshi editor lost saved value');
+  await page.locator('#oshiDrawerClose').click();
+  await page.locator('#amv-oshi [data-amv="oshi-back"]').click();
+  await assertVisible('#amv-oshi .amv-oshi-list');
+  await page.locator('#amModeHeader').click();
+  assert.equal(await page.evaluate(()=>window.AmoristMobileMode.isEditing()),false);
+  await page.locator('#amv-oshi [data-amv="open-oshi"]').first().click();
+  await page.locator('#oshiDetailView').waitFor({state:'visible',timeout:7000});
+  assert.equal(await page.locator('#oshiEditDetailButton').isVisible(),false);
+  await page.locator('#amv-oshi [data-amv="oshi-back"]').click();
+  await page.locator('#amModeHeader').click();
+  assert.equal(await page.evaluate(()=>window.AmoristMobileMode.isEditing()),true);
   await page.evaluate(()=>window.amoristProductNavigate('characters'));
   await assertVisible('#amv-characters .amv-library-controls');
   await page.evaluate(()=>window.amoristProductNavigate('forms'));

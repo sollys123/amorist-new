@@ -14,7 +14,7 @@
     'amorist-dashboard-playing-v1','amorist-game-repos-v1','amorist-form-answers-v1',
     'amorist-visual-sheets-v1','amorist-oshi-hub-v1','amorist-timeline-events-v1'];
   const app = window.AmoristMobile = window.AmoristMobile || {};
-  app.version = '2026.10.24';
+  app.version = '2026.10.24-v4';
   app.publishedUrl = PUBLISHED_URL.href;
   app.repository = 'sollys123/amorist-new';
   app.branch = 'main';
@@ -120,11 +120,12 @@
       else if (localStorage.getItem(INIT_KEY)) app.initialized = true;
       await loadScript('./assets/js/amorist-app.js?v=mobile-editor-20261024');
       await loadScript('./assets/js/oshi-hub.js?v=mobile-editor-20261024');
-      await loadScript('./mobile/app.js?v=20261024-1');
-      await loadScript('./mobile/native-core.js?v=20261024-v3');
-      await loadScript('./mobile/native-discovery.js?v=20261024-v3');
-      await loadScript('./mobile/native-shrine.js?v=20261024-v3');
-      await loadScript('./mobile/native-forms.js?v=20261024-v3');
+      await loadScript('./mobile/app.js?v=20261024-v4');
+      await loadScript('./mobile/native-core.js?v=20261024-v4');
+      await loadScript('./mobile/native-discovery.js?v=20261024-v4');
+      await loadScript('./mobile/native-shrine.js?v=20261024-v4');
+      await loadScript('./mobile/native-forms.js?v=20261024-v4');
+      await loadScript('./mobile/mode.js?v=20261024-v4');
       // Do not let failed metadata lookup block the app.
       checkRemoteSha();
       window.dispatchEvent(new CustomEvent('amorist-mobile-ready'));
