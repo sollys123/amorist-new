@@ -287,3 +287,21 @@ body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-vie
   body.amorist-mobile-app .amv-about-head h1{font-size:21px!important}
   body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"]{padding-inline:9px!important}
 }
+
+
+/* The inherited desktop Oshi 'display:revert!important' exposed a hidden
+   full-screen image lightbox, intercepting taps on the edit and gallery controls. */
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"] [hidden]{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"] #oshiLightbox[hidden]{
+  display:none!important;visibility:hidden!important;pointer-events:none!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"] #oshiLightbox:not([hidden]){
+  display:flex!important;position:fixed!important;inset:0!important;
+  z-index:900!important;background:rgba(23,18,26,.9)!important;
+  align-items:center!important;justify-content:center!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"] #oshiLightbox:not([hidden]) img{
+  max-width:95vw!important;max-height:88dvh!important;object-fit:contain!important;
+}
