@@ -321,3 +321,19 @@ body.amorist-mobile-app.amv-ready :where(#profileEditModal,#gameDialogOverlay,#c
 body.amorist-mobile-app.amv-ready .amv-about :where(h1,h2,h3,dt,dd){
   font-family:var(--amv-native)!important;
 }
+
+
+/* A real bottom sheet must own the full mobile viewport. The fixed app tab bar
+   otherwise sits above the editor's Save button in a nested stacking context,
+   even though the drawer itself has a high local z-index. */
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi:has(#oshiEditorDrawer.open) :where(.mobile-nav.am-bottom-tabs,.am-topbar){
+  visibility:hidden!important;pointer-events:none!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi:has(#oshiEditorDrawer.open) #oshiEditorDrawer.open{
+  padding-bottom:calc(95px + env(safe-area-inset-bottom,0px))!important;
+  overscroll-behavior:contain!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi:has(#oshiEditorDrawer.open) #oshiEditorDrawer .oshi-drawer-actions{
+  position:relative!important;z-index:2!important;
+  background:#fffefd!important;
+}
