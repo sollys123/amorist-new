@@ -15,7 +15,7 @@ const page=await browser.newPage({
 const exceptions=[];
 page.on('pageerror',error=>{if(exceptions.length<5)exceptions.push(String(error.stack||error.message).slice(0,1100));});
 const assertVisible=async selector=>{
-  assert(await page.locator(selector).isVisible(),selector+' not visible');
+  assert(await page.locator(selector).first().isVisible(),selector+' not visible');
 };
 try {
   const response=await page.goto(base,{waitUntil:'domcontentloaded',timeout:45000});
@@ -116,7 +116,7 @@ try {
     };
   });
   console.log('Native forms state',formsState);
-  assert(await page.locator('#amf-screen .amf-template-grid').isVisible(),
+  assert(await page.locator('#amf-screen .amf-template-grid').first().isVisible(),
     'native forms template gallery missing '+JSON.stringify(formsState));
   assert.equal(await page.locator('#amf-screen [data-amf="open"]').count(),5,'five core workshop templates required; saved and custom templates remain separate');
   await page.locator('#amf-screen [data-amf="open"]').first().click();
