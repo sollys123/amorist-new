@@ -19,9 +19,12 @@
     const v=String(value||'').trim();
     return /^(https?:\/\/|data:image\/|blob:|\/(?!\/)|\.{0,2}\/|assets\/|idb-image:|image:)/i.test(v)?v:'';
   };
-  const art=(src,alt='',extra='')=>{
-    const url=safeSrc(src);
-    return url?'<img loading="lazy" decoding="async" referrerpolicy="no-referrer" data-amv-image="'+esc(url)+'" src="'+esc(url)+'" alt="'+esc(alt)+'" '+extra+'>':
+  const art=(src,alt='',extra='',fallback='')=>{
+    const url=safeSrc(src)||safeSrc(fallback);
+    const fallbackUrl=safeSrc(fallback);
+    return url?'<img loading="lazy" decoding="async" referrerpolicy="no-referrer" data-amv-image="'+esc(url)+'" '+
+      (fallbackUrl&&fallbackUrl!==url?'data-amv-fallback="'+esc(fallbackUrl)+'" ':'')+
+      'src="'+esc(url)+'" alt="'+esc(alt)+'" '+extra+'>':
       '<span class="amv-art-empty" aria-hidden="true">✧</span>';
   };
   const icons={
@@ -325,11 +328,16 @@
     const stateO=fav(),all=chars(),gs=gameMap();
     const chosen=all.filter(c=>c.roleType==='route'&&['favorite','oshi'].includes(c.preference));
     const saved=new Map((Array.isArray(stateO.records)?stateO.records:[]).map(c=>[String(c.id),c]));
-    const rows=chosen.map(c=>({...c,...(saved.get(String(c.id))||{}),displayName:saved.get(String(c.id))?.displayName||c.nameCn||c.name,
-      image:saved.get(String(c.id))?.profileImage||saved.get(String(c.id))?.landingImage||c.image,
-      gameName:gs.get(String(c.gameId))?.name||''}));
+    const rows=chosen.map(c=>{
+      const savedRecord=saved.get(String(c.id))||{};
+      const related=gs.get(String(c.gameId))||{};
+      return {...c,...savedRecord,displayName:savedRecord.displayName||c.nameCn||c.name,
+        image:savedRecord.profileImage||savedRecord.landingImage||savedRecord.image||c.image||related.cover||'',
+        fallbackImage:c.image||related.cover||'',charImage:c.image||'',
+        gameName:related.name||''};
+    });
     const card=c=>'<button type="button" class="amv-oshi-card" data-amv="open-oshi" data-id="'+esc(c.id)+'">'+
-      '<div class="amv-oshi-picture">'+art(c.image,c.displayName)+'</div>'+
+      '<div class="amv-oshi-picture">'+art(c.charImage||c.image,c.displayName,'',c.fallbackImage||c.image)+'</div>'+
       '<div><strong>'+esc(c.displayName||'未知角色')+'</strong><small>'+esc(c.gameName)+'</small></div>'+icon('arrow',18)+'</button>';
     if(state.oshi.advanced){
       el.innerHTML='<div class="amv-legacy-gateway"><button type="button" class="amv-inline-back" data-amv="oshi-back">'+icon('back',18)+'返回推角收藏</button>'+
@@ -339,7 +347,7 @@
       const c=rows.find(r=>String(r.id)===String(state.oshi.detail));
       if(c){
         el.innerHTML='<div class="amv-native-detail"><button type="button" class="amv-inline-back" data-amv="oshi-back">'+icon('back',18)+'返回推角展示</button>'+
-          '<div class="amv-character-hero">'+art(c.image,c.displayName)+'</div>'+
+          '<div class="amv-character-hero">'+art(c.image,c.displayName,'',c.fallbackImage)+'</div>'+
           '<span class="amv-eyebrow amv-detail-eyebrow">BELOVED CHARACTER</span><h1 class="amv-char-title">'+esc(c.displayName)+'</h1>'+
           '<p class="amv-char-subtitle">'+esc(c.gameName)+'</p>'+
           '<div class="amv-detail-actions">'+actionButton('oshi-original-detail','人物主页与图集','heart','primary')+
@@ -360,12 +368,25 @@
     hydrateImages(el);
   }
   async function hydrateImages(root){
-    const refs=$$('[data-amv-image]',root).filter(img=>window.amoristImageStore?.isRef?.(img.dataset.amvImage));
-    await Promise.all(refs.map(async img=>{
-      const key=img.dataset.amvImage;try{
-        const url=await window.amoristImageStore.get(key);
-        if(url&&img.isConnected&&img.dataset.amvImage===key)img.src=url;
-      }catch(_){} }));
+    const imgs=$('[data-amv-image]',root);
+    const resolve=async key=>{
+      if(window.amoristImageStore?.isRef?.(key))return window.amoristImageStore.get(key).catch(()=>'');
+      return key;
+    };
+    await Promise.all(imgs.map(async img=>{
+      const primary=img.dataset.amvImage,backup=img.dataset.amvFallback||'';
+      let triedBackup=false;
+      const tryBackup=async()=>{
+        if(triedBackup||!backup||!img.isConnected)return;
+        triedBackup=true;
+        const fallback=await resolve(backup);
+        if(fallback&&img.isConnected)img.src=fallback;
+      };
+      img.addEventListener('error',tryBackup,{once:true});
+      const url=await resolve(primary);
+      if(url&&img.isConnected&&img.dataset.amvImage===primary)img.src=url;
+      else await tryBackup();
+    }));
   }
   function render(name){
     if(name==='home')renderHome();
@@ -518,11 +539,15 @@
       case 'oshi-manage':
         state.oshi.advanced=true;document.body.classList.add('amv-legacy-oshi');
         window.amoristOshiOpenHub?.();window.renderOshiHub?.();renderOshi();break;
-      case 'oshi-original-detail':case 'oshi-edit':
+      case 'oshi-original-detail':case 'oshi-edit':{
+        const intent=target.dataset.amv;
         state.oshi.advanced=true;document.body.classList.add('amv-legacy-oshi');
         window.renderOshiHub?.();
-        if(state.oshi.detail)$('#oshiIndexList .oshi-index-link')?.click();
+        const selected=$('#oshiIndexList .oshi-index-link').find(btn=>String(btn.dataset.oshiOrderId||'')===String(state.oshi.detail));
+        if(selected)selected.click();else $('#oshiIndexList .oshi-index-link')?.click();
+        if(intent==='oshi-edit')requestAnimationFrame(()=>$('#oshiEditDetailButton')?.click());
         renderOshi();break;
+      }
     }
   }
   document.addEventListener('click',e=>{
