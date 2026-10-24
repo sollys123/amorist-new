@@ -30,16 +30,19 @@ jobs:
           node --check mobile/qa-browser.mjs
       - name: Data and PWA structure
         run: node mobile/qa.mjs
-      - name: Install Chromium test browser
+      - name: Install Chromium and WebKit browsers
         run: |
           npm --prefix mobile install --no-save playwright@1.56.0
           cd mobile
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps chromium webkit
       - name: iPhone viewport integration smoke test
         run: |
           python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/amorist-server.log 2>&1 &
           sleep 2
           node mobile/qa-browser.mjs
+      - name: Safari-like mobile WebKit smoke test
+        run: |
+          AM_QA_BROWSER=webkit node mobile/qa-browser.mjs
       - name: Keep test screenshots
         if: always()
         uses: actions/upload-artifact@v4
