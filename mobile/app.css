@@ -1,0 +1,431 @@
+/* AMORIST MOBILE | dedicated touch-first application layer
+   Source document and all existing feature modules remain intact.
+   This stylesheet is loaded last and owns the mobile app shell. */
+:root{
+  --am-plum:#57445d;--am-ink:#352e3c;--am-muted:#837984;--am-rose:#bb8397;
+  --am-line:#e9dde3;--am-paper:#fffdfb;--am-base:#faf6f5;--am-lilac:#f0e9f3;
+  --am-safe-top:env(safe-area-inset-top,0px);--am-safe-bottom:env(safe-area-inset-bottom,0px);
+  --am-top-height:calc(64px + var(--am-safe-top));
+  --am-bottom-height:calc(66px + var(--am-safe-bottom));
+}
+html{scroll-behavior:auto!important;background:var(--am-base);-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
+html,body.amorist-mobile-app{width:100%;min-width:0;max-width:100%;margin:0}
+body.amorist-mobile-app{
+  background:var(--am-base)!important;color:var(--am-ink);
+  -webkit-tap-highlight-color:transparent;touch-action:pan-y;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans SC",sans-serif;
+  overflow-x:hidden!important;min-height:100dvh
+}
+body.amorist-mobile-app *,body.amorist-mobile-app *::before,body.amorist-mobile-app *::after{box-sizing:border-box}
+body.amorist-mobile-app button,body.amorist-mobile-app input,body.amorist-mobile-app textarea,body.amorist-mobile-app select{font-family:inherit}
+body.amorist-mobile-app button{touch-action:manipulation}
+body.amorist-mobile-app button:focus-visible,body.amorist-mobile-app a:focus-visible,body.amorist-mobile-app input:focus-visible{outline:2px solid #b98cac;outline-offset:2px}
+body.amorist-mobile-app :where(input:not([type=checkbox]):not([type=radio]),textarea,select){font-size:16px!important;min-height:42px}
+body.amorist-mobile-app .product-sidebar{display:none!important}
+body.amorist-mobile-app .product-shell{
+  display:block!important;grid-template-columns:none!important;min-width:0!important;width:100%!important;
+  max-width:760px!important;min-height:100dvh!important;margin:0 auto!important;
+  padding:var(--am-top-height) 0 var(--am-bottom-height)!important;
+  background:transparent!important
+}
+body.amorist-mobile-app .product-main{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;overflow:visible!important}
+body.amorist-mobile-app .product-view{
+  min-height:calc(100dvh - var(--am-top-height) - var(--am-bottom-height))!important;
+  width:100%!important;max-width:100%!important;padding:19px 16px 38px!important;
+  background:transparent!important;overflow:visible!important
+}
+body.amorist-mobile-app .product-view:not(.active){display:none!important}
+body.amorist-mobile-app .product-view[data-product-view="home"]{padding:0 0 40px!important}
+body.amorist-mobile-app .product-page-head,body.amorist-mobile-app .resource-page-head{
+  display:flex!important;min-height:0!important;gap:9px!important;
+  flex-direction:column!important;align-items:flex-start!important;
+  margin:4px 0 19px!important;padding:0 0 15px!important;border-bottom:1px solid var(--am-line)!important
+}
+body.amorist-mobile-app .product-page-head h1,body.amorist-mobile-app .resource-page-head h1{
+  margin:0!important;font-size:27px!important;font-weight:550!important;letter-spacing:.025em!important;line-height:1.28!important;
+  color:var(--am-plum)!important
+}
+body.amorist-mobile-app .product-page-head p,body.amorist-mobile-app .resource-page-head p{
+  font-size:11px!important;line-height:1.6!important;max-width:100%!important;overflow-wrap:anywhere;color:var(--am-muted)!important
+}
+body.amorist-mobile-app .product-card{min-width:0;max-width:100%;border-radius:16px!important}
+body.amorist-mobile-app :where(img,canvas,video,iframe){max-width:100%}
+body.amorist-mobile-app :where(.product-button,.tool-btn,.filter-pill,.choice-pill,.product-nav-btn){min-height:42px}
+body.amorist-mobile-app .product-button.small{min-height:38px}
+body.amorist-mobile-app [hidden]{display:none!important}
+/* True persistent app chrome; safe area does not scroll away */
+.am-topbar{
+  position:fixed;z-index:400;left:0;right:0;top:0;
+  min-height:var(--am-top-height);padding:calc(9px + var(--am-safe-top)) max(17px,calc((100vw - 740px)/2)) 10px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+  background:rgba(255,251,251,.96);border-bottom:1px solid var(--am-line);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)
+}
+.am-topbar-start,.am-topbar-actions{display:flex;align-items:center;gap:10px;min-width:0}
+.am-topbar-mark{display:grid;gap:1px;min-width:0}
+.am-topbar-kicker{display:block;font:600 9px/1.3 Georgia,serif;letter-spacing:.19em;color:var(--am-rose)}
+#amTopbarTitle{display:block;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--am-plum);font:500 19px/1.2 Georgia,"Noto Serif SC",serif;letter-spacing:.02em}
+.am-back{border:0;background:var(--am-lilac);border-radius:100%;width:34px;min-width:34px;height:34px;
+  display:grid;place-items:center;font:400 27px/1 Georgia,serif;color:var(--am-plum)}
+.am-save-indicator{width:7px;height:7px;border-radius:50%;background:#a8bca8;box-shadow:0 0 0 3px #e6f0e5}
+.am-save-indicator.pending{background:#d6ab78;box-shadow:0 0 0 3px #fff0db}
+.am-topbar-publish{border:1px solid #d5bcc9;background:#f6ebf1;color:var(--am-plum);
+  padding:8px 13px;border-radius:999px;font:600 12px/1.1 -apple-system,sans-serif;letter-spacing:.03em;white-space:nowrap}
+.am-topbar-publish span{font-size:15px;margin-left:4px}
+/* Five clear bottom tabs, comfortably above the iPhone home gesture */
+body.amorist-mobile-app .mobile-nav.am-bottom-tabs{
+  position:fixed!important;z-index:390!important;
+  left:50%!important;right:auto!important;bottom:0!important;transform:translateX(-50%)!important;
+  display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;align-items:center!important;
+  width:100%!important;max-width:760px!important;min-height:var(--am-bottom-height)!important;
+  margin:0!important;padding:7px 7px calc(7px + var(--am-safe-bottom))!important;
+  background:rgba(255,253,252,.97)!important;border:0!important;
+  border-top:1px solid #e9dce1!important;border-radius:0!important;
+  box-shadow:0 -5px 24px rgba(57,35,50,.07)!important;
+  backdrop-filter:blur(22px)!important;-webkit-backdrop-filter:blur(22px)!important
+}
+body.amorist-mobile-app .mobile-nav.am-bottom-tabs .product-nav-btn{
+  display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+  gap:3px!important;min-width:0!important;min-height:50px!important;padding:3px 1px!important;
+  border:0!important;background:transparent!important;border-radius:12px!important;
+  box-shadow:none!important;color:#958891!important;transition:color .17s ease!important
+}
+body.amorist-mobile-app .mobile-nav.am-bottom-tabs .product-nav-btn .product-nav-icon{
+  font:400 24px/1.1 Georgia,serif!important;width:auto!important;color:inherit!important
+}
+body.amorist-mobile-app .mobile-nav.am-bottom-tabs .product-nav-btn>span:last-child{
+  font:500 10.5px/1.1 -apple-system,sans-serif!important;white-space:nowrap!important;
+  color:inherit!important
+}
+body.amorist-mobile-app .mobile-nav.am-bottom-tabs .product-nav-btn.active{
+  color:var(--am-plum)!important;background:#f4edf1!important
+}
+body.amorist-mobile-app .mobile-nav.am-bottom-tabs .product-nav-btn.active .product-nav-icon{
+  color:#b77d94!important
+}
+/* Extra spaces sheet is an app-level bottom modal */
+body.amorist-mobile-app .mobile-more-sheet{
+  position:fixed!important;inset:0!important;z-index:500!important;display:flex!important;
+  align-items:flex-end!important;justify-content:center!important;margin:0!important;padding:0!important
+}
+body.amorist-mobile-app .mobile-more-sheet[hidden]{display:none!important}
+body.amorist-mobile-app .mobile-more-backdrop{position:absolute!important;inset:0!important;background:rgba(31,24,35,.43)!important;border:0!important}
+body.amorist-mobile-app .mobile-more-sheet>section{
+  position:relative!important;width:100%!important;max-width:760px!important;
+  max-height:min(86dvh,760px)!important;margin:0!important;
+  padding:23px 18px calc(22px + var(--am-safe-bottom))!important;
+  border:1px solid var(--am-line)!important;border-radius:25px 25px 0 0!important;
+  background:var(--am-paper)!important;overflow:auto!important;
+  box-shadow:0 -12px 42px rgba(36,25,34,.16)!important
+}
+body.amorist-mobile-app .mobile-more-sheet>section:before{
+  content:"";display:block;width:38px;height:4px;border-radius:10px;background:#ded1da;
+  margin:-10px auto 14px
+}
+body.amorist-mobile-app .mobile-more-head{margin-bottom:18px!important}
+body.amorist-mobile-app .mobile-more-head strong{font-size:24px!important;color:var(--am-plum)!important}
+body.amorist-mobile-app .mobile-more-grid{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important
+}
+body.amorist-mobile-app .mobile-more-grid>button{
+  display:grid!important;min-width:0!important;min-height:91px!important;
+  border:1px solid var(--am-line)!important;border-radius:14px!important;
+  padding:12px 12px!important;background:#fbf7f9!important;text-align:left!important;align-content:start!important
+}
+body.amorist-mobile-app .mobile-more-grid>button>span{color:var(--am-rose)!important;font-size:20px!important}
+body.amorist-mobile-app .mobile-more-grid b{font-size:13px!important;color:var(--am-plum)!important}
+body.amorist-mobile-app .mobile-more-grid small{font-size:10.5px!important;line-height:1.5!important;color:var(--am-muted)!important}
+/* Library: cover-first browse, full-width readable details */
+body.amorist-mobile-app :where(.game-library-grid,.character-grid,.forms-grid){
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;min-width:0!important
+}
+body.amorist-mobile-app :where(.game-library-grid,.character-grid,.forms-grid)>*{min-width:0!important;max-width:100%!important}
+body.amorist-mobile-app .library-controls,body.amorist-mobile-app .char-filter-bar{
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;
+  gap:11px!important;padding:11px!important;border:1px solid var(--am-line)!important;
+  border-radius:16px!important;background:var(--am-paper)!important
+}
+body.amorist-mobile-app .filter-pills{
+  display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;
+  gap:7px!important;padding-bottom:5px!important;scrollbar-width:none!important;
+  -webkit-overflow-scrolling:touch
+}
+body.amorist-mobile-app .filter-pills::-webkit-scrollbar{display:none}
+body.amorist-mobile-app .filter-pills .filter-pill{flex:none!important;white-space:nowrap!important;min-height:38px!important}
+body.amorist-mobile-app .library-rank-card,body.amorist-mobile-app .game-library-grid .game-card{
+  border-radius:15px!important;overflow:hidden!important
+}
+body.amorist-mobile-app :where(.library-rank-card,.game-card,.char-card,.character-card) img{display:block;object-fit:cover}
+body.amorist-mobile-app :where(.game-detail,.character-detail,.char-detail,.oshi-profile,.timeline-shell,.omikuji-shell){
+  max-width:100%!important;min-width:0!important;overflow-wrap:anywhere
+}
+body.amorist-mobile-app :where(.game-detail,.character-detail,.char-detail) :where(input,textarea,select){max-width:100%}
+body.amorist-mobile-app .batch-actions{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
+body.amorist-mobile-app .batch-actions[hidden]{display:none!important}
+/* Gallery/editor sections use touch-sized controls without sacrificing fields */
+body.amorist-mobile-app .product-dialog-grid,body.amorist-mobile-app .oshi-form-grid,
+body.amorist-mobile-app .profile-edit-grid{grid-template-columns:1fr!important}
+body.amorist-mobile-app .product-overlay{padding:0!important;align-items:flex-end!important;overflow:hidden!important}
+body.amorist-mobile-app .product-overlay .product-dialog{
+  width:100%!important;max-width:760px!important;max-height:94dvh!important;overflow-y:auto!important;
+  margin:0 auto!important;padding:21px 18px calc(25px + var(--am-safe-bottom))!important;
+  border-radius:24px 24px 0 0!important
+}
+body.amorist-mobile-app .product-dialog-grid .wide{grid-column:auto!important}
+body.amorist-mobile-app .profile-edit-modal{padding:0!important;align-items:end!important}
+body.amorist-mobile-app .profile-edit-dialog{
+  width:100%!important;max-height:92dvh!important;padding:20px 17px calc(20px + var(--am-safe-bottom))!important;
+  border-radius:23px 23px 0 0!important
+}
+body.amorist-mobile-app .profile-edit-actions{bottom:0!important;padding-bottom:12px!important}
+body.amorist-mobile-app .oshi-editor-drawer{
+  width:100%!important;max-width:760px!important;max-height:93dvh!important;border-radius:20px 20px 0 0!important
+}
+/* Profile keeps the magazine-like visual language; it gets touch-scale rhythm */
+body.amorist-mobile-app .profile-home-stage-wrap{padding:12px!important}
+body.amorist-mobile-app .profile-home-stage{
+  width:100%!important;max-width:100%!important;min-height:0!important;
+  padding:21px 16px 32px!important;background:#fffdfa!important;border:1px solid var(--am-line)!important;
+  box-shadow:0 4px 21px rgba(76,48,69,.045)!important
+}
+body.amorist-mobile-app .profile-hero{display:block!important}
+body.amorist-mobile-app .profile-identity{
+  display:grid!important;grid-template-columns:105px minmax(0,1fr)!important;
+  gap:16px!important;padding:18px 0!important
+}
+body.amorist-mobile-app .profile-portrait{width:102px!important;height:132px!important}
+body.amorist-mobile-app .profile-name-block h2{font-size:30px!important}
+body.amorist-mobile-app .profile-bio{font-size:13px!important;line-height:1.75!important}
+body.amorist-mobile-app .profile-merged-preferences{
+  display:grid!important;grid-template-columns:1fr!important;gap:15px!important;padding:16px 0!important
+}
+body.amorist-mobile-app .profile-taste-top{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+body.amorist-mobile-app .profile-taste-cards{grid-template-columns:1fr!important}
+body.amorist-mobile-app .profile-bottom-social{grid-template-columns:1fr!important}
+body.amorist-mobile-app .profile-library-stats{
+  display:grid!important;grid-template-columns:1fr!important;gap:12px!important;padding:16px!important
+}
+body.amorist-mobile-app .profile-library-stat-list{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+/* Complex editors use a mobile workflow with direct access to original advanced controls */
+body.amorist-mobile-app .product-view[data-product-view="studio"]{padding:13px 11px 34px!important}
+body.amorist-mobile-app .repo-product-head{padding:0 5px 12px!important}
+body.amorist-mobile-app .am-studio-dock{
+  position:sticky;top:calc(var(--am-top-height) + 4px);z-index:60;
+  display:grid;grid-template-columns:1.15fr 1.15fr .7fr;gap:5px;
+  padding:6px;margin:0 0 13px;background:#fff;
+  border:1px solid var(--am-line);border-radius:13px;
+  box-shadow:0 4px 15px rgba(45,32,44,.06)
+}
+.am-studio-dock button{border:0;border-radius:9px;padding:11px 5px;min-width:0;
+  font-size:12px;font-weight:600;background:transparent;color:var(--am-muted)}
+.am-studio-dock button.active{background:var(--am-lilac);color:var(--am-plum)}
+body.amorist-mobile-app .am-studio-quickform{
+  display:none;padding:17px 15px 20px;background:var(--am-paper);
+  border-radius:17px;border:1px solid var(--am-line)
+}
+body.amorist-mobile-app.am-studio-form .product-view[data-product-view="studio"]>.am-studio-quickform{display:block!important}
+body.amorist-mobile-app.am-studio-form .product-view[data-product-view="studio"]>.app{display:none!important}
+body.amorist-mobile-app.am-studio-canvas .product-view[data-product-view="studio"]>.am-studio-quickform{display:none!important}
+body.amorist-mobile-app.am-studio-canvas .product-view[data-product-view="studio"]>.app{display:block!important}
+.am-quickform-intro{border-bottom:1px solid var(--am-line);padding-bottom:12px;margin-bottom:15px}
+.am-quickform-intro h2{margin:0 0 6px;color:var(--am-plum);font:500 20px Georgia,"Noto Serif SC",serif}
+.am-quickform-intro p{margin:0;color:var(--am-muted);font-size:12px;line-height:1.7}
+.am-studio-fields{display:grid;gap:14px;margin-bottom:18px}
+.am-studio-field{display:grid;gap:6px;min-width:0}
+.am-studio-field label{font-size:12px;color:#6f5c70;font-weight:600}
+.am-studio-field input,.am-studio-field textarea{
+  width:100%;padding:11px 12px;border:1px solid #e0d3de;border-radius:11px;background:white;
+  color:var(--am-ink);font-size:16px!important;min-height:46px
+}
+.am-studio-field textarea{resize:vertical;min-height:112px;line-height:1.6}
+.am-studio-fields .am-studio-hint{margin:3px 0 0;color:var(--am-muted);font-size:11px;line-height:1.6}
+body.amorist-mobile-app .product-view[data-product-view="studio"] .app{
+  width:100%!important;min-width:0!important;max-width:100%!important;padding:0!important;
+  display:block!important;grid-template-columns:1fr!important;overflow:visible!important
+}
+body.amorist-mobile-app.am-studio-form .product-view[data-product-view="studio"]>.app{display:none!important}
+body.amorist-mobile-app .product-view[data-product-view="studio"] .toolbar{
+  position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+  width:100%!important;max-width:100%!important;display:flex!important;flex-direction:column!important;
+  gap:12px!important;padding:13px!important;margin:0 0 12px!important;
+  background:#fff!important;border:1px solid var(--am-line)!important;border-radius:15px!important;
+  height:auto!important;max-height:none!important;overflow:visible!important
+}
+body.amorist-mobile-app .product-view[data-product-view="studio"] .repo-sidebar-section{
+  display:block!important;width:100%!important;min-width:0!important
+}
+body.amorist-mobile-app .product-view[data-product-view="studio"] :where(.toolbar-group,.page-switch,.long-page-buttons){
+  display:flex!important;flex-wrap:wrap!important;gap:7px!important;min-width:0!important
+}
+body.amorist-mobile-app .product-view[data-product-view="studio"] .viewport{
+  width:100%!important;min-width:0!important;max-width:100%!important;overflow:auto!important;
+  border-radius:12px!important;overscroll-behavior-x:contain!important
+}
+body.amorist-mobile-app .product-view[data-product-view="studio"] #canvasShell{
+  position:relative!important;max-width:100%!important;margin:0 auto!important
+}
+body.amorist-mobile-app .product-view[data-product-view="studio"] .repo-page{
+  transform-origin:top left!important
+}
+body.amorist-mobile-app .product-view[data-product-view="forms"] .form-workspace{
+  grid-template-columns:1fr!important;gap:14px!important
+}
+body.amorist-mobile-app .product-view[data-product-view="forms"] .form-side{
+  position:relative!important;top:auto!important;width:100%!important;max-width:100%!important
+}
+body.amorist-mobile-app .product-view[data-product-view="forms"] .visual-sheet{
+  max-width:100%!important;min-width:0!important
+}
+/* Primary actions shared with settings + REPO workflow */
+.am-primary,.am-outline,.am-file-button{
+  display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;
+  padding:11px 15px;border-radius:12px;font:600 14px/1.3 -apple-system,sans-serif;
+  cursor:pointer;text-align:center;text-decoration:none
+}
+.am-primary{width:100%;border:1px solid var(--am-plum);background:var(--am-plum);color:#fff}
+.am-primary:disabled{opacity:.43;cursor:not-allowed}
+.am-outline,.am-file-button{border:1px solid #d3beca;background:#fff;color:var(--am-plum)}
+.am-quiet{background:transparent;border:0;color:var(--am-muted);padding:11px;font-size:12px}
+.am-button-row{display:flex;flex-wrap:wrap;gap:10px}
+.am-button-row>*{flex:1 1 145px}
+/* Native full-screen sheet: publication is a private management action */
+.am-dialog{
+  position:fixed;inset:0;top:0;left:0;right:0;bottom:0;
+  width:100%;height:100dvh;max-height:100dvh;max-width:760px;min-width:0;
+  margin:auto;border:0;border-radius:0;background:#fcfafb;padding:
+  calc(19px + var(--am-safe-top)) 18px calc(22px + var(--am-safe-bottom));
+  color:var(--am-ink);overflow:auto;overscroll-behavior:contain
+}
+.am-dialog::backdrop{background:rgba(30,22,33,.45)}
+.am-dialog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  padding:4px 0 22px;border-bottom:1px solid var(--am-line)}
+.am-dialog-heading span{font:600 10px/1.1 Georgia,serif;letter-spacing:.2em;color:var(--am-rose)}
+.am-dialog-heading h2{margin:7px 0 0;color:var(--am-plum);
+  font:500 27px/1.2 Georgia,"Noto Serif SC",serif}
+.am-close{border:1px solid var(--am-line);background:#fff;width:39px;height:39px;
+  display:grid;place-items:center;border-radius:50%;font-size:25px;color:var(--am-plum)}
+.am-publish-status{padding:17px;margin:20px 0;border:1px solid #ddd0dc;
+  border-radius:17px;background:linear-gradient(135deg,#f3edf5,#fff9f6)}
+.am-publish-status>div{display:flex;align-items:center;gap:9px;font-size:15px;color:var(--am-plum)}
+.am-dot{width:9px;height:9px;border-radius:50%;background:#8db398}
+.am-publish-status p{font-size:13px;margin:9px 0;line-height:1.6;color:var(--am-ink)}
+.am-publish-status small{display:block;color:var(--am-muted);font-size:11px;line-height:1.6}
+.am-dialog-section{padding:20px 1px;border-top:1px solid var(--am-line)}
+.am-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.am-section-head h3{margin:0;font-size:18px;font-weight:600;color:var(--am-plum)}
+.am-section-head span{font-size:10px;color:var(--am-rose);text-align:right}
+.am-dialog-section>p{color:var(--am-muted);line-height:1.7;font-size:12px;margin:8px 0 17px}
+.am-form-field{display:grid;gap:7px;margin:12px 0}
+.am-form-field label{font-size:12px;color:#594b59;font-weight:600}
+.am-form-field input{width:100%;max-width:100%;padding:11px 12px;border-radius:11px;
+  border:1px solid #daceD7;background:#fff;color:#39313e;font-size:16px!important}
+.am-publish-auth{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0}
+.am-help{display:block;color:var(--am-muted);font-size:11px;line-height:1.75}
+.am-check{display:flex;align-items:flex-start;gap:11px;line-height:1.6;font-size:12px;
+  padding:13px 0;margin:8px 0;color:var(--am-ink)}
+.am-check input{width:18px;height:18px;min-width:18px;min-height:18px;margin-top:1px;accent-color:var(--am-plum)}
+.am-progress{font-size:12px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;
+  color:var(--am-muted);margin:11px 0;min-height:17px}
+.am-progress.error{color:#ac5361}.am-progress.success{color:#548a68}
+.am-public-link{display:block;padding:13px 2px;text-align:center;color:var(--am-plum);
+  font-weight:600;font-size:12px;text-decoration:none}
+.am-dialog-foot{text-align:center;padding:26px 0 3px;color:#ae9aab;
+  letter-spacing:.16em;font:10px Georgia,serif}
+.am-mobile-toast{
+  position:fixed;z-index:900;left:50%;bottom:calc(82px + var(--am-safe-bottom));
+  transform:translateX(-50%) translateY(18px);max-width:min(90vw,440px);
+  padding:11px 16px;border-radius:14px;background:rgba(50,39,57,.94);
+  color:white;font-size:12px;line-height:1.5;text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s
+}
+.am-mobile-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:761px){
+  body.amorist-mobile-app{background:linear-gradient(90deg,#eee6ec 0%,#fbf7f7 25%,#fbf7f7 75%,#eee6ec 100%)!important}
+  .am-topbar{padding-left:max(18px,calc((100vw - 740px)/2));padding-right:max(18px,calc((100vw - 740px)/2))}
+}
+@media(max-width:380px){
+  .am-topbar{padding-left:12px;padding-right:12px}
+  .am-topbar-kicker{font-size:8px}
+  #amTopbarTitle{font-size:17px}
+  body.amorist-mobile-app .product-view{padding-left:12px!important;padding-right:12px!important}
+  body.amorist-mobile-app .mobile-nav.am-bottom-tabs .product-nav-btn .product-nav-icon{font-size:22px!important}
+  body.amorist-mobile-app .mobile-nav.am-bottom-tabs .product-nav-btn>span:last-child{font-size:10px!important}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Dedicated profile actions are available in the editor, independently
+   of the read-only public profile navigation. */
+.am-profile-edit-actions{
+  display:flex;flex-wrap:wrap;gap:9px;align-items:center;
+  padding:12px 14px 0;margin:0 auto;max-width:760px
+}
+.am-profile-edit-trigger,.am-profile-export-trigger{
+  display:inline-flex;justify-content:center;align-items:center;gap:6px;
+  border-radius:999px;padding:9px 13px;min-height:39px;font-size:12px;
+  font-weight:600;line-height:1.2;
+}
+.am-profile-edit-trigger{color:white;background:var(--am-plum);border:1px solid var(--am-plum)}
+.am-profile-export-trigger{color:var(--am-plum);border:1px solid #d7c8d9;background:var(--am-paper)}
+body.amorist-mobile-app .profile-edit-modal{
+  z-index:800!important;position:fixed!important;inset:0!important;display:none!important;
+  place-items:end center!important;padding:0!important;background:rgba(31,24,35,.47)!important
+}
+body.amorist-mobile-app .profile-edit-modal.open{display:grid!important}
+body.amorist-mobile-app .profile-edit-dialog{
+  display:block!important;width:100%!important;max-width:760px!important;max-height:90dvh!important;
+  min-width:0!important;margin:0!important;padding:21px 16px calc(23px + var(--am-safe-bottom))!important;
+  border:1px solid var(--am-line)!important;border-radius:23px 23px 0 0!important;
+  background:var(--am-paper)!important;overflow:auto!important
+}
+body.amorist-mobile-app .profile-edit-grid{
+  display:grid!important;grid-template-columns:1fr!important;gap:15px!important
+}
+body.amorist-mobile-app .profile-edit-grid fieldset{
+  display:grid!important;gap:9px!important;min-width:0!important
+}
+body.amorist-mobile-app .profile-edit-grid label{
+  display:grid!important;gap:5px!important;min-width:0!important;
+  font-size:12px!important;color:var(--am-ink)!important
+}
+body.amorist-mobile-app .profile-edit-grid input,
+body.amorist-mobile-app .profile-edit-grid textarea{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  font-size:16px!important;border-radius:10px!important;padding:10px 11px!important;
+  border:1px solid var(--am-line)!important
+}
+body.amorist-mobile-app .profile-edit-avatar-row{
+  display:flex!important;gap:15px!important;align-items:center!important;flex-wrap:wrap!important
+}
+body.amorist-mobile-app .profile-edit-avatar-preview{
+  width:76px!important;height:91px!important;flex:none!important
+}
+body.amorist-mobile-app .profile-edit-actions{
+  display:flex!important;justify-content:flex-end!important;gap:8px!important;
+  position:sticky!important;bottom:-1px!important;padding:12px 0 5px!important;
+  background:var(--am-paper)!important
+}
+
+/* Modal hierarchy: original editor dialogs must cover app navigation.
+   Otherwise the fixed tab bar intercepts confirmation/save buttons. */
+body.amorist-mobile-app #gameDialogOverlay,
+body.amorist-mobile-app #charDialogOverlay,
+body.amorist-mobile-app #assetPickerOverlay,
+body.amorist-mobile-app .product-overlay{
+  z-index:710!important;
+}
+body.amorist-mobile-app .product-overlay .product-dialog{
+  position:relative!important;z-index:711!important;
+}
+body.amorist-mobile-app #oshiDrawerBackdrop{z-index:720!important}
+body.amorist-mobile-app #oshiEditorDrawer{z-index:730!important}
+body.amorist-mobile-app #oshiLightbox{z-index:780!important}
+body.amorist-mobile-app #bangumiCharModal,
+body.amorist-mobile-app .bangumi-char-modal{z-index:780!important}
+body.amorist-mobile-app #savePreview,
+body.amorist-mobile-app .save-preview{z-index:790!important}
+body.amorist-mobile-app #themeBackdrop,
+body.amorist-mobile-app .theme-backdrop{z-index:740!important}
+body.amorist-mobile-app .theme-panel{z-index:750!important}
+body.amorist-mobile-app .archive-panel,
+body.amorist-mobile-app .archive-backdrop{z-index:740!important}
