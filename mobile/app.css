@@ -353,3 +353,55 @@ body.amorist-mobile-app .product-view[data-product-view="forms"] .visual-sheet{
   body.amorist-mobile-app .mobile-nav.am-bottom-tabs .product-nav-btn>span:last-child{font-size:10px!important}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Dedicated profile actions are available in the editor, independently
+   of the read-only public profile navigation. */
+.am-profile-edit-actions{
+  display:flex;flex-wrap:wrap;gap:9px;align-items:center;
+  padding:12px 14px 0;margin:0 auto;max-width:760px
+}
+.am-profile-edit-trigger,.am-profile-export-trigger{
+  display:inline-flex;justify-content:center;align-items:center;gap:6px;
+  border-radius:999px;padding:9px 13px;min-height:39px;font-size:12px;
+  font-weight:600;line-height:1.2;
+}
+.am-profile-edit-trigger{color:white;background:var(--am-plum);border:1px solid var(--am-plum)}
+.am-profile-export-trigger{color:var(--am-plum);border:1px solid #d7c8d9;background:var(--am-paper)}
+body.amorist-mobile-app .profile-edit-modal{
+  z-index:800!important;position:fixed!important;inset:0!important;display:none!important;
+  place-items:end center!important;padding:0!important;background:rgba(31,24,35,.47)!important
+}
+body.amorist-mobile-app .profile-edit-modal.open{display:grid!important}
+body.amorist-mobile-app .profile-edit-dialog{
+  display:block!important;width:100%!important;max-width:760px!important;max-height:90dvh!important;
+  min-width:0!important;margin:0!important;padding:21px 16px calc(23px + var(--am-safe-bottom))!important;
+  border:1px solid var(--am-line)!important;border-radius:23px 23px 0 0!important;
+  background:var(--am-paper)!important;overflow:auto!important
+}
+body.amorist-mobile-app .profile-edit-grid{
+  display:grid!important;grid-template-columns:1fr!important;gap:15px!important
+}
+body.amorist-mobile-app .profile-edit-grid fieldset{
+  display:grid!important;gap:9px!important;min-width:0!important
+}
+body.amorist-mobile-app .profile-edit-grid label{
+  display:grid!important;gap:5px!important;min-width:0!important;
+  font-size:12px!important;color:var(--am-ink)!important
+}
+body.amorist-mobile-app .profile-edit-grid input,
+body.amorist-mobile-app .profile-edit-grid textarea{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  font-size:16px!important;border-radius:10px!important;padding:10px 11px!important;
+  border:1px solid var(--am-line)!important
+}
+body.amorist-mobile-app .profile-edit-avatar-row{
+  display:flex!important;gap:15px!important;align-items:center!important;flex-wrap:wrap!important
+}
+body.amorist-mobile-app .profile-edit-avatar-preview{
+  width:76px!important;height:91px!important;flex:none!important
+}
+body.amorist-mobile-app .profile-edit-actions{
+  display:flex!important;justify-content:flex-end!important;gap:8px!important;
+  position:sticky!important;bottom:-1px!important;padding:12px 0 5px!important;
+  background:var(--am-paper)!important
+}
