@@ -44,7 +44,7 @@
     const chips=[['all','全部'],['2020','2020年代'],['2010','2010年代'],['2000','2000年代'],['1990','1990年代'],['pre1990','更早']];
     host.innerHTML='<div class="amx-heading"><span>OTOME INDEX</span><div><h1>作品索引</h1>'+
       '<button type="button" data-amx="random" aria-label="随机发现作品">'+icons.random+'随机邂逅</button></div>'+
-      '<p>从作品到制作阵容，寻找下一次值得期待的相遇。</p></div>'+
+      '<p>Estar contigo o no estar contigo es la medida de mi tiempo</p></div>'+
       '<label class="amx-search">'+icons.search+'<input id="amx-query" type="search" aria-label="搜索作品索引" placeholder="搜索作品名、制作公司…" value="'+esc(state.query)+'"></label>'+
       '<div class="amx-chips">'+chips.map(([id,name])=>'<button type="button" data-amx="era" data-value="'+id+'" class="'+(state.era===id?'active':'')+'">'+name+'</button>').join('')+'</div>'+
       '<div class="amx-options"><span>'+all.length+' 部作品 · 检索结果 '+result.length+' 部</span>'+
