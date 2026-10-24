@@ -89,6 +89,16 @@ try {
     .some(g=>g.name==='QA 原生移动端新增作品')),'new game did not save');
   await page.evaluate(()=>window.amoristProductNavigate('characters'));
   await assertVisible('#amv-characters .amv-library-controls');
+  await page.evaluate(()=>window.amoristProductNavigate('forms'));
+  await assertVisible('#amf-screen .amf-template-grid');
+  assert.equal(await page.locator('#amf-screen [data-amf="open"]').count(),8,'eight original art templates required');
+  await page.locator('#amf-screen [data-amf="open"]').first().click();
+  await assertVisible('#formWorkspace');
+  await assertVisible('#amf-screen .amf-edit-bar');
+  await page.locator('#amf-screen [data-amf="back"]').click();
+  await assertVisible('#amf-screen .amf-template-grid');
+  await page.screenshot({path:path.join(screens,browserName+'-v3-forms-native.png'),fullPage:false});
+  await page.evaluate(()=>window.amoristProductNavigate('characters'));
   await page.evaluate(()=>window.amoristProductNavigate('omikuji'));
   await assertVisible('#amz-screen .amz-choices');
   assert.equal(await page.locator('#amz-screen .amz-choice').count(),6,'all six shrine rituals must be present');
