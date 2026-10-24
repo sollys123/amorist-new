@@ -17,7 +17,7 @@
   const gameMap=()=>new Map(games().map(g=>[String(g.id),g]));
   const safeSrc=value=>{
     const v=String(value||'').trim();
-    return /^(https?:\/\/|data:image\/|blob:|\/(?!\/)|\.{0,2}\/|assets\/|image:)/i.test(v)?v:'';
+    return /^(https?:\/\/|data:image\/|blob:|\/(?!\/)|\.{0,2}\/|assets\/|idb-image:|image:)/i.test(v)?v:'';
   };
   const art=(src,alt='',extra='')=>{
     const url=safeSrc(src);
@@ -523,6 +523,28 @@
         renderOshi();break;
     }
   }
+  document.addEventListener('click',e=>{
+    const back=e.target.closest('#amBackBtn,.game-detail-back');
+    if(!back)return;
+    if(document.body.classList.contains('amv-legacy-game-detail')){
+      document.body.classList.remove('amv-legacy-game-detail');
+      state.lib.detail='';
+      setTimeout(renderLibrary,0);
+      return;
+    }
+    if(state.route==='library'&&state.lib.detail){
+      e.preventDefault();e.stopImmediatePropagation();
+      state.lib.detail='';renderLibrary();return;
+    }
+    if(state.route==='characters'&&state.chars.detail){
+      e.preventDefault();e.stopImmediatePropagation();
+      state.chars.detail='';renderCharacters();return;
+    }
+    if(state.route==='oshi'&&state.oshi.detail&&!state.oshi.advanced){
+      e.preventDefault();e.stopImmediatePropagation();
+      state.oshi.detail='';renderOshi();return;
+    }
+  },true);
   document.addEventListener('click',e=>{
     const btn=e.target.closest('[data-amv]');
     if(!btn||!btn.closest('.amv-screen'))return;
