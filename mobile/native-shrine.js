@@ -17,12 +17,12 @@
   };
   const glyph=key=>'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round">'+drawing[key]+'</svg>';
   const choices=[
-    {id:'water',name:'水占池',jp:'今日の御籤',desc:'抽取今日的缘分',tag:'DAILY FORTUNE'},
-    {id:'sakura',name:'縁結花樹',jp:'人物みくじ',desc:'邂逅一位心动的人',tag:'CHARACTER'},
-    {id:'bell',name:'鈴音回廊',jp:'声優みくじ',desc:'倾听声音的相遇',tag:'VOICE'},
-    {id:'ink',name:'言霊井',jp:'脚本みくじ',desc:'遇见故事的创造者',tag:'STORY'},
-    {id:'ema',name:'絵馬殿',jp:'制作みくじ',desc:'制作人与作品缘分',tag:'MAKERS'},
-    {id:'torii',name:'千本鳥居',jp:'作品みくじ',desc:'下一部命定的游戏',tag:'WORKS'}
+    {id:'water',name:'水占池',jp:'今日の御籤',desc:'水面に浮かぶ一枚から、今日の縁を。',tag:'今日の御籤'},
+    {id:'sakura',name:'縁結花樹',jp:'人物みくじ',desc:'枝先に咲くひとひらから、今日のひとを。',tag:'縁結御籤'},
+    {id:'bell',name:'鈴音回廊',jp:'声優みくじ',desc:'声優みくじ',tag:'声優みくじ'},
+    {id:'ink',name:'言霊井',jp:'脚本みくじ',desc:'脚本みくじ',tag:'脚本みくじ'},
+    {id:'ema',name:'絵馬殿',jp:'制作みくじ',desc:'制作みくじ',tag:'制作みくじ'},
+    {id:'torii',name:'千本鳥居',jp:'作品みくじ',desc:'作品みくじ',tag:'作品みくじ'}
   ];
   const choicesHtml=choices.map(c=>'<button type="button" class="amz-choice" data-amz="'+c.id+'">'+
     '<div class="amz-choice-icon">'+glyph(c.id)+'</div>'+
@@ -32,9 +32,9 @@
   menu.innerHTML='<div class="amz-hero"><div class="amz-hero-petals" aria-hidden="true">✧</div>'+
     '<span class="amz-kicker">ENMUSUBI JINJA · AMORIST</span>'+
     '<h1>御签所</h1><p>良縁に恵まれますように。</p>'+
-    '<span class="amz-intro">在六处不同的境地，寻找今天与你相遇的缘分。</span></div>'+
-    '<div class="amz-section-head"><div><span>CHOOSE YOUR DESTINY</span><h2>今天去哪里参拜？</h2></div>'+
-    '<small>六处缘结之所</small></div>'+
+    '<span class="amz-intro">縁結花樹・鈴音回廊・言霊井・水占池・絵馬殿・千本鳥居　本日開所</span></div>'+
+    '<div class="amz-section-head"><div><span>ENMUSUBI JINJA</span><h2>境内案内</h2></div>'+
+    '<small>本日開所</small></div>'+
     '<div class="amz-choices">'+choicesHtml+'</div>'+
     '<p class="amz-footer">一期一会 · 願いの行方は風のままに</p>';
   section.insertBefore(menu,root);
