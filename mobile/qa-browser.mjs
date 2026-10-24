@@ -23,6 +23,9 @@ try {
   await page.waitForFunction(()=>Boolean(window.AmoristMobile?.syncHeader),null,{timeout:45000});
   await page.waitForTimeout(1300);
   assert.equal(await page.locator('.am-bottom-tabs button').count(),5,'five tabs required');
+  await page.waitForFunction(()=>document.querySelectorAll('.am-bottom-tabs svg.am-line-icon').length===5,null,{timeout:6000});
+  assert.equal(await page.locator('.am-bottom-tabs svg.am-line-icon').count(),5,
+    'navigation icons must use SVG, never Unicode/Emoji');
   assertVisible('#amTopbar');
   assertVisible('.am-bottom-tabs');
   const mode=await page.evaluate(()=>window.AMORIST_MODE);
@@ -47,6 +50,38 @@ try {
     assert(dimensions.documentWidth<=dimensions.screenWidth+4,
       view+' has unexpected horizontal page overflow: '+JSON.stringify(dimensions));
   }
+
+  // iOS regression: the old desktop rank axis squeezed Japanese tier names into
+  // a 54 px vertical column, and the grid/list controls became colored Emoji.
+  await page.evaluate(()=>window.amoristProductNavigate('library'));
+  await page.waitForTimeout(300);
+  await page.waitForFunction(()=>document.querySelectorAll('.library-reference-views svg.am-line-icon').length===3,
+    null,{timeout:8000});
+  const libraryTypography=await page.evaluate(()=>{
+    const tier=document.querySelector('.library-rank-tier');
+    const title=tier?.querySelector('header h3');
+    const toolbar=document.querySelector('.library-reference-toolbar');
+    const list=document.querySelector('.library-status-tabs');
+    const icons=document.querySelectorAll('.library-reference-views svg.am-line-icon').length;
+    return {
+      titleWidth:title?.getBoundingClientRect().width || 0,
+      titleSize:title?parseFloat(getComputedStyle(title).fontSize):0,
+      tierWidth:tier?.getBoundingClientRect().width || 0,
+      tierColumns:tier?getComputedStyle(tier).gridTemplateColumns:'',
+      toolbarDisplay:toolbar?getComputedStyle(toolbar).display:'',
+      filterScrollWidth:list?.scrollWidth || 0,
+      filterClientWidth:list?.clientWidth || 0,
+      icons
+    };
+  });
+  assert(libraryTypography.titleWidth>65,
+    'rank title cramped on mobile: '+JSON.stringify(libraryTypography));
+  assert(libraryTypography.titleSize>=16,
+    'rank title too small: '+JSON.stringify(libraryTypography));
+  assert(libraryTypography.toolbarDisplay==='grid',
+    'library must use a mobile toolbar: '+JSON.stringify(libraryTypography));
+  assert.equal(libraryTypography.icons,3,'library view controls must be SVG');
+  await page.screenshot({path:path.join(screens,browserName+'-01b-library-layout.png'),fullPage:true});
 
   await page.locator('#profileEditButton').click();
   await assertVisible('#profileEditModal');
