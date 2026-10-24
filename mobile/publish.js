@@ -99,7 +99,7 @@
     const blob=await response.json();
     if(blob.encoding!=='base64'||!blob.content)
       throw new Error('远端数据内容暂时无法读取，已中止以保护公开站');
-    try{return JSON.parse(new TextDecoder().decode(base64ToBytes(blob.content.replace(/\\s/g,''))))}
+    try{return JSON.parse(new TextDecoder().decode(base64ToBytes(blob.content.replace(/\s/g,''))))}
     catch{throw new Error('远端档案无法解析，已中止以避免覆盖')}
   }
   function bytesToDataUrl(bytes,type){
