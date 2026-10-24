@@ -13,7 +13,7 @@ const page=await browser.newPage({
   hasTouch:true,locale:'zh-CN',serviceWorkers:'block'
 });
 const exceptions=[];
-page.on('pageerror',error=>exceptions.push(error.message));
+page.on('pageerror',error=>{if(exceptions.length<5)exceptions.push(String(error.stack||error.message).slice(0,1100));});
 const assertVisible=async selector=>{
   assert(await page.locator(selector).isVisible(),selector+' not visible');
 };
