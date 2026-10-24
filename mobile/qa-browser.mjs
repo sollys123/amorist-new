@@ -105,7 +105,14 @@ try {
       galleryDisplay:gallery?getComputedStyle(gallery).display:null,
       galleryParent:gallery?.parentNode?.className||'',
       html:shell?.innerHTML.slice(0,550)||'',
-      workspaceClass:ws?.className
+      workspaceClass:ws?.className,
+      templateFound:Boolean(document.getElementById('formTemplates')),
+      templateInside:Boolean(root?.querySelector('#formTemplates')),
+      workspaceInside:Boolean(root?.querySelector('#formWorkspace')),
+      children:Array.from(root?.children||[]).slice(0,12).map(x=>({id:x.id,tag:x.tagName,className:x.className})),
+      globalVisualSheet:Boolean(document.getElementById('visualSheet')),
+      globalVisualCanvas:Boolean(document.getElementById('visualCanvas')),
+      appScripts:Array.from(document.scripts).filter(x=>x.src.includes('mobile/')).map(x=>x.src.split('/').slice(-1)[0])
     };
   });
   console.log('Native forms state',formsState);
