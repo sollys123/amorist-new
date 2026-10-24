@@ -294,8 +294,16 @@ body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-a
 body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-library-sidebar{
   display:none!important;
 }
-body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-color .workshop-sidebar{
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active:is(.amf-tools-size,.amf-tools-color) .workshop-sidebar{
   display:block!important;order:2!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-size .workshop-sidebar>.workshop-color-row,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-size .workshop-sidebar>.workshop-palette-panel,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-size .workshop-sidebar>.workshop-primary-actions{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-color .workshop-sidebar>.workshop-settings{
+  display:none!important;
 }
 body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-library .workshop-library-sidebar{
   display:block!important;order:2!important;
