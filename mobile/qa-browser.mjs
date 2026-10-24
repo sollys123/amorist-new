@@ -1,11 +1,13 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import {chromium} from 'playwright';
+import {chromium,webkit} from 'playwright';
 const base='http://127.0.0.1:8765/mobile/';
 const screens=path.resolve(import.meta.dirname,'qa-screenshots');
 fs.mkdirSync(screens,{recursive:true});
-const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+const browserName=process.env.AM_QA_BROWSER==='webkit'?'webkit':'chromium';
+const browser=await (browserName==='webkit'?webkit:chromium).launch({headless:true,
+  ...(browserName==='chromium'?{args:['--no-sandbox']}:{})});
 const page=await browser.newPage({
   viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,
   hasTouch:true,locale:'zh-CN',serviceWorkers:'block'
@@ -29,7 +31,7 @@ try {
     bottom:Math.round(document.querySelector('.am-bottom-tabs').getBoundingClientRect().bottom)}));
   assert(viewport.scroll<=viewport.width+3,'horizontal overflow on phone');
   assert(viewport.bottom<=844,'bottom nav below screen');
-  await page.screenshot({path:path.join(screens,'01-home.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-01-home.png'),fullPage:true});
 
   const views=['library','characters','timeline','oshi','bangumi','omikuji','forms','studio','home'];
   for(const view of views){
@@ -45,7 +47,7 @@ try {
   await page.locator('#profileEditSave').click();
   const savedProfile=await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-profile-v1')||'{}').name);
   assert.equal(savedProfile,'QA 手机版档案','profile edit did not persist');
-  await page.screenshot({path:path.join(screens,'02-profile.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-02-profile.png'),fullPage:true});
 
   await page.evaluate(()=>window.amoristProductNavigate('library'));
   await page.waitForTimeout(200);
@@ -57,7 +59,7 @@ try {
   await page.locator('#gameDialogForm button[type="submit"]').click();
   const gameAdded=await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]').some(g=>g.name==='QA 手机版游戏'));
   assert(gameAdded,'new game was not saved');
-  await page.screenshot({path:path.join(screens,'03-library.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-03-library.png'),fullPage:true});
 
   await page.evaluate(()=>window.amoristProductNavigate('studio'));
   await page.waitForTimeout(250);
@@ -66,7 +68,7 @@ try {
   assert.equal(await page.locator('#gameName').inputValue(),'手机原生 REPO 编辑同步测试','REPO input not synced');
   await page.locator('[data-am-studio-mode="canvas"]').click();
   await assertVisible('.product-view[data-product-view="studio"]>.app');
-  await page.screenshot({path:path.join(screens,'04-repo.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-04-repo.png'),fullPage:true});
 
   await page.locator('#amOpenPublish').click();
   await assertVisible('#amPublishDialog');
