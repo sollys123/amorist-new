@@ -123,7 +123,20 @@ try {
   const oshiCard=page.locator('#amv-oshi [data-amv="open-oshi"]').first();
   const chosenOshiId=await oshiCard.getAttribute('data-id');
   await oshiCard.click();
-  await assertVisible('#oshiDetailView');
+  await page.locator('#oshiDetailView').waitFor({state:'visible',timeout:7000}).catch(async(error)=>{
+    const diagnosis=await page.evaluate(()=>({
+      active:document.querySelector('.product-view.active')?.dataset.productView,
+      id:document.querySelector('#amv-oshi .amv-native-detail')?.textContent?.slice(0,100),
+      gateway:document.querySelector('#amv-oshi .amv-legacy-gateway')?.textContent?.slice(0,100),
+      allOriginalIds:Array.from(document.querySelectorAll('#oshiIndexList .oshi-index-link')).slice(0,10).map(x=>x.dataset.oshiOrderId),
+      oshiRoute:localStorage.getItem('amoristUi.oshiRoute.v1'),
+      detailHidden:document.getElementById('oshiDetailView')?.hidden,
+      cssClasses:document.body.className,
+      indexLength:document.querySelectorAll('#oshiIndexList .oshi-index-link').length,
+      detailComputed:document.getElementById('oshiDetailView')?getComputedStyle(document.getElementById('oshiDetailView')).display:'missing',
+    }));
+    throw new Error('Oshi exact-id profile did not open: '+JSON.stringify(diagnosis)+' '+error.message);
+  });
   const selectedOshiId=await page.evaluate(()=>
     JSON.parse(localStorage.getItem('amoristUi.oshiRoute.v1')||'{}').id);
   assert.equal(String(selectedOshiId),String(chosenOshiId),
@@ -139,7 +152,7 @@ try {
   await page.locator('#amModeHeader').click();
   assert.equal(await page.evaluate(()=>window.AmoristMobileMode.isEditing()),false);
   await page.locator('#amv-oshi [data-amv="open-oshi"]').first().click();
-  await assertVisible('#oshiDetailView');
+  await page.locator('#oshiDetailView').waitFor({state:'visible',timeout:7000});
   assert.equal(await page.locator('#oshiEditDetailButton').isVisible(),false);
   await page.locator('#amv-oshi [data-amv="oshi-back"]').click();
   await page.locator('#amModeHeader').click();
