@@ -39,6 +39,13 @@ try {
     await page.waitForTimeout(100);
     const active=await page.locator('.product-view.active').getAttribute('data-product-view');
     assert.equal(active,view,'navigation mismatch: '+view);
+    const dimensions=await page.evaluate(()=>({
+      documentWidth:document.documentElement.scrollWidth,
+      screenWidth:window.innerWidth,
+      bodyWidth:document.body.scrollWidth
+    }));
+    assert(dimensions.documentWidth<=dimensions.screenWidth+4,
+      view+' has unexpected horizontal page overflow: '+JSON.stringify(dimensions));
   }
 
   await page.locator('#profileEditButton').click();
