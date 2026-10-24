@@ -405,3 +405,27 @@ body.amorist-mobile-app .profile-edit-actions{
   position:sticky!important;bottom:-1px!important;padding:12px 0 5px!important;
   background:var(--am-paper)!important
 }
+
+/* Modal hierarchy: original editor dialogs must cover app navigation.
+   Otherwise the fixed tab bar intercepts confirmation/save buttons. */
+body.amorist-mobile-app #gameDialogOverlay,
+body.amorist-mobile-app #charDialogOverlay,
+body.amorist-mobile-app #assetPickerOverlay,
+body.amorist-mobile-app .product-overlay{
+  z-index:710!important;
+}
+body.amorist-mobile-app .product-overlay .product-dialog{
+  position:relative!important;z-index:711!important;
+}
+body.amorist-mobile-app #oshiDrawerBackdrop{z-index:720!important}
+body.amorist-mobile-app #oshiEditorDrawer{z-index:730!important}
+body.amorist-mobile-app #oshiLightbox{z-index:780!important}
+body.amorist-mobile-app #bangumiCharModal,
+body.amorist-mobile-app .bangumi-char-modal{z-index:780!important}
+body.amorist-mobile-app #savePreview,
+body.amorist-mobile-app .save-preview{z-index:790!important}
+body.amorist-mobile-app #themeBackdrop,
+body.amorist-mobile-app .theme-backdrop{z-index:740!important}
+body.amorist-mobile-app .theme-panel{z-index:750!important}
+body.amorist-mobile-app .archive-panel,
+body.amorist-mobile-app .archive-backdrop{z-index:740!important}
