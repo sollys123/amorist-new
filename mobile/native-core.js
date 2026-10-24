@@ -104,6 +104,7 @@
   };
   function renderHome(){
     const el=hosts.home;if(!el)return;
+    if(state.homePreview){el.innerHTML='<div class="amv-preview-nav"><button type="button" data-amv="close-profile-preview">'+icon('back',18)+'返回应用主页</button><span>自介图专属排版 · 可在下方编辑并导出图片</span></div>';return}
     const p=profile(),gs=games(),cs=chars(),timeline=events().slice().sort((a,b)=>String(b.occurredAt||'').localeCompare(String(a.occurredAt||'')));
     const current=gs.filter(g=>g.status==='进行中').slice(0,8);
     const all=gs.length,done=gs.filter(g=>g.status==='已全通').length;
@@ -264,6 +265,7 @@
   const monthShift=(month,n)=>{const [y,m]=String(month).split('-').map(Number);const d=new Date(y,m-1+n,1);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
   function renderTimeline(){
     const el=hosts.timeline;if(!el)return;
+    if(state.calendarAdvanced){el.innerHTML='<div class="amv-preview-nav"><button type="button" data-amv="timeline-back">'+icon('back',18)+'返回游玩日历</button><span>完整历史时间线与批量管理功能</span></div>';return}
     const v=state.timeline,gs=gameMap(),items=events().filter(x=>x.occurredAt).sort((a,b)=>String(b.occurredAt).localeCompare(String(a.occurredAt)));
     const header=heading('PLAY CHRONICLE','游玩日历','日子会过去，喜欢过的故事会留下。',actionButton('new-session','记录','plus','primary'));
     const modes='<div class="amv-full-segment">'+['calendar','feed'].map((x,i)=>
@@ -555,10 +557,7 @@
   });
   window.addEventListener('storage',()=>render(state.route));
   const main=$('.product-main');
-  if(main)new MutationObserver(()=>{
-    const next=$('.product-view.active')?.dataset.productView||'home';
-    if(next!==state.route)syncRoute();
-  }).observe(main,{subtree:false,childList:false,attributes:false});
+  // The existing router toggles classes on each view; observe those only.
   // Observe direct view class switches only, not each editor input mutation.
   $$('.product-view').forEach(section=>new MutationObserver(()=>{
     if(section.classList.contains('active')&&section.dataset.productView!==state.route)syncRoute();
