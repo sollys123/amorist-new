@@ -305,3 +305,19 @@ body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-vie
 body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"] #oshiLightbox:not([hidden]) img{
   max-width:95vw!important;max-height:88dvh!important;object-fit:contain!important;
 }
+
+
+/* Editorial Oshi views and all owner editing drawers must use one local CJK
+   family. The standalone REPO/self-intro artwork canvases are excluded. */
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"] :where(
+  #oshiHubView,#oshiDetailView,#oshiEditorDrawer
+) :where(h1,h2,h3,h4,p,span,small,strong,b,em,label,dt,dd,button,input,select,textarea,blockquote){
+  font-family:var(--amv-native)!important;
+}
+body.amorist-mobile-app.amv-ready :where(#profileEditModal,#gameDialogOverlay,#charDialogOverlay)
+  :where(h1,h2,h3,legend,label,p,span,small,strong,button,input,select,textarea){
+  font-family:var(--amv-native)!important;
+}
+body.amorist-mobile-app.amv-ready .amv-about :where(h1,h2,h3,dt,dd){
+  font-family:var(--amv-native)!important;
+}
