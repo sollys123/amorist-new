@@ -2,11 +2,11 @@
  * Small offline core by default; opt-in complete artwork download.
  */
 'use strict';
-const VERSION='20261024-1';
+const VERSION='20261024-2';
 const CORE='amorist-mobile-core-'+VERSION;
 const EXTRA='amorist-mobile-artwork-'+VERSION;
 const CORE_URLS=[
-  './','./index.html','./app.css','./app.js','./bootstrap.js','./publish.js',
+  './','./index.html','./app.css','./ios-polish.css','./app.js','./ui-icons.js','./bootstrap.js','./publish.js',
   './manifest.webmanifest','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png',
   './offline-assets.json',
   '../assets/css/amorist.css','../assets/css/site-modes.css',
