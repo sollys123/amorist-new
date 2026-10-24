@@ -78,7 +78,8 @@
 
     <div class="product-main" id="main-content" tabindex="-1">
       <section class="product-view active" data-product-view="home">
-        <div class="profile-home profile-home-public">
+        <div class="am-profile-edit-actions"><button class="am-profile-edit-trigger" type="button" id="profileEditButton">✎ 编辑个人档案</button><button class="am-profile-export-trigger" type="button" id="profileExportButton">⇩ 导出个人主页图片</button></div>
+        <div class="profile-home">
           <div class="profile-home-stage-wrap"><section class="profile-home-stage">
             <header class="profile-masthead"><span>PRIVATE / SELF INTRODUCTION</span><h1>OTOME PROFILE</h1><small id="profileIssueNumber"></small></header>
             <section class="profile-hero">
@@ -914,6 +915,53 @@
   </section>
   <footer class="am-dialog-foot">AMORIST · MOBILE EDITION</footer>
 </dialog>
+<div class="profile-edit-modal" id="profileEditModal" role="dialog" aria-modal="true" aria-label="编辑个人资料" aria-hidden="true">
+  <form class="profile-edit-dialog" id="profileEditForm">
+    <div class="profile-edit-head"><div><span class="profile-panel-label">OWNER PROFILE</span><h2>编辑个人档案</h2></div><button type="button" class="profile-modal-close" id="profileEditClose" aria-label="关闭">×</button></div>
+    <div class="profile-edit-avatar-row"><div class="profile-avatar profile-edit-avatar-preview" id="profileEditAvatarPreview"><img alt="个人头像预览"><span>H</span></div>
+      <div><strong>头像与主视觉</strong><p>从手机相册选择图片，仅在主动发布后公开。</p>
+        <label class="profile-upload-button">上传新头像<input id="profileAvatarUpload" type="file" accept="image/*" hidden></label>
+        <button type="button" class="profile-modal-link" id="profileAvatarRemove">移除头像</button></div>
+    </div>
+    <div class="profile-edit-grid"><fieldset><legend>个人介绍 / PERSONAL</legend>
+      <label>显示名称<input type="text" class="profile-edit-field" data-profile-key="name"></label>
+<label>个人标识 / ID<input type="text" class="profile-edit-field" data-profile-key="handle"></label>
+<label>个人介绍<textarea class="profile-edit-field" data-profile-key="bio" rows="2"></textarea></label>
+<label>入坑年份<input type="text" class="profile-edit-field" data-profile-key="years"></label>
+<label>年龄<input type="text" class="profile-edit-field" data-profile-key="age"></label>
+<label>LOVE TYPE<input type="text" class="profile-edit-field" data-profile-key="type"></label>
+<label>喜爱角色<textarea class="profile-edit-field" data-profile-key="favorite" rows="2"></textarea></label>
+<label>偏好标签<textarea class="profile-edit-field" data-profile-key="tags" rows="2"></textarea></label>
+<label>游戏平台 ID<input type="text" class="profile-edit-field" data-profile-key="platformId"></label>
+<label>游玩平台<input type="text" class="profile-edit-field" data-profile-key="platforms"></label>
+<label>游玩语言<input type="text" class="profile-edit-field" data-profile-key="languages"></label>
+<label>同担态度<textarea class="profile-edit-field" data-profile-key="sameFan" rows="2"></textarea></label>
+    </fieldset><fieldset><legend>游玩与偏好 / OTOME</legend>
+      <label>推角名单<textarea class="profile-edit-field" data-profile-key="oshiChars" rows="2"></textarea></label>
+<label>游玩习惯<textarea class="profile-edit-field" data-profile-key="playstyle" rows="2"></textarea></label>
+<label>游玩节奏<input type="text" class="profile-edit-field" data-profile-key="playPace"></label>
+<label>偏好声优<textarea class="profile-edit-field" data-profile-key="voiceActors" rows="2"></textarea></label>
+<label>XP 属性<textarea class="profile-edit-field" data-profile-key="xp" rows="2"></textarea></label>
+<label>世界观偏好<textarea class="profile-edit-field" data-profile-key="worldview" rows="2"></textarea></label>
+<label>偏好剧本娘<textarea class="profile-edit-field" data-profile-key="scriptWriters" rows="2"></textarea></label>
+<label>偏爱作品<textarea class="profile-edit-field" data-profile-key="likedWorks" rows="2"></textarea></label>
+<label>个人属性<input type="text" class="profile-edit-field" data-profile-key="attribute"></label>
+<label>收藏习惯<input type="text" class="profile-edit-field" data-profile-key="habit"></label>
+<label>游戏偏好<textarea class="profile-edit-field" data-profile-key="mood" rows="2"></textarea></label>
+<label>喜欢的画师<input type="text" class="profile-edit-field" data-profile-key="artist"></label>
+<label>剧本偏好（兼容）<input type="text" class="profile-edit-field" data-profile-key="writer"></label>
+<label>作品偏好（兼容）<input type="text" class="profile-edit-field" data-profile-key="works"></label>
+<label>偏好角色（兼容）<input type="text" class="profile-edit-field" data-profile-key="character"></label>
+<label>偏好关系（兼容）<input type="text" class="profile-edit-field" data-profile-key="relationship"></label>
+<label>雷点与边界<textarea class="profile-edit-field" data-profile-key="boundaries" rows="2"></textarea></label>
+<label>社交账号<input type="text" class="profile-edit-field" data-profile-key="account"></label>
+<label>补充说明<textarea class="profile-edit-field" data-profile-key="note" rows="2"></textarea></label>
+<label>小红书<input type="text" class="profile-edit-field" data-profile-key="xhs"></label>
+<label>联系方式<input type="text" class="profile-edit-field" data-profile-key="contactValue"></label>
+    </fieldset></div>
+    <div class="profile-edit-actions"><button type="button" class="product-button secondary" id="profileEditCancel">取消</button><button class="product-button rose" type="submit" id="profileEditSave">保存档案</button></div>
+  </form>
+</div>
 <div id="amMobileToast" class="am-mobile-toast" role="status" aria-live="polite"></div>
 </body>
 </html>
