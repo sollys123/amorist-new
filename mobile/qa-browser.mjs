@@ -13,9 +13,9 @@ const page=await browser.newPage({
   hasTouch:true,locale:'zh-CN',serviceWorkers:'block'
 });
 const exceptions=[];
-page.on('pageerror',error=>exceptions.push(error.message));
+page.on('pageerror',error=>{if(exceptions.length<5)exceptions.push(String(error.stack||error.message).slice(0,1100));});
 const assertVisible=async selector=>{
-  assert(await page.locator(selector).isVisible(),selector+' not visible');
+  assert(await page.locator(selector).first().isVisible(),selector+' not visible');
 };
 try {
   const response=await page.goto(base,{waitUntil:'domcontentloaded',timeout:45000});
@@ -34,98 +34,143 @@ try {
     bottom:Math.round(document.querySelector('.am-bottom-tabs').getBoundingClientRect().bottom)}));
   assert(viewport.scroll<=viewport.width+3,'horizontal overflow on phone');
   assert(viewport.bottom<=844,'bottom nav below screen');
-  await page.screenshot({path:path.join(screens,browserName+'-01-home.png'),fullPage:true});
+  await page.waitForFunction(()=>Boolean(window.AmoristNativeMobile?.state),null,{timeout:8000});
+  await assertVisible('#amv-home .amv-home-hero');
+  assert.equal(await page.locator('#amv-home .amv-quick-grid button').count(),3);
+  await page.screenshot({path:path.join(screens,browserName+'-01-home.png'),fullPage:false});
 
   const views=['library','characters','timeline','oshi','bangumi','omikuji','forms','studio','home'];
-  for(const view of views){
-    await page.evaluate(v=>window.amoristProductNavigate(v),view);
-    await page.waitForTimeout(100);
+  for(const v of views){
+    await page.evaluate(name=>window.amoristProductNavigate(name),v);
+    await page.waitForTimeout(180);
     const active=await page.locator('.product-view.active').getAttribute('data-product-view');
-    assert.equal(active,view,'navigation mismatch: '+view);
+    assert.equal(active,v,'native router mismatch: '+v);
+    if(['characters','timeline','oshi','bangumi','forms','omikuji'].includes(v)){
+      await page.screenshot({path:path.join(screens,browserName+'-v3-'+v+'.png'),fullPage:false});
+    }
+    if(['home','library','characters','timeline','oshi'].includes(v)){
+      const native=await page.locator('#amv-'+v).isVisible();
+      assert(native,'native screen not visible: '+v);
+      const legacy=await page.evaluate(name=>{
+        const root=document.querySelector('.product-view[data-product-view="'+name+'"]');
+        const old=Array.from(root.children).find(c=>!c.classList.contains('amv-screen'));
+        return old?getComputedStyle(old).display:'missing';
+      },v);
+      assert.equal(legacy,'none','desktop page is still visible: '+v);
+    }
     const dimensions=await page.evaluate(()=>({
-      documentWidth:document.documentElement.scrollWidth,
-      screenWidth:window.innerWidth,
-      bodyWidth:document.body.scrollWidth
+      screen:innerWidth,documentWidth:document.documentElement.scrollWidth
     }));
-    assert(dimensions.documentWidth<=dimensions.screenWidth+4,
-      view+' has unexpected horizontal page overflow: '+JSON.stringify(dimensions));
+    assert(dimensions.documentWidth<=dimensions.screen+4,
+      'mobile view overflow: '+v+' '+JSON.stringify(dimensions));
   }
 
-  // iOS regression: the old desktop rank axis squeezed Japanese tier names into
-  // a 54 px vertical column, and the grid/list controls became colored Emoji.
   await page.evaluate(()=>window.amoristProductNavigate('library'));
-  await page.waitForTimeout(300);
-  await page.waitForFunction(()=>document.querySelectorAll('.library-reference-views svg.am-line-icon').length===3,
-    null,{timeout:8000});
-  const libraryTypography=await page.evaluate(()=>{
-    const tier=document.querySelector('.library-rank-tier');
-    const title=tier?.querySelector('header h3');
-    const toolbar=document.querySelector('.library-reference-toolbar');
-    const list=document.querySelector('.library-status-tabs');
-    const icons=document.querySelectorAll('.library-reference-views svg.am-line-icon').length;
+  await assertVisible('#amv-library .amv-metrics');
+  assert.equal(await page.locator('#amv-library .amv-filter-scroll button').count(),7);
+  await page.locator('#amv-library [data-amv="lib-layout"][data-value="rank"]').click();
+  await assertVisible('#amv-library .amv-rank-groups');
+  await page.locator('#amv-library [data-amv="lib-layout"][data-value="cover"]').click();
+  await assertVisible('#amv-library .amv-game-grid');
+  assert.equal(await page.locator('#amv-library .amv-game-grid .amv-game-card').count(),
+    await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]').length));
+  await page.screenshot({path:path.join(screens,browserName+'-01b-library-native.png'),fullPage:false});
+  const firstNativeCard=page.locator('#amv-library .amv-game-grid .amv-game-card').first();
+  await firstNativeCard.click();
+  await assertVisible('#amv-library .amv-native-detail');
+  await page.locator('#amv-library [data-amv="back-games"]').click();
+  await assertVisible('#amv-library .amv-game-grid');
+
+  await page.locator('#amv-library [data-amv="new-game"]').click();
+  await assertVisible('#gameDialogOverlay');
+  await page.locator('#libraryGameName').fill('QA 原生移动端新增作品');
+  await page.locator('#gameDialogForm button[type="submit"]').click();
+  assert(await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]')
+    .some(g=>g.name==='QA 原生移动端新增作品')),'new game did not save');
+  await page.evaluate(()=>window.amoristProductNavigate('characters'));
+  await assertVisible('#amv-characters .amv-library-controls');
+  await page.evaluate(()=>window.amoristProductNavigate('forms'));
+  const formsState=await page.evaluate(()=>{
+    const root=document.querySelector('.product-view[data-product-view="forms"]');
+    const shell=document.getElementById('amf-screen');
+    const gallery=document.querySelector('#amf-screen .amf-template-grid');
+    const ws=document.getElementById('formWorkspace');
     return {
-      titleWidth:title?.getBoundingClientRect().width || 0,
-      titleSize:title?parseFloat(getComputedStyle(title).fontSize):0,
-      tierWidth:tier?.getBoundingClientRect().width || 0,
-      tierColumns:tier?getComputedStyle(tier).gridTemplateColumns:'',
-      toolbarDisplay:toolbar?getComputedStyle(toolbar).display:'',
-      filterScrollWidth:list?.scrollWidth || 0,
-      filterClientWidth:list?.clientWidth || 0,
-      icons
+      loaded:Boolean(window.AmoristNativeForms),
+      rootActive:root?.classList.contains('active'),
+      rootClass:root?.className,
+      shellExists:Boolean(shell),
+      shellDisplay:shell?getComputedStyle(shell).display:null,
+      galleryExists:Boolean(gallery),
+      galleryDisplay:gallery?getComputedStyle(gallery).display:null,
+      galleryParent:gallery?.parentNode?.className||'',
+      html:shell?.innerHTML.slice(0,550)||'',
+      workspaceClass:ws?.className,
+      templateFound:Boolean(document.getElementById('formTemplates')),
+      templateInside:Boolean(root?.querySelector('#formTemplates')),
+      workspaceInside:Boolean(root?.querySelector('#formWorkspace')),
+      children:Array.from(root?.children||[]).slice(0,12).map(x=>({id:x.id,tag:x.tagName,className:x.className})),
+      globalVisualSheet:Boolean(document.getElementById('visualSheet')),
+      globalVisualCanvas:Boolean(document.getElementById('visualCanvas')),
+      appScripts:Array.from(document.scripts).filter(x=>x.src.includes('mobile/')).map(x=>x.src.split('/').slice(-1)[0])
     };
   });
-  assert(libraryTypography.titleWidth>65,
-    'rank title cramped on mobile: '+JSON.stringify(libraryTypography));
-  assert(libraryTypography.titleSize>=16,
-    'rank title too small: '+JSON.stringify(libraryTypography));
-  assert(libraryTypography.toolbarDisplay==='grid',
-    'library must use a mobile toolbar: '+JSON.stringify(libraryTypography));
-  assert.equal(libraryTypography.icons,3,'library view controls must be SVG');
-  const rankState=await page.evaluate(()=>({
-    selected:document.querySelector('.library-reference-views button.active')?.dataset.libraryView,
-    gridHidden:document.querySelector('#gameLibraryGrid')?.hidden,
-    gridDisplay:getComputedStyle(document.querySelector('#gameLibraryGrid')).display,
-    rankDisplay:getComputedStyle(document.querySelector('#libraryRankView')).display
-  }));
-  assert(rankState.selected==='rank' && rankState.gridHidden && rankState.gridDisplay==='none' && rankState.rankDisplay!=='none',
-    'rank mode must hide grid, not render all 96 cards behind it: '+JSON.stringify(rankState));
-  await page.locator('.library-reference-views button[data-library-view="grid"]').click();
-  const galleryState=await page.evaluate(()=>{
-    const grid=document.querySelector('#gameLibraryGrid');
-    const card=grid?.querySelector('.game-card');
-    const cover=card?.querySelector('.game-cover');
-    return {gridHidden:grid?.hidden,rankHidden:document.querySelector('#libraryRankView')?.hidden,
-      cardDisplay:card?getComputedStyle(card).display:'',
-      coverWidth:cover?.getBoundingClientRect().width||0,
-      cardWidth:card?.getBoundingClientRect().width||0};
-  });
-  assert(!galleryState.gridHidden && galleryState.rankHidden && galleryState.cardDisplay==='block' &&
-    galleryState.coverWidth>=galleryState.cardWidth-8,
-    'gallery cards must stack cover above text, without overlap: '+JSON.stringify(galleryState));
-  await page.locator('.library-reference-views button[data-library-view="rank"]').click();
-  await page.screenshot({path:path.join(screens,browserName+'-01b-library-layout.png'),fullPage:false});
+  console.log('Native forms state',formsState);
+  assert(await page.locator('#amf-screen .amf-template-grid').first().isVisible(),
+    'native forms template gallery missing '+JSON.stringify(formsState));
+  assert.equal(await page.locator('#amf-screen [data-amf="open"]').count(),5,'five core workshop templates required; saved and custom templates remain separate');
+  await page.locator('#amf-screen [data-amf="open"]').first().click();
+  await assertVisible('#workshopSheet');
+  await assertVisible('#amf-screen .amf-editor-tabs');
+  await assertVisible('#amf-screen .amf-edit-bar');
+  await page.locator('#amf-screen [data-amf="tool"][data-value="size"]').click();
+  await assertVisible('#workshopRows');
+  await page.locator('#amf-screen [data-amf="back"]').click();
+  await assertVisible('#amf-screen .amf-template-grid');
+  await page.screenshot({path:path.join(screens,browserName+'-v3-forms-native.png'),fullPage:false});
+  await page.evaluate(()=>window.amoristProductNavigate('characters'));
+  await page.evaluate(()=>window.amoristProductNavigate('omikuji'));
+  await assertVisible('#amz-screen .amz-choices');
+  assert.equal(await page.locator('#amz-screen .amz-choice').count(),6,'all six shrine rituals must be present');
+  const mapHidden=await page.evaluate(()=>getComputedStyle(document.querySelector('#omikujiSanctuary')).display);
+  assert.equal(mapHidden,'none','old desktop shrine map should not be visible');
+  for(const ritual of [
+    {id:'water',panel:'omikujiRitual',back:'omikujiMapBack'},
+    {id:'sakura',panel:'sakuraRitual',back:'sakuraMapBack'},
+    {id:'bell',panel:'bellRitual',back:'bellMapBack'},
+    {id:'ink',panel:'kotodamaRitual',back:'kotodamaMapBack'},
+    {id:'ema',panel:'emaRitual',back:'emaMapBack'},
+    {id:'torii',panel:'toriiRitual',back:'toriiMapBack'}
+  ]){
+    await page.locator('#amz-screen [data-amz="'+ritual.id+'"]').click();
+    await assertVisible('#'+ritual.panel);
+    await page.locator('#'+ritual.back).click();
+    await assertVisible('#amz-screen .amz-choices');
+  }
+  await page.screenshot({path:path.join(screens,browserName+'-v3-shrine-native.png'),fullPage:false});
+  await page.evaluate(()=>window.amoristProductNavigate('characters'));
+  await page.evaluate(()=>window.amoristProductNavigate('bangumi'));
+  await assertVisible('#amx-screen .amx-search');
+  await page.evaluate(()=>window.amoristProductNavigate('characters'));
+  await page.evaluate(()=>window.amoristProductNavigate('timeline'));
+  await assertVisible('#amv-timeline .amv-calendar-panel');
+  await page.locator('#amv-timeline [data-amv="timeline-mode"][data-value="feed"]').click();
+  await assertVisible('#amv-timeline .amv-feed');
   await page.evaluate(()=>window.amoristProductNavigate('home'));
-  await page.waitForTimeout(100);
+  await page.locator('#amv-home [data-amv="edit-profile"]').click();
 
-  await page.locator('#profileEditButton').click();
   await assertVisible('#profileEditModal');
   await page.locator('#profileEditModal [data-profile-key="name"]').fill('QA 手机版档案');
   await page.locator('#profileEditSave').click();
   const savedProfile=await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-profile-v1')||'{}').name);
   assert.equal(savedProfile,'QA 手机版档案','profile edit did not persist');
-  await page.screenshot({path:path.join(screens,browserName+'-02-profile.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-02-profile.png'),fullPage:false});
 
   await page.evaluate(()=>window.amoristProductNavigate('library'));
-  await page.waitForTimeout(200);
-  const add=page.locator('#libraryAddGameButton');
-  await add.waitFor({timeout:15000});
-  await add.click();
-  await assertVisible('#gameDialogOverlay');
-  await page.locator('#libraryGameName').fill('QA 手机版游戏');
-  await page.locator('#gameDialogForm button[type="submit"]').click();
-  const gameAdded=await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]').some(g=>g.name==='QA 手机版游戏'));
+  await page.waitForTimeout(250);
+  const gameAdded=await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]').some(g=>g.name==='QA 原生移动端新增作品'));
   assert(gameAdded,'new game was not saved');
-  await page.screenshot({path:path.join(screens,browserName+'-03-library.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-03-library.png'),fullPage:false});
 
   await page.evaluate(()=>window.amoristProductNavigate('studio'));
   await page.waitForTimeout(250);
@@ -134,7 +179,7 @@ try {
   assert.equal(await page.locator('#gameName').inputValue(),'手机原生 REPO 编辑同步测试','REPO input not synced');
   await page.locator('[data-am-studio-mode="canvas"]').click();
   await assertVisible('.product-view[data-product-view="studio"]>.app');
-  await page.screenshot({path:path.join(screens,browserName+'-04-repo.png'),fullPage:true});
+  await page.screenshot({path:path.join(screens,browserName+'-04-repo.png'),fullPage:false});
 
   await page.locator('#amOpenPublish').click();
   await assertVisible('#amPublishDialog');

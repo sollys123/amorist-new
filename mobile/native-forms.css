@@ -1,0 +1,347 @@
+/* Mobile art studio: coherent template gallery and export workspace chrome */
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]{
+  padding:0!important;background:var(--amv-bg)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>.product-page-head,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>#formTemplates{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>.form-workspace{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active>.form-workspace.active{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  gap:14px!important;max-width:600px!important;margin:0 auto!important;
+  padding:0 19px 30px!important;overflow:visible!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>.amf-screen{
+  max-width:600px;margin:0 auto;padding:23px 19px 37px;
+  background:var(--amv-bg);font-family:var(--amv-sans);
+  color:var(--amv-ink);
+}
+.amf-heading>span{
+  font:700 10px/1.4 Georgia,serif;color:var(--amv-rose);
+  letter-spacing:.16em;
+}
+.amf-heading h1{
+  font:600 30px/1.3 var(--amv-serif);margin:7px 0 5px;
+  color:var(--amv-ink);
+}
+.amf-heading p{
+  margin:6px 0 23px;font:400 12px/1.7 var(--amv-sans);
+  color:var(--amv-muted);
+}
+.amf-category-head{
+  display:flex;justify-content:space-between;align-items:baseline;
+  gap:10px;margin-bottom:14px;
+}
+.amf-category-head h2{
+  margin:0;font:600 18px/1.35 var(--amv-serif);color:var(--amv-ink);
+}
+.amf-category-head span{
+  color:var(--amv-muted);font:400 11px/1.4 var(--amv-sans);
+}
+.amf-template-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:13px;align-items:stretch;
+}
+.amf-template{
+  display:flex;flex-direction:column;
+  min-width:0;width:100%;padding:11px;
+  border:1px solid var(--amv-line);border-radius:17px;
+  background:var(--amv-paper);color:var(--amv-ink);
+  text-align:left;overflow:hidden;
+  box-shadow:0 2px 12px rgba(62,43,57,.03);
+}
+.amf-template:active{background:var(--amv-mist)}
+.amf-template-art{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  height:105px;width:100%;overflow:hidden;
+  border-radius:11px;border:1px solid #E5DDE6;
+  background:linear-gradient(145deg,#F0E9F2,#FAF6F7);
+}
+.amf-template-art-grid{
+  display:grid;grid-template-columns:repeat(3,21px);grid-template-rows:repeat(3,21px);
+  gap:3px;transform:rotate(-5deg);
+}
+.amf-template-art-grid i{
+  border:1px solid #D7C5D8;border-radius:3px;
+  background:linear-gradient(135deg,rgba(219,197,216,.77),rgba(248,242,246,.88));
+}
+.amf-template-art>span{
+  position:absolute;bottom:8px;right:10px;
+  font:700 9px/1.3 Georgia,serif;
+  letter-spacing:.08em;color:#A18BA0;
+}
+.amf-template-art[data-kind="tier"] .amf-template-art-grid{
+  display:grid;grid-template-columns:80px;grid-template-rows:repeat(4,15px);
+  transform:none;gap:4px;
+}
+.amf-template-art[data-kind="tier"] .amf-template-art-grid i{
+  display:none;
+}
+.amf-template-art[data-kind="tier"] .amf-template-art-grid::before{
+  content:"S  A  B  C";white-space:pre;
+  color:#97758D;background:#F7F0F5;padding:6px 10px;
+  width:80px;height:60px;border:1px solid #D7C5D8;
+  font:600 14px/1.4 Georgia,serif;text-align:center;
+}
+.amf-template-art[data-kind="contrast"] .amf-template-art-grid,
+.amf-template-art[data-kind="pref"] .amf-template-art-grid{
+  grid-template-columns:repeat(2,39px);grid-template-rows:repeat(2,34px);
+  transform:none;
+}
+.amf-template-art[data-kind="mood"] .amf-template-art-grid,
+.amf-template-art[data-kind="attr"] .amf-template-art-grid{
+  grid-template-columns:repeat(2,35px);grid-template-rows:repeat(2,35px);
+  border-radius:50%;overflow:hidden;
+}
+.amf-template-content{
+  display:flex;flex-direction:column;flex:1;padding:12px 2px 2px;
+}
+.amf-template-content strong{
+  font:600 13px/1.45 var(--amv-sans);color:var(--amv-ink);
+}
+.amf-template-content p{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  margin:6px 0 9px;overflow:hidden;
+  font:400 10.5px/1.6 var(--amv-sans);
+  color:var(--amv-muted);
+}
+.amf-template-content small{
+  display:flex;align-items:center;gap:4px;margin-top:auto;
+  color:var(--amv-accent);font:600 11px/1.3 var(--amv-sans);
+}
+.amf-foot{
+  text-align:center;margin:27px 0 0;
+  color:var(--amv-faint);font:400 10px/1.7 var(--amv-sans);
+}
+.amf-edit-bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.amf-back{
+  display:flex;align-items:center;gap:3px;
+  background:var(--amv-paper);border:1px solid var(--amv-line);
+  border-radius:12px;padding:9px 12px;min-height:40px;
+  font:600 12px/1.3 var(--amv-sans);
+  color:var(--amv-accent);
+}
+.amf-edit-bar>div{display:grid;gap:3px;min-width:0;text-align:right}
+.amf-edit-bar>div>span{
+  color:var(--amv-rose);font:700 9px/1.4 Georgia,serif;letter-spacing:.1em;
+}
+.amf-edit-bar h2{font:600 16px/1.3 var(--amv-serif);margin:0}
+.amf-preview-hint{
+  margin:13px 0 0;padding:13px 14px;
+  background:var(--amv-mist);border:1px solid var(--amv-line);
+  border-radius:13px;color:var(--amv-muted);
+  font:400 11px/1.65 var(--amv-sans);
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active>.form-workspace.active>.visual-sheet{
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  padding:0!important;margin:0!important;
+  overflow-x:auto!important;overflow-y:visible!important;
+  border-color:var(--amv-line)!important;border-radius:12px!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .form-side{
+  position:relative!important;display:grid!important;gap:11px!important;
+  padding:16px!important;margin:0!important;
+  border:1px solid var(--amv-line)!important;border-radius:17px!important;
+  background:var(--amv-paper)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .form-side h3{
+  margin:0!important;font:600 16px/1.4 var(--amv-serif)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .form-side p{
+  color:var(--amv-muted)!important;font:400 12px/1.7 var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .form-side .product-button{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  min-height:45px!important;width:100%!important;border-radius:12px!important;
+  font:600 13px/1.3 var(--amv-sans)!important;
+}
+@media(max-width:365px){
+  body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>.amf-screen{padding-inline:14px}
+  body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active>.form-workspace.active{padding-inline:14px!important}
+  .amf-template-grid{gap:10px}
+  .amf-template{padding:9px}
+}
+.amf-resume{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:9px;width:100%;min-height:49px;padding:12px 15px;
+  margin:0 0 14px;border-radius:12px;border:1px solid #D8C6D3;
+  background:var(--amv-blush);color:var(--amv-accent);
+  font:600 12px/1.4 var(--amv-sans);text-align:left;
+}
+
+
+/* Runtime workshop v2 replaces the obsolete #formTemplates and .form-workspace.
+   All actual editor content is in .workshop-shell; only show it in editing mode. */
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>.workshop-page-head{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>.workshop-shell{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active>.workshop-shell{
+  display:flex!important;flex-direction:column!important;
+  gap:13px!important;align-items:stretch!important;
+  width:100%!important;max-width:600px!important;
+  height:auto!important;min-height:0!important;overflow:visible!important;
+  margin:0 auto!important;padding:0 19px 36px!important;
+  background:transparent!important;
+}
+.amf-extra-head{margin-top:24px}
+.amf-editor-actions{
+  display:grid;grid-template-columns:1fr 1.4fr;gap:10px;
+  margin:14px 0 15px;
+}
+.amf-editor-actions button{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  min-height:43px;padding:9px 11px;border-radius:12px;
+  border:1px solid var(--amv-line);
+  background:var(--amv-paper);color:var(--amv-accent);
+  font:600 12px/1.3 var(--amv-sans);
+}
+.amf-editor-actions button.amf-export{
+  background:var(--amv-accent);color:#fff;border-color:var(--amv-accent);
+}
+.amf-editor-tabs{
+  display:flex;gap:4px;width:100%;overflow-x:auto;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+  background:var(--amv-mist);border-radius:13px;padding:4px;
+}
+.amf-editor-tabs::-webkit-scrollbar{display:none}
+.amf-editor-tabs button{
+  flex:1 0 auto;min-height:37px;min-width:58px;
+  border:0;border-radius:9px;padding:8px 9px;
+  background:transparent;color:var(--amv-muted);
+  font:500 11px/1.3 var(--amv-sans);white-space:nowrap;
+}
+.amf-editor-tabs button.active{
+  color:var(--amv-accent);background:var(--amv-paper);
+  font-weight:600;box-shadow:0 1px 5px rgba(64,47,61,.07);
+}
+.amf-editor-hint{
+  margin:10px 0 0;padding:0 2px;
+  font:400 11px/1.7 var(--amv-sans);color:var(--amv-muted);
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-main{
+  order:1;display:flex!important;flex-direction:column!important;
+  gap:11px!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  height:auto!important;min-height:0!important;
+  margin:0!important;padding:13px!important;
+  border:1px solid var(--amv-line)!important;border-radius:18px!important;
+  background:var(--amv-paper)!important;overflow:hidden!important;
+  box-shadow:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-main-head{
+  display:flex!important;align-items:center!important;gap:8px!important;
+  width:100%!important;min-width:0!important;
+  margin:0!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active #workshopTitle{
+  display:block!important;flex:1!important;min-width:0!important;
+  max-width:100%!important;
+  padding:10px!important;min-height:42px!important;
+  font:600 15px/1.35 var(--amv-sans)!important;
+  border:1px solid var(--amv-line)!important;
+  border-radius:11px!important;color:var(--amv-ink)!important;
+  background:var(--amv-bg)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active #workshopSavedStatus{
+  font:400 10px/1.2 var(--amv-sans)!important;
+  color:var(--amv-muted)!important;white-space:nowrap!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-sheet{
+  display:block!important;width:100%!important;max-width:100%!important;
+  min-width:0!important;margin:0!important;
+  padding:14px!important;border:1px solid var(--amv-line)!important;
+  border-radius:12px!important;background:var(--amv-bg)!important;
+  box-shadow:none!important;overflow-x:auto!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-grid{
+  min-width:0!important;max-width:100%!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-size-presets,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-settings,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-header-setting{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-size .workshop-size-presets{
+  display:flex!important;flex-wrap:wrap!important;gap:7px!important;width:100%!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-size .workshop-settings{
+  display:flex!important;flex-wrap:wrap!important;gap:11px!important;
+  width:100%!important;min-width:0!important;
+  padding:12px 0!important;margin:0!important;
+  border-bottom:1px solid var(--amv-line)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-size .workshop-header-setting{
+  display:block!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active :where(.workshop-size-presets,.workshop-settings) button{
+  min-height:37px!important;border-radius:10px!important;
+  font:500 11px/1.25 var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-settings input,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-settings select{
+  min-width:0!important;max-width:95px!important;
+  min-height:38px!important;
+  font:400 16px/1.3 var(--amv-sans)!important;
+  border:1px solid var(--amv-line)!important;border-radius:10px!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-sidebar,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-library-sidebar{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active:is(.amf-tools-size,.amf-tools-color) .workshop-sidebar{
+  display:block!important;order:2!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-size .workshop-sidebar>.workshop-color-row,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-size .workshop-sidebar>.workshop-palette-panel,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-size .workshop-sidebar>.workshop-primary-actions{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-color .workshop-sidebar>.workshop-settings{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active.amf-tools-library .workshop-library-sidebar{
+  display:block!important;order:2!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active :where(.workshop-sidebar,.workshop-library-sidebar){
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  padding:14px!important;margin:0!important;
+  border:1px solid var(--amv-line)!important;border-radius:17px!important;
+  background:var(--amv-paper)!important;box-shadow:none!important;
+  position:relative!important;top:auto!important;height:auto!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-presets{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;width:100%!important;min-width:0!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active .workshop-presets button{
+  min-height:41px!important;border:1px solid var(--amv-line)!important;
+  border-radius:11px!important;background:var(--amv-bg)!important;
+  font:500 12px/1.4 var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .workshop-overlay.open,
+body.amorist-mobile-app.amv-ready #workshopCropOverlay.open{
+  display:flex!important;position:fixed!important;inset:0!important;z-index:800!important;
+  align-items:flex-end!important;justify-content:center!important;
+  padding:0!important;background:rgba(36,27,38,.4)!important;
+}
+body.amorist-mobile-app.amv-ready .workshop-overlay.open>.workshop-picker,
+body.amorist-mobile-app.amv-ready #workshopCropOverlay.open>.workshop-picker{
+  width:100%!important;max-width:760px!important;
+  max-height:89dvh!important;overflow-y:auto!important;
+  border-radius:23px 23px 0 0!important;
+  padding:17px 17px calc(18px + env(safe-area-inset-bottom,0px))!important;
+  background:var(--amv-paper)!important;
+  font-family:var(--amv-sans)!important;
+}
+@media(max-width:365px){
+  body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"].amf-active>.workshop-shell{
+    padding-inline:14px!important;
+  }
+  .amf-editor-tabs button{min-width:48px;padding-inline:6px}
+}

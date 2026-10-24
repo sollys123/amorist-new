@@ -1,0 +1,955 @@
+/* AMORIST MOBILE / NATIVE DESIGN SYSTEM v3
+ * Purpose-built mobile screens, consistent components, not a reflowed desktop UI.
+ * Keeps REPO/self-intro/export canvases in their original rendering contexts.
+ */
+body.amorist-mobile-app.amv-ready{
+  --amv-bg:#FAF8F7;
+  --amv-paper:#FFFEFD;
+  --amv-mist:#F5F0F3;
+  --amv-blush:#F4E8EE;
+  --amv-rose:#B7809C;
+  --amv-accent:#75566D;
+  --amv-accent-dark:#50394D;
+  --amv-ink:#332D37;
+  --amv-muted:#8C818E;
+  --amv-faint:#AAA0A8;
+  --amv-line:#E9E1E6;
+  --amv-sans:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans CJK SC",sans-serif;
+  --amv-serif:"Songti SC","STSong","Hiragino Mincho ProN",serif;
+  --amv-shadow:0 8px 25px rgba(79,56,73,.065);
+  --am-top-height:calc(59px + env(safe-area-inset-top,0px));
+  --am-bottom-height:calc(65px + env(safe-area-inset-bottom,0px));
+  background:var(--amv-bg)!important;
+  font-family:var(--amv-sans)!important;
+  color:var(--amv-ink);
+  -webkit-font-smoothing:antialiased;
+}
+body.amorist-mobile-app.amv-ready .product-shell{
+  background:var(--amv-bg)!important;
+  max-width:760px!important;
+  padding-top:var(--am-top-height)!important;
+  padding-bottom:var(--am-bottom-height)!important;
+}
+body.amorist-mobile-app.amv-ready .product-main{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  overflow:visible!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="home"],
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="library"],
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="characters"],
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="timeline"],
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="oshi"]{
+  min-height:calc(100dvh - var(--am-top-height) - var(--am-bottom-height))!important;
+  width:100%!important;max-width:100%!important;
+  margin:0!important;padding:0!important;
+  background:var(--amv-bg)!important;
+  overflow:visible!important;
+}
+/* Old desktop panels keep their behaviors and data stores, but no longer determine
+   the appearance or structure of the five main mobile app screens. */
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="home"] > :not(.amv-screen),
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="library"] > :not(.amv-screen),
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="characters"] > :not(.amv-screen),
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="timeline"] > :not(.amv-screen),
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="oshi"] > :not(.amv-screen){
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .amv-screen{
+  width:100%;max-width:100%;min-width:0;min-height:62dvh;
+  padding:23px 19px 40px;
+  font:400 14px/1.5 var(--amv-sans);
+  color:var(--amv-ink);
+  overflow:hidden;
+}
+body.amorist-mobile-app.amv-ready .amv-screen *{box-sizing:border-box}
+body.amorist-mobile-app.amv-ready .amv-screen button{
+  appearance:none;-webkit-appearance:none;
+  font:inherit;color:inherit;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+body.amorist-mobile-app.amv-ready .amv-screen :where(button,input,select,textarea):focus-visible{
+  outline:2px solid var(--amv-rose);outline-offset:3px;
+}
+.amv-icon{
+  display:inline-block;flex:none;vertical-align:middle;
+  fill:none;stroke:currentColor;stroke-width:1.75;
+}
+.amv-eyebrow{
+  font:700 10px/1.45 Georgia,serif;
+  color:var(--amv-rose);letter-spacing:.17em;
+  text-transform:uppercase;
+}
+.amv-heading{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  gap:10px;margin:2px 0 20px;
+}
+.amv-heading h1{
+  margin:6px 0 4px;font:600 clamp(27px,7vw,34px)/1.3 var(--amv-serif);
+  letter-spacing:-.018em;color:var(--amv-ink);
+}
+.amv-heading p{margin:6px 0 0;color:var(--amv-muted);font:400 12px/1.7 var(--amv-sans)}
+.amv-heading>div{min-width:0;max-width:100%}
+.amv-btn{
+  border:1px solid var(--amv-line)!important;
+  border-radius:12px!important;
+  display:inline-flex!important;align-items:center;justify-content:center;
+  min-height:40px!important;gap:6px;padding:9px 13px!important;
+  text-align:center;white-space:nowrap;
+  font:600 12px/1.3 var(--amv-sans)!important;
+  box-shadow:none!important;transition:background .15s ease;
+}
+.amv-btn-primary{
+  color:#fff!important;background:var(--amv-accent)!important;
+  border-color:var(--amv-accent)!important;
+}
+.amv-btn-soft{
+  background:var(--amv-mist)!important;color:var(--amv-accent)!important;
+  border-color:#E7DAE3!important;
+}
+.amv-inline-back{
+  background:transparent!important;border:0!important;
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--amv-accent)!important;
+  padding:5px 4px!important;
+  font-size:12px!important;min-height:38px!important;
+  margin-bottom:16px;
+}
+.amv-plain-link,.amv-text-link{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  background:transparent!important;border:0!important;
+  color:var(--amv-accent)!important;
+  font:600 12px/1.4 var(--amv-sans)!important;
+  padding:8px 0!important;white-space:nowrap;
+}
+.amv-empty{
+  min-height:140px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:9px;padding:22px 15px;
+  border:1px dashed #E3D6E0;border-radius:18px;background:var(--amv-paper);
+  text-align:center;color:var(--amv-muted);
+}
+.amv-empty strong{font-size:14px;color:var(--amv-ink);font-weight:600}
+.amv-empty p{font-size:12px;line-height:1.6;margin:0;color:var(--amv-muted)}
+.amv-footer-note{margin:28px 0 6px;text-align:center;font:italic 10px/1.5 Georgia,serif;color:var(--amv-faint);letter-spacing:.055em}
+/* App chrome: identical appearance across all nine sections */
+body.amorist-mobile-app.amv-ready .am-topbar{
+  height:var(--am-top-height);min-height:var(--am-top-height);
+  padding:calc(7px + env(safe-area-inset-top,0px)) max(18px,calc((100vw - 720px)/2)) 8px;
+  background:rgba(255,254,253,.96)!important;
+  border-bottom:1px solid var(--amv-line)!important;
+  box-shadow:none!important;
+}
+body.amorist-mobile-app.amv-ready .am-topbar-kicker{
+  color:#B999A9!important;letter-spacing:.12em!important;
+  font:700 9px/1.2 Georgia,serif!important;
+}
+body.amorist-mobile-app.amv-ready #amTopbarTitle{
+  font:600 18px/1.25 var(--amv-sans)!important;
+  color:var(--amv-ink)!important;letter-spacing:0!important;
+}
+body.amorist-mobile-app.amv-ready #amBackBtn{
+  width:35px;height:35px;min-width:35px;
+  border:1px solid var(--amv-line)!important;border-radius:12px!important;
+  background:var(--amv-mist)!important;color:var(--amv-accent)!important;
+}
+body.amorist-mobile-app.amv-ready #amBackBtn[hidden]{display:none!important}
+body.amorist-mobile-app.amv-ready .am-topbar-publish{
+  border-radius:999px!important;min-height:35px;padding:8px 13px!important;
+  background:var(--amv-mist)!important;border:1px solid #E9DAE4!important;
+  color:var(--amv-accent)!important;
+  font:600 12px/1.1 var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .mobile-nav.am-bottom-tabs{
+  min-height:var(--am-bottom-height)!important;
+  padding:5px 8px calc(5px + env(safe-area-inset-bottom,0px))!important;
+  background:rgba(255,254,253,.975)!important;
+  border-top:1px solid var(--amv-line)!important;
+  box-shadow:0 -6px 20px rgba(54,39,51,.035)!important;
+}
+body.amorist-mobile-app.amv-ready .mobile-nav.am-bottom-tabs .product-nav-btn{
+  padding:4px 2px!important;gap:4px!important;
+  color:#989099!important;min-height:49px!important;
+  background:transparent!important;border-radius:11px!important;
+}
+body.amorist-mobile-app.amv-ready .mobile-nav.am-bottom-tabs .product-nav-btn.active{
+  color:var(--amv-accent)!important;background:var(--amv-blush)!important;
+}
+body.amorist-mobile-app.amv-ready .mobile-nav.am-bottom-tabs .product-nav-btn.active .product-nav-icon{
+  color:var(--amv-accent)!important;
+}
+body.amorist-mobile-app.amv-ready .mobile-nav.am-bottom-tabs .product-nav-btn>span:last-child{
+  font:500 10.5px/1.25 var(--amv-sans)!important;letter-spacing:0!important;
+}
+body.amorist-mobile-app.amv-ready .mobile-more-sheet>section{
+  background:var(--amv-paper)!important;border-radius:25px 25px 0 0!important;
+  padding:20px 18px calc(22px + env(safe-area-inset-bottom,0px))!important;
+}
+body.amorist-mobile-app.amv-ready .mobile-more-grid>button{
+  border:1px solid var(--amv-line)!important;border-radius:16px!important;
+  background:var(--amv-bg)!important;
+  min-height:96px!important;padding:14px!important;gap:5px!important;
+}
+body.amorist-mobile-app.amv-ready .mobile-more-grid b{font-size:13px!important;color:var(--amv-ink)!important}
+body.amorist-mobile-app.amv-ready .mobile-more-grid small{font-size:11px!important;color:var(--amv-muted)!important}
+/* Home: app dashboard and focused current-work actions */
+.amv-home-hero{
+  position:relative;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;min-height:200px;
+  padding:25px 23px 26px;margin:1px 0 17px;
+  background:linear-gradient(125deg,#EDE3EB 0%,#F6EFF3 65%,#FCF5F4 100%);
+  border-radius:23px;border:1px solid #E9DDE7;
+  overflow:hidden;
+}
+.amv-home-hero::after{
+  content:"";position:absolute;right:-28px;bottom:-58px;
+  width:185px;height:185px;border-radius:50%;
+  border:1px solid rgba(157,112,146,.22);box-shadow:0 0 0 27px rgba(255,255,255,.065),0 0 0 55px rgba(255,255,255,.045);
+  pointer-events:none;
+}
+.amv-hero-copy{position:relative;z-index:1;max-width:230px}
+.amv-hero-copy>span{
+  font:700 9px/1.4 Georgia,serif;letter-spacing:.15em;color:#9D738D;
+}
+.amv-hero-copy h1{
+  margin:13px 0 10px;color:#5A4057;
+  font:600 32px/1.25 var(--amv-serif);letter-spacing:.035em;
+}
+.amv-hero-copy p{
+  margin:0;max-width:205px;font-size:11px;line-height:1.8;color:#847083;
+}
+.amv-hero-star{
+  position:absolute;right:18px;top:13px;
+  font:400 25px/1 var(--amv-serif);color:#BDA5BA;
+}
+.amv-hero-avatar{
+  width:83px;height:107px;flex:none;align-self:center;
+  border:4px solid rgba(255,253,252,.78);border-radius:100px 100px 16px 16px;
+  overflow:hidden;box-shadow:0 8px 19px rgba(76,49,72,.11);
+  z-index:1;background:#E7D5E3;
+}
+.amv-hero-avatar img{width:100%;height:100%;object-fit:cover}
+.amv-stat-strip,.amv-metrics{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:center;
+  border:1px solid var(--amv-line);border-radius:17px;
+  background:var(--amv-paper);overflow:hidden;
+}
+.amv-stat-strip{margin-bottom:16px;padding:13px 3px}
+.amv-stat-strip>div,.amv-metrics>div{
+  display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0;
+}
+.amv-stat-strip>div+div,.amv-metrics>div+div{border-left:1px solid var(--amv-line)}
+.amv-stat-strip strong,.amv-metrics b{
+  font:500 27px/1.18 Georgia,serif;color:var(--amv-accent-dark);
+  font-variant-numeric:tabular-nums;
+}
+.amv-stat-strip span,.amv-metrics span{
+  font:400 11px/1.5 var(--amv-sans);color:var(--amv-muted);
+}
+.amv-quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:27px}
+.amv-quick-grid button{
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  gap:8px;min-height:78px;padding:11px 4px;
+  background:var(--amv-paper);border:1px solid var(--amv-line);
+  border-radius:16px;box-shadow:none;
+}
+.amv-quick-grid button svg{color:var(--amv-accent)}
+.amv-quick-grid button b{font-size:12px;font-weight:550;color:var(--amv-ink)}
+.amv-section{margin:0 0 27px}
+.amv-section-title{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:12px;margin:0 0 13px;
+}
+.amv-section-title span{
+  display:block;font:700 10px/1.3 Georgia,serif;
+  letter-spacing:.15em;color:var(--amv-rose);
+}
+.amv-section-title h2{
+  margin:4px 0 0;font:600 19px/1.35 var(--amv-serif);color:var(--amv-ink);
+}
+.amv-hscroll{
+  display:flex;gap:12px;margin:0 -19px;padding:2px 19px 9px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;
+  scrollbar-width:none;
+}
+.amv-hscroll::-webkit-scrollbar{display:none}
+.amv-playing-card{
+  flex:0 0 123px;width:123px;min-width:0;
+  background:transparent;border:0;padding:0;text-align:left;
+  scroll-snap-align:start;
+}
+.amv-playing-card .amv-cover{height:158px;border-radius:13px;overflow:hidden;box-shadow:0 3px 12px rgba(51,39,50,.085)}
+.amv-playing-card b{
+  display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  margin-top:9px;font-size:12px;color:var(--amv-ink);font-weight:600;
+}
+.amv-playing-card small{display:block;margin-top:4px;font-size:10px;color:var(--amv-muted)}
+.amv-cover{
+  display:flex;align-items:center;justify-content:center;
+  width:100%;aspect-ratio:3/4;background:#ECE5E9;
+  overflow:hidden;position:relative;
+}
+.amv-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.amv-art-empty{
+  font:400 32px/1 Georgia,serif;color:#B6A1B5;display:grid;place-items:center;
+}
+.amv-recent-list{
+  overflow:hidden;background:var(--amv-paper);
+  border:1px solid var(--amv-line);border-radius:17px;
+}
+.amv-recent-item{
+  display:grid;grid-template-columns:45px minmax(0,1fr) 19px;
+  width:100%;align-items:center;gap:12px;min-height:66px;
+  background:transparent;border:0;text-align:left;padding:12px 15px;
+}
+.amv-recent-item+.amv-recent-item{border-top:1px solid var(--amv-line)}
+.amv-rec-date{font:500 13px/1 Georgia,serif;color:var(--amv-rose)}
+.amv-recent-item b{display:block;font-size:12px;font-weight:600;color:var(--amv-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.amv-recent-item small{display:block;margin-top:5px;color:var(--amv-muted);font-size:11px;line-height:1.3}
+.amv-recent-item svg{color:var(--amv-faint)}
+.amv-profile-card{
+  display:flex;gap:13px;align-items:center;
+  padding:16px;background:var(--amv-paper);
+  border:1px solid var(--amv-line);border-radius:17px 17px 0 0;
+}
+.amv-profile-avatar{
+  width:52px;height:52px;display:grid;place-items:center;flex:none;
+  border-radius:50%;background:var(--amv-blush);overflow:hidden;
+}
+.amv-profile-avatar img{width:100%;height:100%;object-fit:cover}
+.amv-profile-copy{min-width:0}
+.amv-profile-copy strong{font-size:16px;color:var(--amv-ink);font-weight:600}
+.amv-profile-copy p{
+  margin:5px 0 0;color:var(--amv-muted);
+  font-size:11px;line-height:1.6;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+}
+.amv-export-row{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;min-height:54px;gap:12px;padding:12px 15px;
+  border:1px solid var(--amv-line);border-radius:15px;
+  background:var(--amv-paper);text-align:left;
+}
+.amv-profile-card+.amv-export-row{border-top:0;border-radius:0 0 17px 17px}
+.amv-export-row>span{
+  display:flex;align-items:center;gap:10px;min-width:0;
+}
+.amv-export-row svg{color:var(--amv-accent)}
+.amv-export-row b{font-size:12px;font-weight:550;color:var(--amv-ink)}
+/* Library and characters: app filters, 2-col cover grid and first-class detail screens */
+.amv-metrics{padding:13px 4px;margin-bottom:18px}
+.amv-metrics b{font-size:25px}
+.amv-library-controls{display:grid;gap:12px}
+.amv-search{
+  display:flex;align-items:center;gap:9px;
+  min-height:46px;background:var(--amv-paper);
+  border:1px solid var(--amv-line);border-radius:14px;
+  padding:0 13px;color:var(--amv-muted);
+}
+.amv-search:focus-within{border-color:#C9A6BD;box-shadow:0 0 0 3px rgba(178,130,159,.085)}
+.amv-search input[type=search]{
+  border:0!important;outline:0!important;box-shadow:none!important;
+  width:100%;flex:1;min-width:0;min-height:43px!important;
+  padding:9px 0!important;background:transparent!important;
+  color:var(--amv-ink)!important;font:400 16px/1.3 var(--amv-sans)!important;
+  -webkit-appearance:none;appearance:none;
+}
+.amv-search input::placeholder{color:#AAA0AB}
+.amv-filter-scroll{
+  display:flex;align-items:center;gap:8px;max-width:100%;
+  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;padding:1px 0 4px;
+}
+.amv-filter-scroll::-webkit-scrollbar{display:none}
+.amv-chip{
+  flex:none;min-height:37px;
+  background:var(--amv-paper)!important;
+  border:1px solid var(--amv-line)!important;
+  border-radius:999px!important;
+  padding:7px 14px!important;
+  white-space:nowrap!important;
+  font:500 12px/1.25 var(--amv-sans)!important;
+  color:var(--amv-muted)!important;
+}
+.amv-chip.active{
+  color:var(--amv-accent)!important;background:var(--amv-blush)!important;
+  border-color:#DDC6D4!important;font-weight:600!important;
+}
+.amv-secondary-chips .amv-chip{background:transparent!important;border-color:transparent!important}
+.amv-secondary-chips .amv-chip.active{background:var(--amv-blush)!important}
+.amv-toolbar{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  min-height:42px;
+}
+.amv-sort-label{font:500 12px/1.2 var(--amv-sans);color:var(--amv-muted);display:flex;align-items:center;gap:8px}
+.amv-sort-label select{
+  appearance:none;-webkit-appearance:none;
+  min-width:100px;min-height:38px;border:0;background:transparent;
+  padding:6px 4px;color:var(--amv-ink);
+  font:600 12px/1.3 var(--amv-sans);text-align:left;
+}
+.amv-segment,.amv-full-segment{
+  display:flex;gap:2px;padding:4px;
+  border:1px solid var(--amv-line);border-radius:12px;
+  background:#F2EDF0;
+}
+.amv-segment button{
+  display:grid;place-items:center;width:37px;height:33px;
+  border:0!important;border-radius:9px;background:transparent;
+  color:#948796!important;
+}
+.amv-segment button.selected{
+  color:var(--amv-accent)!important;background:#fff!important;
+  box-shadow:0 1px 6px rgba(68,41,62,.075);
+}
+.amv-subtoolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:9px;margin:17px 0 12px;
+  font:400 12px/1.5 var(--amv-sans);color:var(--amv-muted);
+}
+.amv-game-grid,.amv-char-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px 12px;align-items:start;
+}
+.amv-game-card,.amv-char-card{
+  min-width:0;width:100%;position:relative;
+  display:block;appearance:none;
+  border:0!important;background:transparent!important;
+  padding:0!important;text-align:left!important;
+  box-shadow:none!important;overflow:visible;
+}
+.amv-game-card .amv-cover{
+  aspect-ratio:3/4;border-radius:14px;
+  border:1px solid rgba(110,76,103,.10);
+  box-shadow:0 4px 12px rgba(52,40,48,.055);
+}
+.amv-game-info{padding:10px 2px 0;min-width:0}
+.amv-game-info strong{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+  overflow:hidden;text-overflow:ellipsis;
+  min-height:18px;max-height:40px;
+  font:600 13px/1.48 var(--amv-sans);color:var(--amv-ink);
+  overflow-wrap:anywhere;
+}
+.amv-game-info>small{
+  display:block;margin-top:5px;color:var(--amv-muted);
+  font:400 11px/1.3 var(--amv-sans);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.amv-game-card>.amv-icon{display:none}
+.amv-card-badges{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:8px}
+.amv-status,.amv-category{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:22px;padding:3px 7px;border-radius:6px;
+  font:500 10px/1.2 var(--amv-sans);
+  color:var(--amv-accent);background:var(--amv-blush);
+}
+.amv-status[data-status="已全通"]{color:#67836C;background:#E8F0E9}
+.amv-status[data-status="进行中"]{color:#7B6097;background:#F0EAF5}
+.amv-status[data-status="已封盘"]{color:#8C7B67;background:#F1EAE1}
+.amv-category{color:#9A738B;background:#F8F2F5}
+.amv-game-grid.as-list{grid-template-columns:minmax(0,1fr);gap:0}
+.amv-game-grid.as-list .amv-game-row{
+  display:grid!important;grid-template-columns:70px minmax(0,1fr) 18px;
+  gap:13px;min-height:104px;align-items:center;
+  padding:11px 2px!important;border-bottom:1px solid var(--amv-line)!important;
+}
+.amv-game-row .amv-cover{width:70px!important;aspect-ratio:3/4!important;border-radius:9px!important}
+.amv-game-row .amv-game-info{padding:0}
+.amv-game-row>.amv-icon{display:block;color:var(--amv-faint)}
+.amv-rank-groups{display:grid;gap:0}
+.amv-rank-group{padding:15px 0 19px;border-bottom:1px solid var(--amv-line)}
+.amv-group-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:12px}
+.amv-group-head h2{
+  font:600 18px/1.4 var(--amv-serif);color:var(--amv-ink);margin:0;
+}
+.amv-group-head span,.amv-group-empty{font:400 11px/1.5 var(--amv-sans);color:var(--amv-muted)}
+.amv-group-empty{margin:4px 0 0}
+.amv-rank-track{
+  display:flex;align-items:flex-start;gap:12px;
+  overflow-x:auto;max-width:100%;
+  padding:2px 1px 8px;
+  scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.amv-rank-track::-webkit-scrollbar{display:none}
+.amv-rank-track .amv-game-card{
+  flex:0 0 clamp(112px,35vw,155px);
+  width:clamp(112px,35vw,155px);
+  scroll-snap-align:start;
+}
+.amv-selection{
+  position:absolute;z-index:2;right:7px;top:7px;
+  display:grid;place-items:center;width:24px;height:24px;
+  border:2px solid #fff;background:rgba(255,255,255,.9);
+  border-radius:50%;box-shadow:0 1px 7px rgba(0,0,0,.1);
+}
+.amv-selection.checked{background:var(--amv-accent);color:#fff}
+.amv-bulkbar{
+  position:fixed;z-index:400;left:50%;bottom:calc(var(--am-bottom-height) + 12px);
+  transform:translateX(-50%);
+  display:flex;align-items:center;justify-content:space-between;gap:4px;
+  width:calc(100% - 26px);max-width:720px;
+  padding:9px 11px;border:1px solid var(--amv-line);border-radius:16px;
+  background:#fff;box-shadow:var(--amv-shadow);
+  font:500 11px/1.3 var(--amv-sans);
+}
+.amv-bulkbar button{
+  border:0;border-radius:9px;padding:10px 11px;
+  color:var(--amv-accent);background:var(--amv-mist);
+  font:600 12px/1.2 var(--amv-sans);
+}
+.amv-bulkbar .danger{color:#AE5364;background:#F8EBEE}
+/* Game details */
+.amv-native-detail{padding-bottom:25px}
+.amv-game-detail-head{
+  display:grid;grid-template-columns:123px minmax(0,1fr);
+  gap:18px;align-items:center;margin:2px 0 21px;
+}
+.amv-game-detail-head .amv-cover{
+  height:171px;aspect-ratio:3/4;border-radius:15px;
+  box-shadow:var(--amv-shadow);
+}
+.amv-game-detail-title{min-width:0}
+.amv-game-detail-title h1{
+  margin:9px 0 10px;
+  font:600 clamp(20px,6vw,27px)/1.38 var(--amv-serif);
+  overflow-wrap:anywhere;
+}
+.amv-game-detail-title p{color:var(--amv-muted);font-size:12px;margin:8px 0 0}
+.amv-detail-actions{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 19px;
+}
+.amv-detail-actions .amv-btn{min-height:45px!important;font-size:13px!important}
+.amv-detail-progress{
+  border-radius:16px;border:1px solid var(--amv-line);
+  background:var(--amv-paper);padding:17px 16px;margin-bottom:14px;
+}
+.amv-detail-progress>div:first-child{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  font-size:12px;color:var(--amv-muted);margin-bottom:12px;
+}
+.amv-detail-progress b{color:var(--amv-accent);font-size:15px}
+.amv-progress{height:6px;border-radius:10px;background:#EDE4EC;overflow:hidden}
+.amv-progress i{display:block;height:100%;border-radius:10px;background:#A9829E}
+.amv-facts{
+  background:var(--amv-paper);border:1px solid var(--amv-line);
+  border-radius:16px;padding:0 16px;margin-bottom:18px;
+}
+.amv-facts>div{
+  min-height:49px;display:flex;justify-content:space-between;
+  align-items:center;gap:18px;padding:12px 0;
+}
+.amv-facts>div+div{border-top:1px solid var(--amv-line)}
+.amv-facts span{font-size:12px;color:var(--amv-muted);flex:none}
+.amv-facts strong{font-size:12px;line-height:1.5;color:var(--amv-ink);font-weight:550;text-align:right;overflow-wrap:anywhere}
+.amv-detail-section{
+  padding:17px 17px;margin-bottom:14px;
+  background:var(--amv-paper);border:1px solid var(--amv-line);border-radius:16px;
+}
+.amv-detail-section h2{
+  margin:0 0 12px;font:600 16px/1.4 var(--amv-serif);color:var(--amv-ink);
+}
+.amv-prose{margin:0;color:#625765;font:400 13px/1.9 var(--amv-sans);white-space:pre-line;overflow-wrap:anywhere}
+.amv-route-chips{display:flex;gap:7px;flex-wrap:wrap}
+.amv-route-chips span{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:7px 9px;border-radius:9px;background:var(--amv-mist);
+  color:var(--amv-muted);font-size:11px;
+}
+.amv-route-chips span.done{background:#E8F0E9;color:#627C66}
+.amv-log-row{border-top:1px solid var(--amv-line);padding:10px 0}
+.amv-log-row small{font-size:10px;color:var(--amv-rose)}
+.amv-log-row p{margin:4px 0 0;font-size:12px;line-height:1.7;color:var(--amv-ink)}
+.amv-char-grid{margin-top:2px}
+.amv-char-visual{
+  width:100%;aspect-ratio:3/4;position:relative;
+  background:#EEE6EA;border-radius:15px;overflow:hidden;
+  border:1px solid var(--amv-line);
+}
+.amv-char-visual img{display:block;width:100%;height:100%;object-fit:cover}
+.amv-char-card strong{
+  display:block;margin:10px 2px 0;font:600 13px/1.4 var(--amv-sans);
+  color:var(--amv-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.amv-char-card>small{
+  display:block;margin:4px 2px 0;color:var(--amv-muted);font:400 11px/1.5 var(--amv-sans);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.amv-char-preference{
+  position:absolute;right:7px;bottom:7px;padding:4px 8px;
+  border:1px solid rgba(255,255,255,.65);
+  border-radius:999px;background:rgba(255,254,253,.88);
+  font:500 10px/1.3 var(--amv-sans);color:var(--amv-accent);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.amv-character-hero{
+  height:310px;max-width:480px;margin:4px auto 21px;
+  display:grid;place-items:center;border-radius:22px;
+  overflow:hidden;background:linear-gradient(145deg,#EDE2EA,#FBF6F6);
+}
+.amv-character-hero img{width:100%;height:100%;object-fit:contain;display:block}
+.amv-detail-eyebrow{display:block;margin-top:8px}
+.amv-char-title{font:600 27px/1.4 var(--amv-serif);margin:9px 0 3px;color:var(--amv-ink)}
+.amv-char-subtitle{font:400 12px/1.5 var(--amv-sans);color:var(--amv-muted);margin:0 0 18px}
+/* Calendar is a native date-first view, not a squeezed desktop grid. */
+.amv-full-segment{margin-bottom:18px;max-width:100%}
+.amv-full-segment button{
+  flex:1;min-height:40px;padding:9px 10px;border:0!important;border-radius:10px;
+  background:transparent;color:var(--amv-muted)!important;
+  font:500 13px/1.3 var(--amv-sans)!important;
+}
+.amv-full-segment button.active{background:#fff!important;color:var(--amv-accent)!important;box-shadow:0 1px 7px rgba(70,50,65,.06)}
+.amv-calendar-panel{
+  border:1px solid var(--amv-line);border-radius:19px;
+  padding:17px 12px 15px;margin-bottom:24px;
+  background:var(--amv-paper);
+}
+.amv-month-head{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding:0 5px;
+}
+.amv-month-head>div{display:flex;align-items:baseline;gap:9px}
+.amv-month-head>div span{color:var(--amv-muted);font:400 12px/1 Georgia,serif}
+.amv-month-head strong{color:var(--amv-ink);font:600 21px/1.2 var(--amv-serif)}
+.amv-icon-button{
+  width:36px;height:36px;display:grid;place-items:center;
+  border:1px solid var(--amv-line)!important;border-radius:12px;
+  background:var(--amv-bg)!important;color:var(--amv-accent)!important;
+}
+.amv-weekdays,.amv-calendar-grid{
+  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;
+}
+.amv-weekdays{margin-bottom:8px}
+.amv-weekdays span{
+  display:grid;place-items:center;min-height:23px;
+  font-size:11px;color:var(--amv-muted);
+}
+.amv-day,.amv-day-blank{
+  position:relative;display:grid;place-items:center;
+  width:100%;aspect-ratio:1;min-height:38px;
+  border:0!important;border-radius:11px;
+  background:transparent!important;color:var(--amv-ink)!important;
+  font:500 13px/1 var(--amv-sans)!important;
+}
+.amv-day.today>span{color:var(--amv-accent);font-weight:700}
+.amv-day.picked{background:var(--amv-blush)!important;color:var(--amv-accent)!important}
+.amv-day i{
+  position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;background:var(--amv-rose);
+}
+.amv-month-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:10px;border-top:1px solid var(--amv-line);
+  margin-top:13px;padding:13px 6px 0;font-size:11px;color:var(--amv-muted);
+}
+.amv-month-footer button{border:0;background:transparent;color:var(--amv-accent);font-size:11px}
+.amv-event-list{
+  background:var(--amv-paper);border:1px solid var(--amv-line);
+  border-radius:17px;overflow:hidden;
+}
+.amv-event-item{
+  display:grid;grid-template-columns:37px minmax(0,1fr) 15px;
+  align-items:center;gap:11px;width:100%;
+  min-height:79px;text-align:left;padding:15px 13px;
+  border:0;background:transparent;
+}
+.amv-event-item+.amv-event-item{border-top:1px solid var(--amv-line)}
+.amv-event-symbol{
+  width:36px;height:36px;display:grid;place-items:center;
+  border-radius:12px;background:var(--amv-mist);color:var(--amv-accent);
+}
+.amv-event-text{min-width:0}
+.amv-event-text>div{display:flex;align-items:center;gap:8px}
+.amv-event-text small{font-size:10px;color:var(--amv-rose)}
+.amv-event-text>div>span{font-size:10px;color:var(--amv-muted)}
+.amv-event-text strong{
+  display:block;margin-top:5px;font-size:13px;color:var(--amv-ink);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.amv-event-text p{margin:6px 0 0;font-size:11px;color:var(--amv-muted);line-height:1.5}
+.amv-event-item>.amv-icon{color:var(--amv-faint)}
+.amv-feed{display:grid;gap:24px;margin-bottom:20px}
+.amv-feed-month{
+  color:var(--amv-accent);font:600 17px/1.3 Georgia,serif;margin-bottom:12px;
+}
+/* Oshi archive is a mobile portrait collection; original art editing remains a linked advanced view. */
+.amv-oshi-feature{
+  position:relative;overflow:hidden;
+  padding:25px 23px;margin:0 0 20px;border-radius:19px;
+  background:linear-gradient(120deg,#EEE3EC,#F9EFF3);
+  border:1px solid #EBDCE5;
+}
+.amv-oshi-feature::after{
+  content:"♡";position:absolute;right:-3px;bottom:-46px;
+  font:400 155px/1 Georgia,serif;color:rgba(150,103,137,.095);
+}
+.amv-oshi-feature>span{
+  font:700 10px/1.4 Georgia,serif;color:var(--amv-rose);letter-spacing:.16em;
+}
+.amv-oshi-feature h2{
+  margin:10px 0 8px;font:600 29px/1.3 var(--amv-serif);color:var(--amv-accent-dark);
+}
+.amv-oshi-feature p{margin:0;font-size:12px;line-height:1.6;color:var(--amv-muted);max-width:220px}
+.amv-oshi-stats{display:flex;align-items:baseline;gap:8px;margin-top:20px}
+.amv-oshi-stats b{font:400 29px/1 Georgia,serif;color:var(--amv-accent)}
+.amv-oshi-stats span{font-size:11px;color:var(--amv-muted)}
+.amv-oshi-list{display:grid;gap:10px;margin-bottom:20px}
+.amv-oshi-card{
+  display:grid!important;grid-template-columns:80px minmax(0,1fr) 18px;
+  align-items:center;gap:14px;min-height:106px;padding:10px!important;
+  border:1px solid var(--amv-line)!important;border-radius:16px;
+  background:var(--amv-paper)!important;text-align:left;
+}
+.amv-oshi-picture{
+  height:88px;width:80px;display:grid;place-items:center;
+  border-radius:10px;background:var(--amv-mist);overflow:hidden;
+}
+.amv-oshi-picture img{width:100%;height:100%;object-fit:cover}
+.amv-oshi-card strong{display:block;font-size:15px;font-weight:600;margin:0 0 7px}
+.amv-oshi-card small{display:block;color:var(--amv-muted);font-size:11px}
+.amv-oshi-card>.amv-icon{color:var(--amv-faint)}
+/* Legacy gateways only appear when chosen, so no feature is deleted. */
+body.amorist-mobile-app.amv-ready.amv-profile-preview .product-view[data-product-view="home"]>.am-profile-edit-actions,
+body.amorist-mobile-app.amv-ready.amv-profile-preview .product-view[data-product-view="home"]>.profile-home{
+  display:block!important;
+}
+body.amorist-mobile-app.amv-ready.amv-profile-preview .product-view[data-product-view="home"]>.amv-screen{
+  padding:14px 18px!important;min-height:0!important;
+}
+body.amorist-mobile-app.amv-ready.amv-profile-preview .amv-home{display:none!important}
+body.amorist-mobile-app.amv-ready.amv-legacy-game-detail .product-view[data-product-view="library"]>#gameDetailPanel:not([hidden]){
+  display:block!important;padding:16px!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-game-detail .product-view[data-product-view="library"]>.amv-screen{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-timeline .product-view[data-product-view="timeline"]>#timelineContent{
+  display:block!important;margin:0 14px 30px!important;max-width:calc(100% - 28px)!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-timeline .product-view[data-product-view="timeline"]>.timeline-bottom-actions{
+  display:flex!important;gap:8px;padding:0 16px 30px!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"]>:not(.amv-screen){
+  display:revert!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"]>.oshi-hub-view[hidden],
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"]>.oshi-detail-view[hidden],
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"]>.oshi-editor-drawer[hidden],
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"]>.oshi-drawer-backdrop[hidden]{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready.amv-legacy-oshi .product-view[data-product-view="oshi"]>.amv-screen{
+  min-height:0;padding-bottom:0!important;
+}
+.amv-preview-nav{
+  display:flex;flex-direction:column;gap:7px;
+  padding:12px 15px;border:1px solid #E2D4DE;border-radius:14px;
+  background:var(--amv-mist);color:var(--amv-muted);
+}
+.amv-preview-nav button{
+  display:flex;align-items:center;gap:7px;min-height:30px;
+  border:0;background:transparent!important;color:var(--amv-accent)!important;
+  font-size:13px!important;font-weight:600!important;text-align:left;
+}
+.amv-preview-nav span,.amv-legacy-gateway p{margin:0;font-size:11px;color:var(--amv-muted);line-height:1.6}
+.amv-legacy-gateway{
+  display:grid;gap:4px;padding:13px 14px;
+  border:1px solid var(--amv-line);border-radius:13px;background:var(--amv-paper);
+}
+/* Modal controls use the same tokens everywhere, including legacy feature editors. */
+body.amorist-mobile-app.amv-ready .product-overlay .product-dialog,
+body.amorist-mobile-app.amv-ready #gameDialogOverlay .product-dialog,
+body.amorist-mobile-app.amv-ready #charDialogOverlay .product-dialog{
+  background:var(--amv-paper)!important;
+  border-radius:24px 24px 0 0!important;
+  box-shadow:0 -9px 33px rgba(33,28,34,.1)!important;
+  padding:21px 18px calc(25px + env(safe-area-inset-bottom,0px))!important;
+  max-height:93dvh!important;overflow-y:auto!important;
+  font-family:var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready :where(.product-dialog,.profile-edit-dialog,.am-dialog,.oshi-editor-drawer)
+  :where(input:not([type=checkbox]):not([type=radio]),textarea,select){
+  min-height:44px!important;max-width:100%!important;
+  font:400 16px/1.4 var(--amv-sans)!important;
+  border:1px solid #E4D8E1!important;border-radius:11px!important;
+  background:#fff!important;color:var(--amv-ink)!important;
+}
+body.amorist-mobile-app.amv-ready :where(.product-dialog,.profile-edit-dialog,.am-dialog,.oshi-editor-drawer)
+  :where(.product-button,button[type=submit],.product-dialog-close){
+  min-height:42px!important;border-radius:11px!important;font-family:var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .am-dialog{background:var(--amv-bg)!important;font-family:var(--amv-sans)!important}
+.amv-sheet{
+  width:100%;max-width:760px;max-height:82dvh;
+  border:0;border-radius:23px 23px 0 0;
+  margin:auto auto 0;background:var(--amv-paper);
+  padding:12px 16px calc(18px + env(safe-area-inset-bottom,0px));
+  color:var(--amv-ink);font-family:var(--amv-sans);overflow-y:auto;
+}
+.amv-sheet::backdrop{background:rgba(36,24,37,.38)}
+.amv-sheet-title{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;padding:9px 1px 15px;border-bottom:1px solid var(--amv-line);
+}
+.amv-sheet-title strong{font-size:16px;font-weight:600}
+.amv-sheet-title button{border:0;background:transparent;font-size:12px;color:var(--amv-accent)}
+.amv-sheet-option{
+  display:block;width:100%;padding:17px 9px;
+  border:0;border-bottom:1px solid var(--amv-line);
+  background:transparent;text-align:left;font:500 14px/1.4 var(--amv-sans);
+  color:var(--amv-ink);
+}
+/* Bangumi, omikuji, REPO and image composition: the unique artwork is preserved,
+   but app chrome, tools and cards follow one sizing and typography system. */
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="bangumi"],
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"],
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="omikuji"],
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="studio"]{
+  background:var(--amv-bg)!important;
+  padding:18px 16px 36px!important;
+  color:var(--amv-ink);font-family:var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="bangumi"] .resource-page-head,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>.product-page-head,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="studio"]>.product-page-head{
+  padding:4px 1px 14px!important;margin:0 0 16px!important;
+  border-bottom:1px solid var(--amv-line)!important;
+  background:transparent!important;
+  display:flex!important;align-items:flex-start!important;
+  gap:12px!important;flex-wrap:wrap!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="bangumi"] .resource-page-head h1,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>.product-page-head h1,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="studio"]>.product-page-head h1{
+  margin:5px 0 6px!important;font:600 27px/1.3 var(--amv-serif)!important;
+  letter-spacing:0!important;color:var(--amv-ink)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="bangumi"] .resource-page-head p,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"]>.product-page-head p,
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="studio"]>.product-page-head p{
+  font:400 11px/1.65 var(--amv-sans)!important;color:var(--amv-muted)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] #formTemplates{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:12px!important;margin:0!important;padding:0!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] #formTemplates[style*="display: none"],
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] #formTemplates[hidden]{
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .form-template{
+  width:100%!important;min-width:0!important;
+  display:flex!important;flex-direction:column!important;
+  gap:7px!important;min-height:182px!important;
+  padding:12px!important;
+  border:1px solid var(--amv-line)!important;border-radius:16px!important;
+  background:var(--amv-paper)!important;box-shadow:none!important;
+  transform:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .form-template .template-preview{
+  min-width:0!important;max-width:100%!important;
+  height:83px!important;border:1px solid var(--amv-line)!important;
+  border-radius:10px!important;overflow:hidden!important;
+  background:#F6F0F4!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .form-template h3{
+  margin:2px 0 0!important;font:600 14px/1.4 var(--amv-sans)!important;
+  color:var(--amv-ink)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .form-template>p{
+  display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden!important;font:400 11px/1.55 var(--amv-sans)!important;
+  color:var(--amv-muted)!important;min-height:0!important;margin:0!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .form-template-foot{
+  margin-top:auto!important;display:flex!important;flex-wrap:wrap!important;
+  gap:4px!important;padding-top:7px!important;border-top:1px solid var(--amv-line)!important;
+  font:500 10px/1.4 var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .form-template-foot strong{
+  color:var(--amv-accent)!important;font-size:11px!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .form-workspace.active{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:13px!important;
+  padding:0!important;margin:0!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .visual-sheet{
+  min-width:0!important;max-width:100%!important;
+  overflow:auto!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .form-side{
+  position:relative!important;top:auto!important;min-width:0!important;max-width:100%!important;
+  border:1px solid var(--amv-line)!important;border-radius:17px!important;
+  background:var(--amv-paper)!important;padding:15px!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="forms"] .form-side>.product-button{
+  min-height:44px!important;width:100%!important;border-radius:12px!important;
+  font:600 12px/1.3 var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="studio"] .am-studio-dock{
+  top:calc(var(--am-top-height) + 6px)!important;
+  background:var(--amv-paper)!important;border:1px solid var(--amv-line)!important;
+  border-radius:14px!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="studio"] .am-studio-dock button{
+  min-height:39px!important;font:600 12px/1.3 var(--amv-sans)!important;
+  border-radius:9px!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="studio"] .am-studio-dock button.active{
+  background:var(--amv-blush)!important;color:var(--amv-accent)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="studio"] .am-studio-quickform{
+  border:1px solid var(--amv-line)!important;border-radius:18px!important;
+  background:var(--amv-paper)!important;padding:17px!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="studio"] .am-studio-fields{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:15px;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="bangumi"] :where(.resource-filter-panel,.bangumi-filter-panel,.bangumi-db-card){
+  border-color:var(--amv-line)!important;
+  border-radius:15px!important;background:var(--amv-paper)!important;
+  box-shadow:none!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="bangumi"] :where(.product-button,.icon-text-button,.bangumi-db-sort button){
+  min-height:38px!important;font:500 12px/1.3 var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="bangumi"] :where(input,select){
+  font:400 16px/1.4 var(--amv-sans)!important;
+  max-width:100%!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="omikuji"] .omikuji-map-head h1{
+  font:600 27px/1.4 var(--amv-serif)!important;
+  color:var(--amv-ink)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="omikuji"] .omikuji-sanctuary{
+  max-width:100%!important;overflow:visible!important;
+}
+/* Special editors keep all image export functionality, but their controls use a shared
+   tap target, accent, surface and spacing system. */
+body.amorist-mobile-app.amv-ready .product-view:not([data-product-view="home"]) :where(.product-button,.tool-btn):not(.amv-btn){
+  min-height:41px!important;border-radius:10px!important;
+  font-family:var(--amv-sans)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view:not([data-product-view="home"]) :where(.product-input,.product-textarea,.product-select){
+  font-family:var(--amv-sans)!important;
+}
+/* This media query only adjusts spacing, never hides a feature. */
+@media(max-width:365px){
+  body.amorist-mobile-app.amv-ready .amv-screen{padding-inline:14px}
+  .amv-home-hero{padding-inline:18px;min-height:190px}
+  .amv-hero-copy h1{font-size:28px}
+  .amv-hero-avatar{width:69px;height:94px}
+  .amv-hscroll{margin-inline:-14px;padding-inline:14px}
+  .amv-game-grid,.amv-char-grid{column-gap:10px}
+  .amv-heading h1{font-size:27px}
+  .amv-game-detail-head{grid-template-columns:108px minmax(0,1fr);gap:12px}
+  .amv-game-detail-head .amv-cover{height:151px}
+  .amv-card-badges{gap:4px}
+  .amv-chip{padding-inline:11px!important}
+  .amv-event-item{gap:8px}
+}
+@media(min-width:620px){
+  body.amorist-mobile-app.amv-ready .amv-screen{max-width:600px;margin:0 auto;padding-inline:25px}
+  .amv-home-hero{min-height:220px}
+  .amv-home-hero h1{font-size:39px}
+  .amv-game-grid,.amv-char-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(prefers-reduced-motion:reduce){
+  body.amorist-mobile-app.amv-ready .amv-screen *{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
