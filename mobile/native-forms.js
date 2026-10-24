@@ -41,7 +41,7 @@
     if(!editing){
       const last=current(),userTemplates=templates(),userSaved=saved();
       app.innerHTML='<div class="amf-heading"><span>VISUAL CREATION</span><h1>图文创作</h1>'+
-        '<p>从模板开始制作，将喜欢的游戏与角色整理成作品。</p></div>'+
+        '<p>در ازل پرتوِ حُسنت ز تجلی دَم زد ,عشق پیدا شد و آتش به همه عالم زد</p></div>'+
         (last?'<button type="button" class="amf-resume" data-amf="resume"><span>继续编辑 · '+esc(last.title||'未命名作品')+'</span>'+arrow+'</button>':'')+
         '<div class="amf-category-head"><h2>选择创作方式</h2><span>'+presets.length+' 类基础模板</span></div>'+
         '<div class="amf-template-grid">'+presets.map(it=>templateMarkup(it,'open')).join('')+'</div>'+
