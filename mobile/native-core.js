@@ -48,7 +48,7 @@
     chars:{query:'',role:'all',preference:'all',detail:''},
     timeline:{mode:'calendar',month:new Date().toISOString().slice(0,7),day:''},
     oshi:{detail:'',advanced:false},
-    calendarAdvanced:false,homePreview:false};
+    calendarAdvanced:false,homePreview:false,homeAbout:false};
   const VIEWS=['home','library','characters','timeline','oshi'];
   const mount=(name)=>{const s=$('.product-view[data-product-view="'+name+'"]');if(!s)return null;
     const host=document.createElement('div');host.className='amv-screen';host.id='amv-'+name;
@@ -59,6 +59,16 @@
   draftDialog.setAttribute('aria-label','档案操作');
   document.body.append(draftDialog);
   const toast=message=>window.AmoristMobile?.toast?.(message);
+  const isEditing=()=>window.AmoristMobileMode?.isEditing?.()===true;
+  const adminButton=(name,label,ic='plus',kind='soft')=>isEditing()?actionButton(name,label,ic,kind):'';
+  const quoteByView={
+    library:'Whatever our souls are made of, his and mine are the same',
+    characters:'L’amour est comme la fièvre, il naît et s’éteint sans que la volonté y ait la moindre part',
+    timeline:'只留下日期、封面与状态。作品名在需要时出现，不再占据每一个日历格。',
+    oshi:'Liebe ist, daß Du mir das Messer bist, mit dem ich in mir wühle.',
+    forms:'در ازل پرتوِ حُسنت ز تجلی دَم زد ,عشق پیدا شد و آتش به همه عالم زد',
+    bangumi:'Estar contigo o no estar contigo es la medida de mi tiempo'
+  };
   const go=name=>window.amoristProductNavigate?.(name,true);
   const heading=(eyebrow,title,subtitle,action)=>'<div class="amv-heading"><div>'+
     '<span class="amv-eyebrow">'+esc(eyebrow)+'</span><h1>'+esc(title)+'</h1>'+
@@ -105,24 +115,50 @@
       '<strong>'+esc(c.nameCn||c.name||'未知角色')+'</strong>'+
       '<small>'+esc(work?.name||'未关联作品')+'</small></button>';
   };
+  function renderAbout(){
+    const el=hosts.home,p=profile(),name=String(p.name||p.handle||'').trim();
+    if(!el)return;
+    const groups=[
+      {tag:'PROFILE / ABOUT ME',title:'PROFILE',fields:[['NAME','name'],['HANDLE','handle'],['AGE','age'],['SINCE','years'],['BIOGRAPHY','bio']]},
+      {tag:'PLAY STYLE',title:'PLAY RECORD',fields:[['HABIT','habit'],['DEVICE','platforms'],['LANGUAGE','languages'],['ATTRIBUTE','attribute'],['PLAY STYLE','playstyle'],['PLAY PACE','playPace']]},
+      {tag:'TASTE / PREFERENCE',title:'TASTE',fields:[['ARTIST','artist'],['WRITER','writer'],['WORKS','works'],['WORLDVIEW','worldview'],['HEROINE TYPE','character'],['VOICE ACTOR','voiceActors'],['XP TAGS','tags'],['RELATIONSHIP','relationship'],['MY OSHIS','oshiChars']]},
+      {tag:'NOTE / SOCIAL',title:'MORE ABOUT ME',fields:[['BOUNDARIES','boundaries'],['SAME FAN','sameFan'],['ACCOUNT CONTENT','account'],['NOTE','note'],['REDNOTE','xhs'],['NS ID','platformId'],['KKV','contactValue']]}
+    ];
+    const detail=groups.map(group=>{
+      const pairs=group.fields.filter(row=>String(p[row[1]]??'').trim());
+      if(!pairs.length)return '';
+      return '<section class="amv-about-group"><span class="amv-eyebrow">'+esc(group.tag)+'</span>'+
+        '<h2>'+esc(group.title)+'</h2><dl>'+pairs.map(([label,key])=>'<div><dt>'+esc(label)+'</dt>'+
+        '<dd>'+esc(p[key])+'</dd></div>').join('')+'</dl></section>';
+    }).join('');
+    el.innerHTML='<div class="amv-about"><button type="button" class="amv-inline-back" data-amv="close-about">'+icon('back',17)+'返回</button>'+
+      '<div class="amv-about-head"><div class="amv-about-avatar">'+art(p.avatar||'',name)+'</div>'+
+      '<div><span class="amv-eyebrow">PRIVATE / SELF INTRODUCTION</span><h1>'+esc(name||'OTOME PROFILE')+'</h1>'+
+      (p.handle?'<p>'+esc(p.handle)+'</p>':'')+'</div></div>'+
+      detail+(isEditing()?'<div class="amv-about-edit">'+actionButton('edit-profile','编辑 PROFILE','edit','soft')+
+      actionButton('preview-profile','预览原始自介图','wand','soft')+'</div>':'')+'</div>';
+    hydrateImages(el);
+  }
   function renderHome(){
     const el=hosts.home;if(!el)return;
+    if(state.homeAbout){renderAbout();return}
     if(state.homePreview){el.innerHTML='<div class="amv-preview-nav"><button type="button" data-amv="close-profile-preview">'+icon('back',18)+'返回应用主页</button><span>自介图专属排版 · 可在下方编辑并导出图片</span></div>';return}
     const p=profile(),gs=games(),cs=chars(),timeline=events().slice().sort((a,b)=>String(b.occurredAt||'').localeCompare(String(a.occurredAt||'')));
     const current=gs.filter(g=>g.status==='进行中').slice(0,8);
     const all=gs.length,done=gs.filter(g=>g.status==='已全通').length;
     const name=String(p.name||p.handle||'HARU').trim();
     const banner='<div class="amv-home-hero"><span class="amv-hero-star">✧</span>'+
-      '<div class="amv-hero-copy"><span>AMORIST · PRIVATE ARCHIVE</span><h1>我的乙女<br>游戏手记</h1>'+
-      '<p>把游戏、角色与一段段心动的时光，妥善珍藏。</p></div>'+
-      (p.avatar?'<div class="amv-hero-avatar">'+art(p.avatar,'个人头像')+'</div>':'')+'</div>';
+      '<div class="amv-hero-copy"><span>PRIVATE / SELF INTRODUCTION</span><h1>OTOME<br>PROFILE</h1>'+
+      (p.bio?'<p>'+esc(p.bio)+'</p>':'')+
+      (p.handle?'<p class="amv-home-handle">'+esc(p.handle)+'</p>':'')+'</div>'+
+      (p.avatar?'<div class="amv-hero-avatar">'+art(p.avatar,name)+'</div>':'')+'</div>';
     const stats='<div class="amv-stat-strip"><div><strong>'+all+'</strong><span>收藏游戏</span></div>'+
       '<div><strong>'+done+'</strong><span>已全通</span></div>'+
       '<div><strong>'+cs.length+'</strong><span>收藏角色</span></div></div>';
-    const shortcuts='<div class="amv-quick-grid">'+
-      '<button data-amv="new-game" type="button">'+icon('plus',20)+'<b>添加游戏</b></button>'+
-      '<button data-amv="new-session" type="button">'+icon('clock',20)+'<b>记录游玩</b></button>'+
-      '<button data-amv="nav-studio" type="button">'+icon('edit',20)+'<b>写 REPO</b></button></div>';
+    const shortcuts=isEditing()?'<div class="amv-quick-grid">'+
+      '<button data-amv="new-game" type="button">'+icon('plus',20)+'<b>ADD GAME</b></button>'+
+      '<button data-amv="new-session" type="button">'+icon('clock',20)+'<b>PLAY LOG</b></button>'+
+      '<button data-amv="nav-studio" type="button">'+icon('edit',20)+'<b>REPO</b></button></div>':'';
     const playing='<section class="amv-section">'+
       '<div class="amv-section-title"><div><span>NOW PLAYING</span><h2>最近正在玩</h2></div>'+
       '<button data-amv="nav-library" type="button" class="amv-text-link">全部游戏 '+icon('arrow',15)+'</button></div>'+
@@ -140,11 +176,13 @@
           icon('arrow',16)+'</button>';
       }).join('')+'</div>':empty('尚未留下游玩记录','可以从这里开始记录每天的游戏时间'))+'</section>';
     const personal='<section class="amv-section"><div class="amv-section-title"><div><span>ABOUT ME</span><h2>我的个人档案</h2></div>'+
-      '<button type="button" data-amv="edit-profile" class="amv-text-link">编辑 '+icon('edit',15)+'</button></div>'+
+      (isEditing()?'<button type="button" data-amv="edit-profile" class="amv-text-link">EDIT '+icon('edit',15)+'</button>':'')+'</div>'+
       '<div class="amv-profile-card"><div class="amv-profile-avatar">'+art(p.avatar,name)+'</div><div class="amv-profile-copy"><strong>'+esc(name)+'</strong>'+
       '<p>'+esc(p.bio||p.type||'记录喜欢的作品与角色。')+'</p></div></div>'+
-      '<button class="amv-export-row" data-amv="preview-profile" type="button">'+
-      '<span>'+icon('wand',19)+'<b>自介图预览与导出</b></span>'+icon('arrow',17)+'</button></section>';
+      '<button class="amv-export-row" data-amv="view-profile" type="button">'+
+      '<span>'+icon('book',19)+'<b>PROFILE / ABOUT ME</b></span>'+icon('arrow',17)+'</button>'+
+      (isEditing()?'<button class="amv-export-row" data-amv="preview-profile" type="button">'+
+      '<span>'+icon('wand',19)+'<b>SELF INTRODUCTION / EXPORT</b></span>'+icon('arrow',17)+'</button>':'')+'</section>';
     el.innerHTML='<div class="amv-home">'+banner+stats+shortcuts+playing+recent+personal+footerLabel('Made of stories & a little affection · Amorist')+'</div>';
     hydrateImages(el);
   }
@@ -164,10 +202,10 @@
       '<div class="amv-segment" role="group" aria-label="游戏视图">'+[
       ['cover','grid'],['list','list'],['rank','layers']].map(row=>
       '<button type="button" class="'+(v.layout===row[0]?'selected':'')+'" data-amv="lib-layout" data-value="'+row[0]+'" aria-label="'+({cover:'封面视图',list:'列表视图',rank:'喜好分类'}[row[0]])+'">'+icon(row[1],18)+'</button>').join('')+'</div></div></div>';
-    const start=heading('MY COLLECTION','游戏档案','喜欢的作品，每一部都值得记录。',actionButton('new-game','添加','plus','primary'));
+    const start=heading('MY GAME ARCHIVE','游戏档案',quoteByView.library,adminButton('new-game','ADD','plus','primary'));
     const metrics='<div class="amv-metrics"><div><b>'+counts+'</b><span>全部作品</span></div><div><b>'+done+'</b><span>已全通</span></div><div><b>'+active+'</b><span>进行中</span></div></div>';
     const manage='<div class="amv-subtoolbar"><span>'+cards.length+' 部作品</span>'+
-      '<button class="amv-plain-link" type="button" data-amv="lib-manage">'+(v.manage?'结束管理':'批量管理')+'</button></div>';
+      (isEditing()?'<button class="amv-plain-link" type="button" data-amv="lib-manage">'+(v.manage?'完成':'MANAGE')+'</button>':'')+'</div>';
     let collection='';
     if(v.layout==='rank'){
       collection='<div class="amv-rank-groups">'+categories.map(cat=>{
@@ -180,7 +218,7 @@
       collection=cards.length?'<div class="amv-game-grid '+(v.layout==='list'?'as-list':'')+'">'+cards.map(g=>cardGame(g,v.layout)).join('')+'</div>':
         empty('没有找到作品','试着更换筛选条件，或者添加新的游戏。');
     }
-    const bulk=v.manage?'<div class="amv-bulkbar"><span>已选 '+v.selected.size+' 部</span>'+
+    const bulk=isEditing()&&v.manage?'<div class="amv-bulkbar"><span>已选 '+v.selected.size+' 部</span>'+
       '<button type="button" data-amv="bulk-status">状态</button><button type="button" data-amv="bulk-category">喜好</button>'+
       '<button type="button" data-amv="bulk-delete" class="danger">删除</button></div>':'';
     el.innerHTML=start+metrics+controls+manage+collection+bulk;
@@ -204,8 +242,8 @@
     const logs=Array.isArray(g.logs)&&g.logs.length?'<section class="amv-detail-section"><h2>游玩笔记</h2>'+
       g.logs.slice(-5).reverse().map(x=>'<div class="amv-log-row"><small>'+esc(x.date||x.createdAt||'')+'</small><p>'+esc(x.text||x.note||'')+'</p></div>').join('')+'</section>':'';
     el.innerHTML='<div class="amv-native-detail"><button class="amv-inline-back" data-amv="back-games" type="button">'+icon('back',17)+'返回游戏库</button>'+
-      cover+'<div class="amv-detail-actions">'+actionButton('edit-game','编辑档案','edit','primary')+
-      actionButton('game-repo','制作 REPO','wand','soft')+'</div>'+
+      cover+'<div class="amv-detail-actions">'+adminButton('edit-game','EDIT','edit','primary')+
+      actionButton('game-repo','REPO','wand','soft')+'</div>'+
       '<div class="amv-detail-progress"><div><span>游玩进度</span><b>'+progress+'%</b></div>'+
       '<div class="amv-progress"><i style="width:'+progress+'%"></i></div></div>'+
       rows+routes+notes+logs+'<button class="amv-export-row" data-amv="advanced-game" type="button"><span>'+
@@ -227,7 +265,7 @@
     const el=hosts.characters;if(!el)return;
     if(state.chars.detail){renderCharacterDetail();return}
     const cs=visibleChars(),v=state.chars,all=chars().filter(c=>!c.animeId),map=gameMap();
-    const start=heading('CHARACTER BOOK','角色图鉴','每一次心动，都有一个名字。',actionButton('new-char','添加','plus','primary'));
+    const start=heading('CHARACTER BOOK','角色图鉴',quoteByView.characters,adminButton('new-char','ADD','plus','primary'));
     const metrics='<div class="amv-metrics"><div><b>'+all.length+'</b><span>全部角色</span></div>'+
       '<div><b>'+all.filter(c=>c.preference==='favorite').length+'</b><span>最推</span></div>'+
       '<div><b>'+new Set(all.map(c=>c.gameId).filter(Boolean)).size+'</b><span>所属作品</span></div></div>';
@@ -256,7 +294,7 @@
     el.innerHTML='<div class="amv-native-detail"><button type="button" class="amv-inline-back" data-amv="back-chars">'+icon('back',17)+'返回角色图鉴</button>'+
       artview+'<span class="amv-eyebrow amv-detail-eyebrow">CHARACTER PROFILE</span><h1 class="amv-char-title">'+esc(c.nameCn||c.name||'未知角色')+'</h1>'+
       '<p class="amv-char-subtitle">'+esc(c.nameCn&&c.name?c.name:'')+'</p>'+
-      '<div class="amv-detail-actions">'+actionButton('edit-char','编辑角色','edit','primary')+
+      '<div class="amv-detail-actions">'+adminButton('edit-char','EDIT','edit','primary')+
       (c.bangumiCharacterId?actionButton('char-original','人物详情','heart','soft'):'')+'</div>'+
       '<div class="amv-facts">'+fields.map(x=>'<div><span>'+esc(x[0])+'</span><strong>'+esc(x[1]||'未记录')+'</strong></div>').join('')+'</div>'+
       (c.note||c.summary?'<section class="amv-detail-section"><h2>人物笔记</h2><p class="amv-prose">'+esc(c.note||c.summary)+'</p></section>':'')+
@@ -270,7 +308,7 @@
     const el=hosts.timeline;if(!el)return;
     if(state.calendarAdvanced){el.innerHTML='<div class="amv-preview-nav"><button type="button" data-amv="timeline-back">'+icon('back',18)+'返回游玩日历</button><span>完整历史时间线与批量管理功能</span></div>';return}
     const v=state.timeline,gs=gameMap(),items=events().filter(x=>x.occurredAt).sort((a,b)=>String(b.occurredAt).localeCompare(String(a.occurredAt)));
-    const header=heading('PLAY CHRONICLE','游玩日历','日子会过去，喜欢过的故事会留下。',actionButton('new-session','记录','plus','primary'));
+    const header=heading('PLAY CHRONICLE','游玩日历',quoteByView.timeline,adminButton('new-session','ADD','plus','primary'));
     const modes='<div class="amv-full-segment">'+['calendar','feed'].map((x,i)=>
       '<button type="button" data-amv="timeline-mode" data-value="'+x+'" class="'+(v.mode===x?'active':'')+'">'+
       (i?'游玩记录':'月历视图')+'</button>').join('')+'</div>';
@@ -308,8 +346,8 @@
         '<section><div class="amv-feed-month">'+esc(month)+'</div>'+renderEventList(rows,gs)+'</section>').join(''):
         empty('游玩日历还是空的','添加游戏的开始或完成日期，或者记录每天的游玩。'))+'</div>';
     }
-    el.innerHTML=header+modes+content+'<button class="amv-export-row amv-timeline-advanced" type="button" data-amv="timeline-advanced">'+
-      '<span>'+icon('layers',18)+'<b>高级时间线与批量记录</b></span>'+icon('arrow',18)+'</button>';
+    el.innerHTML=header+modes+content+(isEditing()?'<button class="amv-export-row amv-timeline-advanced" type="button" data-amv="timeline-advanced">'+
+      '<span>'+icon('layers',18)+'<b>PLAY LOG / MANAGE</b></span>'+icon('arrow',18)+'</button>':'');
     hydrateImages(el);
   }
   function renderEventList(items,mapping){
@@ -407,7 +445,7 @@
       if(previous==='characters')state.chars.detail='';
       if(previous==='oshi'){state.oshi.detail='';state.oshi.advanced=false;}
       if(previous==='timeline')state.calendarAdvanced=false;
-      if(previous==='home')state.homePreview=false;
+      if(previous==='home'){state.homePreview=false;state.homeAbout=false;}
       document.body.classList.remove('amv-legacy-game-detail','amv-legacy-timeline','amv-profile-preview','amv-legacy-oshi');
     }
     render(next);
@@ -458,6 +496,7 @@
     renderLibrary();
   }
   function nativeUpdateBulk(field){
+    if(!isEditing())return;
     if(!state.lib.selected.size){toast('请先选择游戏');return}
     const selected=state.lib.selected;
     if(field==='delete'){
@@ -475,14 +514,16 @@
   function handleAction(target){
     const id=target.dataset.id||'',value=target.dataset.value||'';
     switch(target.dataset.amv){
-      case 'new-game': window.openEnhancedGameDialog?.(null);break;
-      case 'new-char':$('#addCharButton')?.click();break;
-      case 'new-session':window.openTimelineSessionDialog?.();break;
+      case 'new-game': if(isEditing())window.openEnhancedGameDialog?.(null);break;
+      case 'new-char':if(isEditing())$('#addCharButton')?.click();break;
+      case 'new-session':if(isEditing())window.openTimelineSessionDialog?.();break;
       case 'nav-library':go('library');break;
       case 'nav-timeline':go('timeline');break;
       case 'nav-oshi':go('oshi');break;
       case 'nav-studio':go('studio');break;
-      case 'edit-profile':$('#profileEditButton')?.click();break;
+      case 'edit-profile':if(isEditing())$('#profileEditButton')?.click();break;
+      case 'view-profile':state.homeAbout=true;renderHome();window.scrollTo({top:0,behavior:'auto'});break;
+      case 'close-about':state.homeAbout=false;renderHome();window.scrollTo({top:0,behavior:'auto'});break;
       case 'preview-profile':
         state.homePreview=true;document.body.classList.add('amv-profile-preview');
         renderHome();window.scrollTo({top:0,behavior:'instant'});break;
@@ -491,13 +532,13 @@
       case 'home-game':go('library');state.lib.detail=id;renderLibrary();break;
       case 'lib-status':state.lib.status=value;renderLibrary();break;
       case 'lib-layout':state.lib.layout=value;renderLibrary();break;
-      case 'lib-manage':state.lib.manage=!state.lib.manage;state.lib.selected.clear();renderLibrary();break;
+      case 'lib-manage':if(!isEditing())return;state.lib.manage=!state.lib.manage;state.lib.selected.clear();renderLibrary();break;
       case 'open-game':
         if(state.lib.manage){state.lib.selected.has(id)?state.lib.selected.delete(id):state.lib.selected.add(id);renderLibrary();}
         else {state.lib.detail=id;renderLibrary();window.scrollTo({top:0,behavior:'auto'});}
         break;
       case 'back-games':state.lib.detail='';document.body.classList.remove('amv-legacy-game-detail');renderLibrary();break;
-      case 'edit-game':window.openEnhancedGameDialog?.(games().find(g=>String(g.id)===String(state.lib.detail))||null);break;
+      case 'edit-game':if(isEditing())window.openEnhancedGameDialog?.(games().find(g=>String(g.id)===String(state.lib.detail))||null);break;
       case 'game-repo':{
         const game=games().find(g=>String(g.id)===String(state.lib.detail));
         if(game)window.amoristRepoManager?.open?.(game);
@@ -511,7 +552,7 @@
       case 'char-preference':state.chars.preference=value;renderCharacters();break;
       case 'open-char':state.chars.detail=id;renderCharacters();window.scrollTo({top:0,behavior:'auto'});break;
       case 'back-chars':state.chars.detail='';renderCharacters();break;
-      case 'edit-char':editCharacter(state.chars.detail);break;
+      case 'edit-char':if(isEditing())editCharacter(state.chars.detail);break;
       case 'char-original':{
         const c=chars().find(c=>String(c.id)===String(state.chars.detail));
         if(c?.bangumiCharacterId)window.dispatchEvent(new CustomEvent('amorist-open-character',{detail:c.bangumiCharacterId}));
