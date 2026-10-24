@@ -373,27 +373,30 @@
     renderOshi();
   }
   function showOriginalOshi(id, openEditor=false){
-    // The existing original hub has the authoritative per-character artwork,
-    // copy, collection layout, and its own linked editing drawer.
+    // The source hub recreates index buttons and its MutationObserver assigns
+    // data-oshi-order-id in a microtask. Resolve the ID after the real DOM
+    // has settled; never fall back to a different person's first card.
     window.amoristOshiOpenHub?.();
-    const selected=$$('#oshiIndexList .oshi-index-link').find(button=>
-      String(button.dataset.oshiOrderId||'')===String(id));
-    if(!selected){
-      state.oshi.advanced=false;
+    requestAnimationFrame(()=>{
+      const selected=$$('#oshiIndexList .oshi-index-link').find(button=>
+        String(button.dataset.oshiOrderId||'')===String(id));
+      if(!selected){
+        state.oshi.advanced=false;
+        state.oshi.detail=String(id);
+        document.body.classList.remove('amv-legacy-oshi');
+        renderOshi();
+        toast('该人物的原始展板未找到，已显示其档案。');
+        return;
+      }
+      selected.click();
       state.oshi.detail=String(id);
-      document.body.classList.remove('amv-legacy-oshi');
+      state.oshi.advanced=true;
+      document.body.classList.add('amv-legacy-oshi');
       renderOshi();
-      toast('该人物的原始展板未找到，已显示其档案。');
-      return false;
-    }
-    selected.click(); // opens exactly the matching original editorial profile
-    state.oshi.detail=String(id);
-    state.oshi.advanced=true;
-    document.body.classList.add('amv-legacy-oshi');
-    renderOshi();
-    if(openEditor && isEditing())
-      requestAnimationFrame(()=>$('#oshiEditDetailButton')?.click());
-    window.scrollTo({top:0,behavior:'auto'});
+      if(openEditor && isEditing())
+        requestAnimationFrame(()=>$('#oshiEditDetailButton')?.click());
+      window.scrollTo({top:0,behavior:'auto'});
+    });
     return true;
   }
   function renderOshi(){
