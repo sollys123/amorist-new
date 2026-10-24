@@ -361,48 +361,96 @@
         (e.note?'<p>'+esc(e.note)+'</p>':'')+'</div>'+icon('arrow',16)+'</button>';
     }).join('')+'</div>';
   }
+  // Use the original curated Oshi record and its own detail renderer. The v3
+  // implementation opened the first unrelated portrait and then tried to
+  // invoke a non-existent method on an HTMLElement. Avoid that entirely.
+  function closeOshiAdvanced(){
+    $('#oshiDrawerClose')?.click();
+    window.amoristOshiOpenHub?.();
+    state.oshi.detail='';
+    state.oshi.advanced=false;
+    document.body.classList.remove('amv-legacy-oshi');
+    renderOshi();
+  }
+  function showOriginalOshi(id, openEditor=false){
+    // The existing original hub has the authoritative per-character artwork,
+    // copy, collection layout, and its own linked editing drawer.
+    window.amoristOshiOpenHub?.();
+    const selected=$$('#oshiIndexList .oshi-index-link').find(button=>
+      String(button.dataset.oshiOrderId||'')===String(id));
+    if(!selected){
+      state.oshi.advanced=false;
+      state.oshi.detail=String(id);
+      document.body.classList.remove('amv-legacy-oshi');
+      renderOshi();
+      toast('该人物的原始展板未找到，已显示其档案。');
+      return false;
+    }
+    selected.click(); // opens exactly the matching original editorial profile
+    state.oshi.detail=String(id);
+    state.oshi.advanced=true;
+    document.body.classList.add('amv-legacy-oshi');
+    renderOshi();
+    if(openEditor && isEditing())
+      requestAnimationFrame(()=>$('#oshiEditDetailButton')?.click());
+    window.scrollTo({top:0,behavior:'auto'});
+    return true;
+  }
   function renderOshi(){
     const el=hosts.oshi;if(!el)return;
-    const stateO=fav(),all=chars(),gs=gameMap();
-    const chosen=all.filter(c=>c.roleType==='route'&&['favorite','oshi'].includes(c.preference));
-    const saved=new Map((Array.isArray(stateO.records)?stateO.records:[]).map(c=>[String(c.id),c]));
-    const rows=chosen.map(c=>{
-      const savedRecord=saved.get(String(c.id))||{};
-      const related=gs.get(String(c.gameId))||{};
-      return {...c,...savedRecord,displayName:savedRecord.displayName||c.nameCn||c.name,
-        image:savedRecord.profileImage||savedRecord.landingImage||savedRecord.image||c.image||related.cover||'',
-        fallbackImage:c.image||related.cover||'',charImage:c.image||'',
-        gameName:related.name||''};
-    });
-    const card=c=>'<button type="button" class="amv-oshi-card" data-amv="open-oshi" data-id="'+esc(c.id)+'">'+
-      '<div class="amv-oshi-picture">'+art(c.charImage||c.image,c.displayName,'',c.fallbackImage||c.image)+'</div>'+
-      '<div><strong>'+esc(c.displayName||'未知角色')+'</strong><small>'+esc(c.gameName)+'</small></div>'+icon('arrow',18)+'</button>';
     if(state.oshi.advanced){
-      el.innerHTML='<div class="amv-legacy-gateway"><button type="button" class="amv-inline-back" data-amv="oshi-back">'+icon('back',18)+'返回推角收藏</button>'+
-        '<p>这里保留原版的展板排版、人物主页和图集编辑功能。</p></div>';return;
+      el.innerHTML='<div class="amv-legacy-gateway">'+
+        '<button type="button" class="amv-inline-back" data-amv="oshi-back">'+icon('back',18)+'INDEX / 好きな人たち</button>'+
+        (isEditing()?'<span class="amv-legacy-edit-hint">EDITOR / Oshi archive</span>':'')+
+        '</div>';
+      return;
     }
+    const stored=fav(),allGames=games(),gs=gameMap();
+    const all=chars().map(row=>model.normalizeCharacterRecord?.(row,allGames)||row);
+    const chosen=all.filter(c=>!c.animeId && !Array.isArray(c.animeIds) &&
+      c.roleType==='route' && ['favorite','oshi'].includes(c.preference));
+    const saved=new Map((Array.isArray(stored.records)?stored.records:[])
+      .filter(Boolean).map(c=>[String(c.id),c]));
+    const order=Array.isArray(stored.order)?stored.order.map(String):[];
+    const rows=chosen.map(c=>{
+      const record=saved.get(String(c.id))||{};
+      const work=gs.get(String(c.gameId))||{};
+      return {...c,...record,displayName:record.name||c.nameCn||c.name||'',
+        image:record.profileImage||record.image||record.landingImage||c.image||work.cover||'',
+        fallbackImage:c.image||work.cover||'',charImage:c.image||'',
+        gameName:record.game||work.name||''};
+    }).sort((a,b)=>{
+      const ia=order.indexOf(String(a.id)),ib=order.indexOf(String(b.id));
+      return (ia<0?9999:ia)-(ib<0?9999:ib);
+    });
     if(state.oshi.detail){
       const c=rows.find(r=>String(r.id)===String(state.oshi.detail));
       if(c){
-        el.innerHTML='<div class="amv-native-detail"><button type="button" class="amv-inline-back" data-amv="oshi-back">'+icon('back',18)+'返回推角展示</button>'+
+        el.innerHTML='<div class="amv-native-detail">'+
+          '<button type="button" class="amv-inline-back" data-amv="oshi-back">'+icon('back',18)+'好きな人たち</button>'+
           '<div class="amv-character-hero">'+art(c.image,c.displayName,'',c.fallbackImage)+'</div>'+
-          '<span class="amv-eyebrow amv-detail-eyebrow">BELOVED CHARACTER</span><h1 class="amv-char-title">'+esc(c.displayName)+'</h1>'+
+          '<span class="amv-eyebrow amv-detail-eyebrow">PORTRAITS OF AFFECTION</span>'+
+          '<h1 class="amv-char-title">'+esc(c.displayName)+'</h1>'+
           '<p class="amv-char-subtitle">'+esc(c.gameName)+'</p>'+
-          '<div class="amv-detail-actions">'+actionButton('oshi-original-detail','人物主页与图集','heart','primary')+
-          actionButton('oshi-edit','编辑展板','edit','soft')+'</div>'+
-          (c.review||c.short?'<section class="amv-detail-section"><h2>心动理由</h2><p class="amv-prose">'+esc(c.review||c.short)+'</p></section>':'')+
-          '</div>';hydrateImages(el);return;
+          (c.review?'<section class="amv-detail-section"><span class="amv-eyebrow">WHY HIM</span>'+
+            '<p class="amv-prose">'+esc(c.review)+'</p></section>':'')+
+          '<div class="amv-detail-actions">'+actionButton('oshi-original-detail','ARTWORKS','heart','primary')+
+          adminButton('oshi-edit','EDIT','edit','soft')+'</div></div>';
+        hydrateImages(el);return;
       }
       state.oshi.detail='';
     }
-    el.innerHTML=heading('MY BELOVED','推角展示','收藏那些让人反复心动的名字。',actionButton('oshi-manage','管理展板','edit','soft'))+
-      '<div class="amv-oshi-feature"><span>PORTRAITS OF AFFECTION</span><h2>好きな人たち</h2>'+
-      '<p>写下喜欢的理由，保存每一张珍贵的画面。</p>'+
-      '<div class="amv-oshi-stats"><b>'+rows.length+'</b><span>位特别的人</span></div></div>'+
-      (rows.length?'<div class="amv-oshi-list">'+rows.map(card).join('')+'</div>':
-      empty('还没有推角资料','先在角色图鉴中将攻略对象标记为「最推」或「推」。'))+
-      '<button type="button" class="amv-export-row" data-amv="oshi-manage"><span>'+icon('layers',18)+
-      '<b>高级展板排版与图片编辑</b></span>'+icon('arrow',18)+'</button>';
+    const cards=rows.map(c=>'<button type="button" class="amv-oshi-card" data-amv="open-oshi" data-id="'+esc(c.id)+'">'+
+      '<div class="amv-oshi-picture">'+art(c.charImage||c.image,c.displayName,'',c.fallbackImage||c.image)+'</div>'+
+      '<div><strong>'+esc(c.displayName)+'</strong><small>'+esc(c.gameName)+'</small></div>'+
+      icon('arrow',18)+'</button>').join('');
+    const allEdit=adminButton('oshi-manage','EDIT','edit','soft');
+    el.innerHTML=heading('PORTRAITS OF AFFECTION','好きな人たち',quoteByView.oshi,allEdit)+
+      '<div class="amv-oshi-feature"><span>MY OSHIS</span><h2>好きな人たち</h2>'+
+      '<div class="amv-oshi-stats"><b>'+rows.length+'</b><span>PORTRAITS</span></div></div>'+
+      (rows.length?'<div class="amv-oshi-list">'+cards+'</div>':empty('まだ誰もいません',''))+
+      (isEditing()?'<button type="button" class="amv-export-row" data-amv="oshi-manage">'+
+      '<span>'+icon('layers',18)+'<b>EDITORIAL LAYOUT</b></span>'+icon('arrow',18)+'</button>':'');
     hydrateImages(el);
   }
   async function hydrateImages(root){
@@ -575,20 +623,17 @@
         renderTimeline();window.scrollTo({top:0,behavior:'auto'});break;
       case 'timeline-back':
         state.calendarAdvanced=false;document.body.classList.remove('amv-legacy-timeline');renderTimeline();break;
-      case 'open-oshi':state.oshi.detail=id;renderOshi();window.scrollTo({top:0,behavior:'auto'});break;
-      case 'oshi-back':state.oshi.detail='';state.oshi.advanced=false;document.body.classList.remove('amv-legacy-oshi');renderOshi();break;
-      case 'oshi-manage':
+      case 'open-oshi':showOriginalOshi(id);break;
+      case 'oshi-back':closeOshiAdvanced();break;
+      case 'oshi-manage':{
+        if(!isEditing())return;
+        window.amoristOshiOpenHub?.();
         state.oshi.advanced=true;document.body.classList.add('amv-legacy-oshi');
-        window.amoristOshiOpenHub?.();window.renderOshiHub?.();renderOshi();break;
-      case 'oshi-original-detail':case 'oshi-edit':{
-        const intent=target.dataset.amv;
-        state.oshi.advanced=true;document.body.classList.add('amv-legacy-oshi');
-        window.renderOshiHub?.();
-        const selected=$('#oshiIndexList .oshi-index-link').find(btn=>String(btn.dataset.oshiOrderId||'')===String(state.oshi.detail));
-        if(selected)selected.click();else $('#oshiIndexList .oshi-index-link')?.click();
-        if(intent==='oshi-edit')requestAnimationFrame(()=>$('#oshiEditDetailButton')?.click());
-        renderOshi();break;
+        renderOshi();
+        $('#oshiEditButton')?.click();break;
       }
+      case 'oshi-original-detail':showOriginalOshi(state.oshi.detail);break;
+      case 'oshi-edit':if(isEditing())showOriginalOshi(state.oshi.detail,true);break;
     }
   }
   document.addEventListener('click',e=>{
@@ -666,6 +711,7 @@
   state.route=$('.product-view.active')?.dataset.productView||'home';
   document.body.classList.add('amv-ready');
   VIEWS.forEach(render);
+  window.AmoristMobileOshi={closeAdvanced:closeOshiAdvanced,openDetail:showOriginalOshi};
   window.AmoristNativeMobile={state,render,syncRoute};
   console.info('[Amorist] native mobile presentation v3 mounted without altering export canvas');
 })();
