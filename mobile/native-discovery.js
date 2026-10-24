@@ -22,7 +22,7 @@
   const title=g=>g.nameCn||g.name||'未命名作品';
   const year=g=>Number(g.year)||Number(String(g.date||'').slice(0,4))||0;
   const rows=()=>{
-    let found=list().filter(g=>state.era==='all'||String(Math.floor(year(g)/10)*10)===state.era);
+    let found=list().filter(g=>state.era==='all'||(state.era==='pre1990'?year(g)>0&&year(g)<1990:String(Math.floor(year(g)/10)*10)===state.era));
     const q=state.query.toLowerCase().trim();
     if(q)found=found.filter(g=>(title(g)+' '+(g.name||'')+' '+(g.developer||'')+' '+(g.maker||'')).toLowerCase().includes(q));
     return found.sort((a,b)=>state.sort==='old'?year(a)-year(b):year(b)-year(a));
@@ -41,7 +41,7 @@
       return;
     }
     const all=list(),result=rows(),visible=result.slice(0,state.page*36);
-    const chips=[['all','全部'],['2020','2020年代'],['2010','2010年代'],['2000','2000年代'],['1990','更早']];
+    const chips=[['all','全部'],['2020','2020年代'],['2010','2010年代'],['2000','2000年代'],['1990','1990年代'],['pre1990','更早']];
     host.innerHTML='<div class="amx-heading"><span>OTOME INDEX</span><div><h1>作品索引</h1>'+
       '<button type="button" data-amx="random" aria-label="随机发现作品">'+icons.random+'随机邂逅</button></div>'+
       '<p>从作品到制作阵容，寻找下一次值得期待的相遇。</p></div>'+
