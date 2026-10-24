@@ -418,7 +418,7 @@
     const rows=chosen.map(c=>{
       const record=saved.get(String(c.id))||{};
       const work=gs.get(String(c.gameId))||{};
-      return {...c,...record,displayName:record.name||c.nameCn||c.name||'',
+      return {...c,...record,displayName:record.displayName||record.name||c.nameCn||c.name||'',
         image:record.profileImage||record.image||record.landingImage||c.image||work.cover||'',
         fallbackImage:c.image||work.cover||'',charImage:c.image||'',
         gameName:record.game||work.name||''};
