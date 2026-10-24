@@ -30,10 +30,11 @@
     if(!editing){
       // Close private owner controls, not the user's actual published records.
       $('#amPublishDialog')?.close?.();
-      $('#oshiDrawerClose')?.click?.();
+      if($('#oshiEditorDrawer')?.classList.contains('open'))$('#oshiDrawerClose')?.click();
     }
     window.AmoristNativeMobile?.render?.(window.AmoristNativeMobile.state.route);
     window.AmoristNativeDiscovery?.render?.();
+    window.AmoristNativeForms?.render?.();
     window.dispatchEvent(new CustomEvent('amorist-mobile-mode-change',{detail:{editing}}));
   };
   const setEditing=next=>{
