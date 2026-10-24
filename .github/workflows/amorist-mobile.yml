@@ -28,6 +28,7 @@ jobs:
           node --check mobile/native-discovery.js
           node --check mobile/native-shrine.js
           node --check mobile/native-forms.js
+          node --check mobile/mode.js
           node --check mobile/publish.js
           node --check mobile/sw.js
           node --check mobile/qa.mjs
