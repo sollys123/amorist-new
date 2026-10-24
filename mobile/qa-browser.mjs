@@ -89,6 +89,17 @@ try {
     .some(g=>g.name==='QA 原生移动端新增作品')),'new game did not save');
   await page.evaluate(()=>window.amoristProductNavigate('characters'));
   await assertVisible('#amv-characters .amv-library-controls');
+  await page.evaluate(()=>window.amoristProductNavigate('omikuji'));
+  await assertVisible('#amz-screen .amz-choices');
+  assert.equal(await page.locator('#amz-screen .amz-choice').count(),6,'all six shrine rituals must be present');
+  const mapHidden=await page.evaluate(()=>getComputedStyle(document.querySelector('#omikujiSanctuary')).display);
+  assert.equal(mapHidden,'none','old desktop shrine map should not be visible');
+  await page.locator('#amz-screen [data-amz="water"]').click();
+  await assertVisible('#omikujiRitual');
+  await page.locator('#omikujiMapBack').click();
+  await assertVisible('#amz-screen .amz-choices');
+  await page.screenshot({path:path.join(screens,browserName+'-v3-shrine-native.png'),fullPage:false});
+  await page.evaluate(()=>window.amoristProductNavigate('characters'));
   await page.evaluate(()=>window.amoristProductNavigate('bangumi'));
   await assertVisible('#amx-screen .amx-search');
   await page.evaluate(()=>window.amoristProductNavigate('characters'));
