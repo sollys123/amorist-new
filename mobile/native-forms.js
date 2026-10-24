@@ -6,6 +6,7 @@
   const source=root?.querySelector('#formTemplates');
   const workspace=root?.querySelector('#formWorkspace');
   if(!root||!source||!workspace)return;
+  let editing=false;
   const app=document.createElement('div');app.className='amf-screen';app.id='amf-screen';
   root.insertBefore(app,root.firstChild);
   const esc=x=>String(x??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -18,7 +19,7 @@
     code:(el.dataset.formTemplate||'NOTE').toUpperCase()
   }));
   function render(){
-    const active=workspace.classList.contains('active');
+    const active=editing&&workspace.classList.contains('active');
     root.classList.toggle('amf-active',active);
     if(active){
       app.innerHTML='<div class="amf-edit-bar"><button type="button" data-amf="back" class="amf-back">'+
@@ -28,6 +29,7 @@
     }else{
       app.innerHTML='<div class="amf-heading"><span>VISUAL CREATION</span><h1>图文创作</h1><p>选择一张模板，从记录中整理出自己的乙游故事。</p></div>'+
         '<div class="amf-category-head"><h2>选择你的模板</h2><span>'+items.length+' 种创作方式</span></div>'+
+        (workspace.classList.contains('active')?'<button type="button" class="amf-resume" data-amf="resume"><span>继续上次编辑的图文作品</span>'+svg+'</button>':'')+
         '<div class="amf-template-grid">'+items.map(it=>
           '<button type="button" class="amf-template" data-amf="open" data-key="'+esc(it.key)+'">'+
           '<div class="amf-template-art" data-kind="'+esc(it.key)+'"><div class="amf-template-art-grid">'+
@@ -41,14 +43,17 @@
   }
   app.addEventListener('click',e=>{
     const b=e.target.closest('[data-amf]');if(!b)return;
-    if(b.dataset.amf==='back'){root.querySelector('#backToTemplates')?.click();return}
+    if(b.dataset.amf==='back'){editing=false;root.querySelector('#backToTemplates')?.click();render();return}
+    if(b.dataset.amf==='resume'){editing=true;render();return}
     if(b.dataset.amf==='open'){
       const sourceButton=source.querySelector('[data-form-template="'+b.dataset.key+'"]');
+      editing=true;
       sourceButton?.click();
       render();
       window.scrollTo({top:0,behavior:'auto'});
     }
   });
+  source.addEventListener('click',event=>{if(event.target.closest('[data-form-template]'))editing=true;},true);
   new MutationObserver(render).observe(workspace,{attributes:true,attributeFilter:['class']});
   render();
   window.AmoristNativeForms={render,count:items.length};
