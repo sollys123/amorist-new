@@ -75,6 +75,9 @@ self.addEventListener('fetch',event=>{
   const url=new URL(request.url);
   if(!sameOrigin(url))return;
   if(isPublication(url)){event.respondWith(tryNetworkFirst(request));return}
+  // Prefer freshly deployed application code while preserving offline fallback.
+  // A stale iOS service worker must not mix an older JS bundle with new HTML.
+  if(/\.(?:js|css)$/i.test(url.pathname)){event.respondWith(tryNetworkFirst(request));return}
   if(request.mode==='navigate'){
     event.respondWith((async()=>{
       try {
