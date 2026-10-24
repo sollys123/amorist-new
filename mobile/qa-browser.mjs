@@ -70,6 +70,9 @@ try {
     .some(g=>g.name==='QA 原生移动端新增作品')),'new game did not save');
   await page.evaluate(()=>window.amoristProductNavigate('characters'));
   await assertVisible('#amv-characters .amv-library-controls');
+  await page.evaluate(()=>window.amoristProductNavigate('bangumi'));
+  await assertVisible('#amx-screen .amx-search');
+  await page.evaluate(()=>window.amoristProductNavigate('characters'));
   await page.evaluate(()=>window.amoristProductNavigate('timeline'));
   await assertVisible('#amv-timeline .amv-calendar-panel');
   await page.locator('#amv-timeline [data-amv="timeline-mode"][data-value="feed"]').click();
