@@ -124,6 +124,7 @@
       await loadScript('./mobile/native-core.js?v=20261024-v3');
       await loadScript('./mobile/native-discovery.js?v=20261024-v3');
       await loadScript('./mobile/native-shrine.js?v=20261024-v3');
+      await loadScript('./mobile/native-forms.js?v=20261024-v3');
       // Do not let failed metadata lookup block the app.
       checkRemoteSha();
       window.dispatchEvent(new CustomEvent('amorist-mobile-ready'));
