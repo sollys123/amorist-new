@@ -378,13 +378,15 @@
   function syncRoute(){
     const next=$('.product-view.active')?.dataset.productView||'home';
     if(next!==state.route){
+      const previous=state.route;
       state.route=next;
-      state.lib.detail='';
-      state.chars.detail='';
-      state.oshi.detail='';
-      state.oshi.advanced=false;
-      state.calendarAdvanced=false;
-      state.homePreview=false;
+      // Clear detail state when LEAVING its section, not when ENTERING it.
+      // A home shortcut can navigate and open a specific game in one action.
+      if(previous==='library')state.lib.detail='';
+      if(previous==='characters')state.chars.detail='';
+      if(previous==='oshi'){state.oshi.detail='';state.oshi.advanced=false;}
+      if(previous==='timeline')state.calendarAdvanced=false;
+      if(previous==='home')state.homePreview=false;
       document.body.classList.remove('amv-legacy-game-detail','amv-legacy-timeline','amv-profile-preview','amv-legacy-oshi');
     }
     render(next);
@@ -523,6 +525,17 @@
         renderOshi();break;
     }
   }
+  document.addEventListener('click',e=>{
+    const tab=e.target.closest('.am-bottom-tabs [data-product-target]');
+    if(!tab||tab.dataset.productTarget!==state.route)return;
+    if(state.route==='library'&&state.lib.detail){
+      state.lib.detail='';document.body.classList.remove('amv-legacy-game-detail');
+      renderLibrary();window.scrollTo({top:0,behavior:'auto'});
+    }
+    if(state.route==='characters'&&state.chars.detail){
+      state.chars.detail='';renderCharacters();window.scrollTo({top:0,behavior:'auto'});
+    }
+  },true);
   document.addEventListener('click',e=>{
     const back=e.target.closest('#amBackBtn,.game-detail-back');
     if(!back)return;
