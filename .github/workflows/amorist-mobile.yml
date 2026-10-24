@@ -24,6 +24,7 @@ jobs:
         run: |
           node --check mobile/bootstrap.js
           node --check mobile/app.js
+          node --check mobile/native-core.js
           node --check mobile/publish.js
           node --check mobile/sw.js
           node --check mobile/qa.mjs
