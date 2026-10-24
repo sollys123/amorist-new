@@ -45,6 +45,19 @@ try {
     await page.waitForTimeout(180);
     const active=await page.locator('.product-view.active').getAttribute('data-product-view');
     assert.equal(active,v,'native router mismatch: '+v);
+    if(['characters','timeline','oshi','bangumi','forms','omikuji'].includes(v)){
+      await page.screenshot({path:path.join(screens,browserName+'-v3-'+v+'.png'),fullPage:false});
+    }
+    if(['home','library','characters','timeline','oshi'].includes(v)){
+      const native=await page.locator('#amv-'+v).isVisible();
+      assert(native,'native screen not visible: '+v);
+      const legacy=await page.evaluate(name=>{
+        const root=document.querySelector('.product-view[data-product-view="'+name+'"]');
+        const old=Array.from(root.children).find(c=>!c.classList.contains('amv-screen'));
+        return old?getComputedStyle(old).display:'missing';
+      },v);
+      assert.equal(legacy,'none','desktop page is still visible: '+v);
+    }
     const dimensions=await page.evaluate(()=>({
       screen:innerWidth,documentWidth:document.documentElement.scrollWidth
     }));
@@ -62,6 +75,12 @@ try {
   assert.equal(await page.locator('#amv-library .amv-game-grid .amv-game-card').count(),
     await page.evaluate(()=>JSON.parse(localStorage.getItem('amorist-game-library-v1')||'[]').length));
   await page.screenshot({path:path.join(screens,browserName+'-01b-library-native.png'),fullPage:false});
+  const firstNativeCard=page.locator('#amv-library .amv-game-grid .amv-game-card').first();
+  await firstNativeCard.click();
+  await assertVisible('#amv-library .amv-native-detail');
+  await page.locator('#amv-library [data-amv="back-games"]').click();
+  await assertVisible('#amv-library .amv-game-grid');
+
   await page.locator('#amv-library [data-amv="new-game"]').click();
   await assertVisible('#gameDialogOverlay');
   await page.locator('#libraryGameName').fill('QA 原生移动端新增作品');
