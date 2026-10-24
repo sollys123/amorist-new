@@ -368,7 +368,7 @@
     hydrateImages(el);
   }
   async function hydrateImages(root){
-    const imgs=$('[data-amv-image]',root);
+    const imgs=Array.from(root.querySelectorAll('[data-amv-image]'));
     const resolve=async key=>{
       if(window.amoristImageStore?.isRef?.(key))return window.amoristImageStore.get(key).catch(()=>'');
       return key;
