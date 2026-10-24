@@ -49,28 +49,37 @@
 
   function hydratePublished(data) {
     const stored = data.localStorage || {};
-    const existing = MOBILE_KEYS.some(key => localStorage.getItem(key) !== null);
-    if (!app.initialized && !existing) {
-      let imported = 0;
+    if (!app.initialized) {
+      // Import only keys that are absent. Visitor-owned tool drafts must not
+      // block all personal profile / library records from being imported.
+      let imported = 0, preserved = 0;
+      const failed = [];
       for (const [key, raw] of Object.entries(stored)) {
         if (!isPublishableKey(key) || key.startsWith('am-mobile-')) continue;
+        if (localStorage.getItem(key) !== null) { preserved++; continue; }
         try {
           const value = typeof raw === 'string' ? raw : JSON.stringify(raw);
           localStorage.setItem(key, window.AmoristDataModel?.normalizeStorageEntry?.(key,value) ?? value);
           imported++;
-        } catch (error) { console.warn('Import skipped for', key, error); }
+        } catch (error) {
+          failed.push(key);
+          console.warn('Published data import failed for', key, error);
+        }
       }
       app.importedCount = imported;
-    } else if (!app.initialized) {
-      // A phone may already contain an editor draft: never overwrite it.
-      app.importedCount = 0;
-      app.existingDraftPreserved = true;
-    }
-    if (!app.initialized) {
-      try {
-        localStorage.setItem(INIT_KEY, new Date().toISOString());
-        localStorage.setItem(VERSION_KEY, String(data.exportedAt || ''));
-      } catch (error) { console.warn('Unable to write bootstrap metadata', error); }
+      app.existingDraftPreserved = preserved > 0;
+      if (failed.length) {
+        app.bootstrapError = '部分档案无法存储（' + failed.length + ' 项）';
+        toast('部分档案未成功存入本机，请先清理浏览器存储空间并备份现有草稿');
+      } else {
+        try {
+          localStorage.setItem(INIT_KEY, new Date().toISOString());
+          localStorage.setItem(VERSION_KEY, String(data.exportedAt || ''));
+        } catch (error) {
+          app.bootstrapError = '无法保存初始化标记';
+          console.warn('Unable to write bootstrap metadata', error);
+        }
+      }
     }
     app.initialized = true;
     app.lastPublished = data;
