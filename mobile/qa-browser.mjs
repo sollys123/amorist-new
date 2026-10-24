@@ -118,10 +118,13 @@ try {
   console.log('Native forms state',formsState);
   assert(await page.locator('#amf-screen .amf-template-grid').isVisible(),
     'native forms template gallery missing '+JSON.stringify(formsState));
-  assert.equal(await page.locator('#amf-screen [data-amf="open"]').count(),8,'eight original art templates required');
+  assert.equal(await page.locator('#amf-screen [data-amf="open"]').count(),5,'five core workshop templates required; saved and custom templates remain separate');
   await page.locator('#amf-screen [data-amf="open"]').first().click();
-  await assertVisible('#formWorkspace');
+  await assertVisible('#workshopSheet');
+  await assertVisible('#amf-screen .amf-editor-tabs');
   await assertVisible('#amf-screen .amf-edit-bar');
+  await page.locator('#amf-screen [data-amf="tool"][data-value="size"]').click();
+  await assertVisible('#workshopRows');
   await page.locator('#amf-screen [data-amf="back"]').click();
   await assertVisible('#amf-screen .amf-template-grid');
   await page.screenshot({path:path.join(screens,browserName+'-v3-forms-native.png'),fullPage:false});
