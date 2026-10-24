@@ -56,7 +56,7 @@ try {
   await page.locator('#amv-home [data-amv="close-about"]').click();
   await assertVisible('#amv-home .amv-home-hero');
   await assertVisible('#amv-home .amv-home-hero');
-  assert.equal(await page.locator('#amv-home .amv-quick-grid button').count(),3);
+  assert.equal(await page.locator('#amv-home .amv-quick-grid button').count(),0,'viewer must not show edit shortcuts');
   await page.screenshot({path:path.join(screens,browserName+'-01-home.png'),fullPage:false});
 
   const views=['library','characters','timeline','oshi','bangumi','omikuji','forms','studio','home'];
@@ -107,6 +107,7 @@ try {
   assert.equal(await page.evaluate(()=>window.AmoristMobileMode.isEditing()),true,
     'owner mode did not activate');
   await assertVisible('#amOpenPublish');
+  assert.equal(await page.locator('#amv-home .amv-quick-grid button').count(),0,'not on home');
   await page.locator('#amv-library [data-amv="new-game"]').click();
   await assertVisible('#gameDialogOverlay');
   await page.locator('#libraryGameName').fill('QA 原生移动端新增作品');
