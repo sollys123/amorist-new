@@ -1,0 +1,183 @@
+/* Amorist native discovery — the same app color, spacing, radius and type scale. */
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="bangumi"]{
+  padding:0!important;background:var(--amv-bg)!important;
+}
+body.amorist-mobile-app.amv-ready .product-view[data-product-view="bangumi"]>:not(.amx-screen){
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"]>:not(.amx-screen){
+  display:revert!important;
+}
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"]>:where([hidden],.bangumi-db-manager[hidden]){
+  display:none!important;
+}
+body.amorist-mobile-app.amv-ready .amx-screen{
+  padding:23px 19px 38px;margin:0 auto;max-width:600px;
+  font:400 13px/1.5 var(--amv-sans);
+  color:var(--amv-ink);overflow:hidden;
+}
+.amx-screen *{box-sizing:border-box}
+.amx-screen button,.amx-screen input,.amx-screen select{
+  font-family:var(--amv-sans);-webkit-tap-highlight-color:transparent;
+}
+.amx-heading{margin-bottom:21px}
+.amx-heading>span{
+  font:700 10px/1.4 Georgia,serif;
+  letter-spacing:.16em;color:var(--amv-rose);
+}
+.amx-heading>div{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  margin:5px 0;
+}
+.amx-heading h1{
+  font:600 30px/1.3 var(--amv-serif);margin:0;color:var(--amv-ink);
+}
+.amx-heading>div button{
+  display:inline-flex;align-items:center;gap:6px;
+  min-height:39px;flex:none;
+  border:1px solid var(--amv-line);border-radius:12px;
+  color:var(--amv-accent);background:var(--amv-mist);padding:8px 11px;
+  font:600 12px/1.25 var(--amv-sans);
+}
+.amx-heading p{font-size:12px;line-height:1.7;color:var(--amv-muted);margin:7px 0 0}
+.amx-search{
+  display:flex;align-items:center;gap:11px;
+  min-height:47px;width:100%;padding:0 12px;
+  border:1px solid var(--amv-line);border-radius:14px;
+  background:var(--amv-paper);color:var(--amv-muted);
+}
+.amx-search input{
+  flex:1;min-width:0;width:100%;height:44px;
+  border:0!important;outline:0!important;box-shadow:none!important;
+  background:transparent!important;font:400 16px/1.4 var(--amv-sans)!important;
+  color:var(--amv-ink);
+}
+.amx-search input::placeholder{color:var(--amv-faint)}
+.amx-chips{
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;padding:14px 0 8px;
+}
+.amx-chips::-webkit-scrollbar{display:none}
+.amx-chips button{
+  flex:none;min-height:37px;padding:8px 13px;
+  border:1px solid var(--amv-line);border-radius:999px;
+  color:var(--amv-muted);background:var(--amv-paper);
+  font:500 12px/1.2 var(--amv-sans);white-space:nowrap;
+}
+.amx-chips button.active{
+  color:var(--amv-accent);background:var(--amv-blush);
+  border-color:#DDC6D4;font-weight:600;
+}
+.amx-options{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin:3px 0 16px;
+}
+.amx-options>span{font-size:11px;color:var(--amv-muted)}
+.amx-options select{
+  min-height:35px;max-width:110px;padding:6px 9px;
+  background:var(--amv-paper);color:var(--amv-accent);
+  border:1px solid var(--amv-line);border-radius:10px;
+  font:500 12px/1.2 var(--amv-sans);
+}
+.amx-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px 12px;align-items:start;
+}
+.amx-card{
+  min-width:0;width:100%;padding:0;
+  text-align:left;background:transparent;border:0;
+  color:var(--amv-ink);
+}
+.amx-cover{
+  display:grid;place-items:center;width:100%;aspect-ratio:3/4;
+  background:var(--amv-mist);border:1px solid var(--amv-line);
+  overflow:hidden;border-radius:14px;
+}
+.amx-cover img{width:100%;height:100%;object-fit:cover}
+.amx-placeholder{font:400 33px/1 Georgia,serif;color:#B7A1B3}
+.amx-card b{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;margin:9px 2px 0;
+  font:600 13px/1.5 var(--amv-sans);color:var(--amv-ink);
+}
+.amx-card small{
+  display:block;margin:5px 2px 0;
+  color:var(--amv-muted);font:400 11px/1.4 var(--amv-sans);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.amx-card>span{
+  display:block;margin:6px 2px 0;
+  color:var(--amv-rose);font:500 10px/1.4 Georgia,serif;
+}
+.amx-load{
+  display:block;width:100%;min-height:45px;
+  margin:19px 0 10px;padding:10px;
+  border:1px solid var(--amv-line);border-radius:13px;
+  background:var(--amv-paper);color:var(--amv-accent);
+  font:600 12px/1.3 var(--amv-sans);
+}
+.amx-advanced-link{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:9px;min-height:57px;width:100%;
+  margin:21px 0 0;padding:13px 15px;
+  border:1px solid var(--amv-line);border-radius:15px;
+  background:var(--amv-paper);color:var(--amv-accent);
+}
+.amx-advanced-link>span{display:flex;align-items:center;gap:10px}
+.amx-advanced-link b{font:600 12px/1.3 var(--amv-sans);color:var(--amv-ink)}
+.amx-empty{
+  display:grid;place-items:center;min-height:140px;
+  border:1px dashed var(--amv-line);border-radius:16px;
+  background:var(--amv-paper);padding:20px;text-align:center;
+  color:var(--amv-muted);font:400 12px/1.7 var(--amv-sans);
+}
+.amx-toolbar{
+  display:flex;flex-direction:column;gap:6px;
+  padding:13px 15px;border:1px solid var(--amv-line);
+  border-radius:14px;background:var(--amv-mist);
+}
+.amx-toolbar button{
+  display:flex;align-items:center;gap:8px;
+  color:var(--amv-accent);font:600 13px/1.3 var(--amv-sans);
+  background:transparent;border:0;padding:4px 0;
+}
+.amx-toolbar span{font-size:11px;color:var(--amv-muted)}
+/* Advanced browser retains every existing search, maker, CV, writer and edit capability.
+   Full-width desktop grids become comfortable, tappable native-style rows. */
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"]>.resource-page-head,
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"]>.bangumi-db-layout,
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"]>.resource-filter-panel{
+  margin:12px 17px!important;max-width:calc(100% - 34px)!important;
+}
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"] .bangumi-timeline-year{
+  min-width:0!important;max-width:100%!important;padding-left:0!important;
+}
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"] .bangumi-timeline-items{
+  display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+  min-width:0!important;gap:9px!important;
+}
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"] .bangumi-db-card{
+  display:grid!important;grid-template-columns:76px minmax(0,1fr)!important;
+  gap:13px!important;align-items:center!important;
+  border:1px solid var(--amv-line)!important;
+  background:var(--amv-paper)!important;border-radius:15px!important;
+  padding:10px!important;min-width:0!important;
+}
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"] .bangumi-db-cover{
+  width:76px!important;min-height:0!important;aspect-ratio:3/4!important;
+  border-radius:9px!important;overflow:hidden!important;
+}
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"] .bangumi-db-card h3{
+  font:600 14px/1.45 var(--amv-sans)!important;color:var(--amv-ink)!important;
+}
+body.amorist-mobile-app.amv-ready.amx-advanced .product-view[data-product-view="bangumi"] :where(.bgm-meta,.bgm-jp){
+  font:400 11px/1.5 var(--amv-sans)!important;color:var(--amv-muted)!important;
+}
+@media(max-width:365px){
+  body.amorist-mobile-app.amv-ready .amx-screen{padding-inline:14px}
+  .amx-grid{gap:17px 10px}
+  .amx-heading h1{font-size:27px}
+}
+@media(min-width:620px){
+  .amx-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
